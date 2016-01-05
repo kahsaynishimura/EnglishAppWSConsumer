@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">Alice\'s Adventures in Wonderland</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+
+    <string name="no_connection_title">Not connected</string>
+    <string name="no_connection">No network connection was found.</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
+
+
+    <string name="teens2">Teens 2</string>
+    <string name="w2">W 2</string>
+    <string-array name="books">
+        <item>@string/teens2</item>
+        <item>@string/w2</item>
+    </string-array>
+    <string name="title_activity_lesson">Choose your lesson</string>
+    <string name="title_activity_practice">Practice</string>
+    <string name="title_activity_transition">One more exercise</string>
+    <string name="title_activity_lesson_completed">Congrats!</string>
+    <string name="go_to_next_lesson">Go to next lesson</string>
+    <string name="correct_sentences_in_this_lesson">correct sentences in this lesson.</string>
+    <string name="exit">Exit</string>
+    <string name="you_graduated_from">You graduated from</string>
+    <string name="placeholder">placeholder</string>
+    <string name="try_again">Try again</string>
+    <string name="start_time">Start</string>
+    <string name="finish_time">Finish</string>
+    <string name="correct"># correct sentences</string>
+    <string name="errors_percentage">Errors</string>
+    <string name="title_activity_select_user">Alice\'s Adventures in Wonderland</string>
+    <string name="log_in">Log in</string>
+    <string name="quit_confirm">Confirmation</string>
+    <string name="quit_text">Are you sure you want to go back and lose all the progress you have made?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+</resources>
