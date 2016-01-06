@@ -7,7 +7,7 @@ public class User {
     private Integer _id;
     private String name;
     private String code;
-    private Integer lastCompletedLessonId;
+    private Integer lastCompletedLessonId;//change to exercise_id
 
 
     public User(){
