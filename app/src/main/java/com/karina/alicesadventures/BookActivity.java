@@ -2,6 +2,7 @@ package com.karina.alicesadventures;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
@@ -11,8 +12,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.karina.alicesadventures.Util.HTTPConnection;
 
 public class BookActivity extends ActionBarActivity {
+
+    private ListBooksTask mListBooksTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +29,8 @@ public class BookActivity extends ActionBarActivity {
     }
 
     private void loadComponents() {
-
-
+        mListBooksTask = new ListBooksTask();
+        mListBooksTask.execute("http://www.karinanishimura.com.br/cakephp/books/index_api.xml");
         String[] books = getResources().getStringArray(R.array.books);
         ArrayAdapter<String> a =
                 new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, books);
@@ -44,6 +50,26 @@ public class BookActivity extends ActionBarActivity {
                 startActivity(i);
             }
         });
+    }
+
+    private class ListBooksTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            HTTPConnection httpConnection = new HTTPConnection();
+            String result = "";
+            try {
+                result = httpConnection.sendGet(params[0]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return result;
+        }//params progress result
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Toast.makeText(BookActivity.this, s, Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

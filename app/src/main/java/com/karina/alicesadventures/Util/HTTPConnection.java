@@ -14,7 +14,7 @@ import javax.net.ssl.HttpsURLConnection;
  * Created by karina on 2016-01-06.
  */
 public class HTTPConnection {
-    private final String USER_AGENT = "Mozilla/5.0";
+   // private final String USER_AGENT = "Mozilla/5.0";
 
     /*public static void main(String[] args) throws Exception {
 
@@ -35,16 +35,15 @@ public class HTTPConnection {
 
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
         // optional default is GET
         con.setRequestMethod("GET");
 
         //add request header
-        con.setRequestProperty("User-Agent", USER_AGENT);
+     //   con.setRequestProperty("User-Agent", USER_AGENT);
+        con.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
+        con.setRequestProperty("Accept", "text/xml; charset=utf-8");
 
         int responseCode = con.getResponseCode();
-        //System.out.println("\nSending 'GET' request to URL : " + url);
-        //System.out.println("Response Code : " + responseCode);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
@@ -56,7 +55,6 @@ public class HTTPConnection {
         }
         in.close();
 
-        //print result
         return response.toString();
 
     }
@@ -71,7 +69,7 @@ public class HTTPConnection {
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         //add reuqest header
         con.setRequestMethod("POST");
-        con.setRequestProperty("User-Agent", USER_AGENT);
+     //   con.setRequestProperty("User-Agent", USER_AGENT);
         con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
         //   urlParameters.
