@@ -15,13 +15,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.karina.alicesadventures.Util.HTTPConnection;
+import com.karina.alicesadventures.model.Book;
+import com.karina.alicesadventures.parsers.BookXmlParser;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
-import java.io.IOException;
 import java.io.StringReader;
+import java.util.List;
 
 public class BookActivity extends ActionBarActivity {
 
@@ -58,57 +56,29 @@ public class BookActivity extends ActionBarActivity {
             }
         });
     }
-
-    private class ListBooksTask extends AsyncTask<String, Void, String> {
+    List<Book> books = null;
+    private class ListBooksTask extends AsyncTask<String, Void, List<Book>> {
         @Override
-        protected String doInBackground(String... params) {
+        protected List<Book> doInBackground(String... params) {
             HTTPConnection httpConnection = new HTTPConnection();
-            String result = "";
+            BookXmlParser bookXmlParser = new BookXmlParser();
+
             try {
-                result = httpConnection.sendGet(params[0]);
-                addBooksToList(result);
+                String result = httpConnection.sendGet(params[0]);
+                books = bookXmlParser.parse(new StringReader(result));
+                //  addBooksToList(result);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return result;
-        }//params progress result
-
-        private void addBooksToList(String xml) {
-            try {
-                XmlPullParserFactory factory = null;
-
-                factory = XmlPullParserFactory.newInstance();
-
-                factory.setNamespaceAware(true);
-                XmlPullParser xpp = factory.newPullParser();
-
-                xpp.setInput(new StringReader(xml));
-                int eventType = xpp.getEventType();
-                while (eventType != XmlPullParser.END_DOCUMENT) {
-                    if (eventType == XmlPullParser.START_DOCUMENT) {
-                        System.out.println("Start document");
-                    } else if (eventType == XmlPullParser.END_DOCUMENT) {
-                        System.out.println("End document");
-                    } else if (eventType == XmlPullParser.START_TAG) {
-                        System.out.println("Start tag " + xpp.getName());
-                    } else if (eventType == XmlPullParser.END_TAG) {
-                        System.out.println("End tag " + xpp.getName());
-                    } else if (eventType == XmlPullParser.TEXT) {
-                        System.out.println("Text " + xpp.getText());
-                    }
-                    eventType = xpp.next();
-                }
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            return books;
         }
 
+
+
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            Toast.makeText(BookActivity.this, s, Toast.LENGTH_LONG).show();
+        protected void onPostExecute(List<Book> books) {
+            super.onPostExecute(books);
+            Toast.makeText(BookActivity.this, "onpostexecute", Toast.LENGTH_LONG).show();
         }
     }
 
