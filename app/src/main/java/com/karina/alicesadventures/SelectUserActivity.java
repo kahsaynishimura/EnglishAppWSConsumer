@@ -48,7 +48,7 @@ public class SelectUserActivity extends ActionBarActivity {
 
                     //user = db.findUser(code);
                     //if (user != null) {
-                        Intent i = new Intent(SelectUserActivity.this, LessonActivity.class);
+                        Intent i = new Intent(SelectUserActivity.this, BookActivity.class);
 
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(SelectUserActivity.this);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
