@@ -20,15 +20,23 @@ import java.util.HashMap;
 
 public class SelectUserActivity extends ActionBarActivity {
     private LoginTask mLoginTask;
-    private SessionManager session;
+    private SessionManager sessionManager;
     private static int SPLASH_TIME_OUT = 2000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_user);
+        sessionManager = new SessionManager(SelectUserActivity.this);
+        if (sessionManager.isLoggedIn()) {
+            Intent i = new Intent(SelectUserActivity.this, BookActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
 
-        session = new SessionManager(getApplicationContext());
+        }else{
+            setContentView(R.layout.activity_select_user);
+        }
+
     }
 
 
@@ -126,9 +134,11 @@ public class SelectUserActivity extends ActionBarActivity {
 
             } else {
                 // save logged in user
-                session.createLoginSession(user);
+                sessionManager.createLoginSession(user);
 
                 Intent i = new Intent(SelectUserActivity.this, BookActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
                 finish();
             }
