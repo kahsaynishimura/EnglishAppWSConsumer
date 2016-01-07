@@ -25,6 +25,7 @@ public class BookActivity extends ActionBarActivity {
 
     private ListBooksTask mListBooksTask;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,30 +37,13 @@ public class BookActivity extends ActionBarActivity {
     private void loadComponents() {
         mListBooksTask = new ListBooksTask();
         mListBooksTask.execute("http://www.karinanishimura.com.br/cakephp/books/index_api.xml");
-        String[] books = getResources().getStringArray(R.array.books);
-        ArrayAdapter<String> a =
-                new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, books);
 
-        ListView myBooks = (ListView) findViewById(R.id.books);
-        myBooks.setAdapter(a);
-
-        myBooks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(BookActivity.this, LessonActivity.class);
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(BookActivity.this);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-
-                editor.putInt("book_id", ++position);//be careful with this fixed id for books. it presumes that in the database the book id is in orther
-                editor.commit();
-                startActivity(i);
-            }
-        });
     }
-    List<Book> books = null;
+
     private class ListBooksTask extends AsyncTask<String, Void, List<Book>> {
         @Override
         protected List<Book> doInBackground(String... params) {
+            List<Book> books = null;
             HTTPConnection httpConnection = new HTTPConnection();
             BookXmlParser bookXmlParser = new BookXmlParser();
 
@@ -74,11 +58,31 @@ public class BookActivity extends ActionBarActivity {
         }
 
 
-
         @Override
         protected void onPostExecute(List<Book> books) {
             super.onPostExecute(books);
-            Toast.makeText(BookActivity.this, "onpostexecute", Toast.LENGTH_LONG).show();
+            if (books == null) {
+                Toast.makeText(BookActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
+            } else {
+                ArrayAdapter<Book> a =
+                        new ArrayAdapter<Book>(BookActivity.this, android.R.layout.simple_list_item_1, books);
+
+                ListView myBooks = (ListView) findViewById(R.id.books);
+                myBooks.setAdapter(a);
+
+                myBooks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Intent i = new Intent(BookActivity.this, LessonActivity.class);
+                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(BookActivity.this);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                        editor.putInt("book_id", ++position);//be careful with this fixed id for books. it presumes that in the database the book id is in orther
+                        editor.commit();
+                        startActivity(i);
+                    }
+                });
+            }
         }
     }
 

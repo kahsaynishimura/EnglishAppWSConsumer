@@ -38,4 +38,5 @@
     <string name="quit_text">Are you sure you want to go back and lose all the progress you have made?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="verify_internet_connection">Please, check your connection.</string>
 </resources>
