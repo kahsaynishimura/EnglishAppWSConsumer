@@ -32,8 +32,8 @@ public class SelectUserActivity extends ActionBarActivity {
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
-
-        }else{
+            finish();
+        } else {
             setContentView(R.layout.activity_select_user);
         }
 
