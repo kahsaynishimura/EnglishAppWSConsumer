@@ -76,8 +76,8 @@ public class SelectUserActivity extends ActionBarActivity {
 
             HashMap<String,String> hashMap=new HashMap<>();
 
-            hashMap.put("data[User][password]","t");
-            hashMap.put("data[User][username]","t");
+            hashMap.put("data[User][password]",mEmail);
+            hashMap.put("data[User][username]",mPassword);
             try {
                 mLoginTask = new LoginTask("http://karinanishimura.com.br/cakephp/users/login_api.xml", hashMap);
                 mLoginTask.execute();
