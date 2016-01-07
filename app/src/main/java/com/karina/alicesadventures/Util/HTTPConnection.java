@@ -16,17 +16,18 @@ import javax.net.ssl.HttpsURLConnection;
 public class HTTPConnection {
    // private final String USER_AGENT = "Mozilla/5.0";
 
-    /*public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         HTTPConnection http = new HTTPConnection();
 
-        System.out.println("Testing 1 - Send Http GET request");
-        http.sendGet();
+       // System.out.println("Testing 1 - Send Http GET request");
+       // http.sendGet();
 
         System.out.println("\nTesting 2 - Send Http POST request");
-        http.sendPost();
+        HashMap<String,String> hashMap=new HashMap<>();
+        http.sendPost("http://karinanishimura.com.br/cakephp/users/login_api.xml",hashMap);
 
-    }*/
+    }
     public HTTPConnection() {
     }
 
@@ -60,9 +61,8 @@ public class HTTPConnection {
     }
 
     // HTTP POST request
-    public void sendPost(HashMap<String, String> urlParameters) throws Exception {
+    public String sendPost(String url , HashMap<String, String> urlParameters) throws Exception {
 
-        String url = "http://karinanishimura.com.br/cakephp/users/login_api.xml";
         URL obj = new URL(url);
 //        HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 
@@ -70,7 +70,8 @@ public class HTTPConnection {
         //add reuqest header
         con.setRequestMethod("POST");
      //   con.setRequestProperty("User-Agent", USER_AGENT);
-        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+        con.setRequestProperty("Accept", "text/xml; charset=utf-8");
+     //   con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
         //   urlParameters.
         //        ;= "data[User][username]=thiago&data[User][password]=thiago";
@@ -96,9 +97,10 @@ public class HTTPConnection {
             response.append(inputLine);
         }
         in.close();
+        System.out.println("Response Code : " + response.toString());
 
         //print result
-        System.out.println(response.toString());
+       return response.toString();
 
     }
 }

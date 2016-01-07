@@ -11,13 +11,6 @@
 
     <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
 
-
-    <string name="teens2">Teens 2</string>
-    <string name="w2">W 2</string>
-    <string-array name="books">
-        <item>@string/teens2</item>
-        <item>@string/w2</item>
-    </string-array>
     <string name="title_activity_lesson">Choose your lesson</string>
     <string name="title_activity_practice">Practice</string>
     <string name="title_activity_transition">One more exercise</string>
@@ -39,4 +32,6 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="verify_internet_connection">Please, check your connection.</string>
+    <string name="email">Email:</string>
+    <string name="password">Password:</string>
 </resources>

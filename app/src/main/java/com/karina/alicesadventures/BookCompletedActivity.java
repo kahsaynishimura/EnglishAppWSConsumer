@@ -17,7 +17,7 @@ public class BookCompletedActivity extends ActionBarActivity {
         setContentView(R.layout.activity_book_completed);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(BookCompletedActivity.this);
         txt = (TextView) findViewById(R.id.txt_correct);
-        txt.setText(getString(R.string.you_graduated_from) + " " + getBookName(sharedPreferences.getInt("book_id", 1)));
+      //TODO:  txt.setText(getString(R.string.you_graduated_from) + " " + getBookName(sharedPreferences.getInt("book_id", 1)));
         Button btn = (Button) findViewById(R.id.exit_btn);
         btn.setText(getString(R.string.exit));
         btn.setOnClickListener(new View.OnClickListener() {
@@ -27,11 +27,11 @@ public class BookCompletedActivity extends ActionBarActivity {
             }
         });
     }
-
+/*
     public String getBookName(Integer bookId) {
 
         String[] books = getResources().getStringArray(R.array.books);
 
         return books[bookId - 1];
-    }
+    }*/
 }
