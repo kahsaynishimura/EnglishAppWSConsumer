@@ -74,10 +74,10 @@ public class SelectUserActivity extends ActionBarActivity {
             focusView.requestFocus();
         } else {
 
-            HashMap<String,String> hashMap=new HashMap<>();
+            HashMap<String, String> hashMap = new HashMap<>();
 
-            hashMap.put("data[User][password]",mEmail);
-            hashMap.put("data[User][username]",mPassword);
+            hashMap.put("data[User][password]", mEmail);
+            hashMap.put("data[User][username]", mPassword);
             try {
                 mLoginTask = new LoginTask("http://karinanishimura.com.br/cakephp/users/login_api.xml", hashMap);
                 mLoginTask.execute();
@@ -121,11 +121,14 @@ public class SelectUserActivity extends ActionBarActivity {
             mLoginTask = null;
             if (user == null) {
                 Toast.makeText(SelectUserActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
-            } else{
+            } else if (user.get_id() == null) {
+                Toast.makeText(SelectUserActivity.this, getText(R.string.not_found), Toast.LENGTH_LONG).show();
+
+            } else {
                 // save logged in user
                 session.createLoginSession(user);
 
-                Intent i=new Intent(SelectUserActivity.this,BookActivity.class);
+                Intent i = new Intent(SelectUserActivity.this, BookActivity.class);
                 startActivity(i);
                 finish();
             }
@@ -135,7 +138,7 @@ public class SelectUserActivity extends ActionBarActivity {
         protected void onCancelled() {
             super.onCancelled();
 
-                mLoginTask = null;
+            mLoginTask = null;
 
         }
     }

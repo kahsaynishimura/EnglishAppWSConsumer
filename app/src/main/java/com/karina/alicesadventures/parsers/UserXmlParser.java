@@ -57,9 +57,7 @@ public class UserXmlParser { // We don't use namespaces
         String role = null;
         String username = null;
         Integer lastCompletedExercise = null;
-        int countFields = 0;
         while (parser.next() != XmlPullParser.END_TAG) {
-            countFields++;
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
@@ -77,9 +75,6 @@ public class UserXmlParser { // We don't use namespaces
             } else {
                 skip(parser);
             }
-        }
-        if (countFields <= 0) {
-            return null;
         }
         return new User(id, name, role, username, lastCompletedExercise);
     }
