@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.karina.alicesadventures.Util.HTTPConnection;
+import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.Book;
 import com.karina.alicesadventures.parsers.BookXmlParser;
 
@@ -24,12 +25,14 @@ import java.util.List;
 public class BookActivity extends ActionBarActivity {
 
     private ListBooksTask mListBooksTask;
-
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book);
+        sessionManager=new SessionManager(BookActivity.this);
+        sessionManager.checkLogin();
         mListBooksTask = new ListBooksTask();
         mListBooksTask.execute("http://www.karinanishimura.com.br/cakephp/books/index_api.xml");
     }
@@ -53,6 +56,7 @@ public class BookActivity extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(List<Book> books) {
+            mListBooksTask=null;
             super.onPostExecute(books);
             if (books == null) {
                 Toast.makeText(BookActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
@@ -94,8 +98,8 @@ public class BookActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_logout) {
+           sessionManager. logoutUser();
         }
 
         return super.onOptionsItemSelected(item);
