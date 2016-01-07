@@ -96,12 +96,12 @@
     </object>
     <object type="LMREQUEST" id="z107">
         <attribute name="uuid" type="string">DFDDDB83-03A2-40DA-A7F4-ACBD1DC83D34</attribute>
-        <attribute name="url" type="string"></attribute>
+        <attribute name="url" type="string">http://karinanishimura.com.br/cakephp/users/login_api.xml?data%5BUser%5D%5Busername%5D=t\u2600data%5BUser%5D%5Bpassword%5D=t</attribute>
         <attribute name="storecookies" type="bool">1</attribute>
         <attribute name="sendcookies" type="bool">1</attribute>
         <attribute name="redirectmethod" type="bool">0</attribute>
         <attribute name="redirectauthorization" type="bool">0</attribute>
-        <attribute name="method" type="string">GET</attribute>
+        <attribute name="method" type="string">POST</attribute>
         <attribute name="followredirects" type="bool">0</attribute>
         <attribute name="order" type="int64">0</attribute>
         <attribute name="name" type="string">My API</attribute>

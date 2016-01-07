@@ -3,6 +3,7 @@ package com.karina.alicesadventures.parsers;
 import android.util.Xml;
 
 import com.karina.alicesadventures.model.Book;
+import com.karina.alicesadventures.model.User;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -18,19 +19,20 @@ import java.util.List;
 public class UserXmlParser { // We don't use namespaces
     private static final String ns = null;
 
-    public List parse( StringReader in) throws XmlPullParserException, IOException {
+    public User parse(StringReader in) throws XmlPullParserException, IOException {
         try {
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(in);
             parser.nextTag();
-            return readBooks(parser);
+            return readRoot(parser);
         } finally {
             in.close();
         }
     }
-    private List<Book> readBooks(XmlPullParser parser) throws XmlPullParserException, IOException {
-        List<Book> entries = new ArrayList<Book>();
+
+    private User readRoot(XmlPullParser parser) throws XmlPullParserException, IOException {
+        User user = null;
 
         parser.require(XmlPullParser.START_TAG, ns, "response");
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -38,53 +40,50 @@ public class UserXmlParser { // We don't use namespaces
                 continue;
             }
             String name = parser.getName();
-            // Starts by looking for the entry tag
-            if (name.equals("books")) {
-                entries.add(readBooksParent(parser));
+            if (name.equals("user")) {
+                user = readUser(parser);
             } else {
                 skip(parser);
             }
         }
-        return entries;
-    }
-    // Parses the contents of a book. If it encounters a name and id, hands them off
-    // to their respective &quot;read&quot; methods for processing. Otherwise, skips the tag.
-    private Book readBooksParent(XmlPullParser parser) throws XmlPullParserException, IOException {
-        parser.require(XmlPullParser.START_TAG, ns, "books");
-        Book book = null;
-        while (parser.next() != XmlPullParser.END_TAG) {
-            if (parser.getEventType() != XmlPullParser.START_TAG) {
-                continue;
-            }
-            String name = parser.getName();
-            if (name.equals("Book")) {
-                book = readBook(parser);
-            } else {
-                skip(parser);
-            }
-        }
-        return book;
+        return user;
     }
 
-    private Book readBook(XmlPullParser parser) throws XmlPullParserException, IOException {
-        parser.require(XmlPullParser.START_TAG, ns, "Book");
-        String bookName = null;
+
+    private User readUser(XmlPullParser parser) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, "user");
         Integer id = null;
+        String name = null;
+        String role = null;
+        String username = null;
+        Integer lastCompletedExercise = null;
+        int countFields = 0;
         while (parser.next() != XmlPullParser.END_TAG) {
+            countFields++;
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
-            String name = parser.getName();
-            if (name.equals("name")) {
-                bookName = readText(parser);
-            } else if (name.equals("id")) {
+            String tagName = parser.getName();
+            if (tagName.equals("id")) {
                 id = Integer.parseInt(readText(parser));
-            }  else {
+            } else if (tagName.equals("name")) {
+                name = readText(parser);
+            } else if (tagName.equals("role")) {
+                role = readText(parser);
+            } else if (tagName.equals("username")) {
+                username = readText(parser);
+            } else if (tagName.equals("last_completed_lesson")) {
+                lastCompletedExercise = Integer.parseInt(readText(parser));
+            } else {
                 skip(parser);
             }
         }
-        return new Book(id, bookName);
+        if (countFields <= 0) {
+            return null;
+        }
+        return new User(id, name, role, username, lastCompletedExercise);
     }
+
     private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
         String result = "";
         if (parser.next() == XmlPullParser.TEXT) {

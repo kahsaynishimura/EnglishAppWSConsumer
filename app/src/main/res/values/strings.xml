@@ -34,4 +34,6 @@
     <string name="verify_internet_connection">Please, check your connection.</string>
     <string name="email">Email:</string>
     <string name="password">Password:</string>
+    <string name="error_field_required">This information is required</string>
+    <string name="error_invalid_email">A valid email is required</string>
 </resources>

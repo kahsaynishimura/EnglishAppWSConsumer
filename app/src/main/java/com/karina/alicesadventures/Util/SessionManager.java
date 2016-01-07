@@ -9,84 +9,99 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+import com.karina.alicesadventures.model.User;
+
 public class SessionManager {
-	// Shared Preferences
-	SharedPreferences pref;
+    // Shared Preferences
+    SharedPreferences pref;
 
-	// Editor for Shared preferences
-	Editor editor;
+    // Editor for Shared preferences
+    Editor editor;
+    // Context
+    Context _context;
+    // Shared pref mode
+    int PRIVATE_MODE = 0;
+    // Sharedpref file name
+    private static final String PREF_NAME = "SharedPreferences";
 
-	// Context
-	Context _context;
+    // User id (make variable public to access from outside)
+    public static final String KEY_ID = "id";
 
-	// Shared pref mode
-	int PRIVATE_MODE = 0;
+    private static final String IS_LOGIN = "is_logged_in";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_ROLE = "role";
+    public static final String KEY_USERNAME = "username";
+    public static final String KEY_LAST_COMPLETED_EXERCISE = "last_completed_exercise";
 
-	// Sharedpref file name
-	private static final String PREF_NAME = "SharedPreferences";
+    // Constructor
+    @SuppressLint("CommitPrefEdits")
+    public SessionManager(Context context) {
+        this._context = context;
+        pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
+        editor = pref.edit();
+    }
 
-	// All Shared Preferences Keys
-	private static final String IS_LOGIN = "IsLoggedIn";
+    /**
+     * Create login session
+     */
+    public void createLoginSession(User user) {
 
-	// User id (make variable public to access from outside)
-	public static final String KEY_ID = "id";
+        editor.putBoolean(IS_LOGIN, true);
 
-	// Email address (make variable public to access from outside)
-	public static final String KEY_EMAIL = "email";
+        editor.putString(KEY_NAME, user.getName());
 
-	// Email address pagseguro (make variable public to access from outside)
-	public static final String KEY_EMAIL_PAGSEGURO = "email_pagseguro";
+        editor.putInt(KEY_ID, user.get_id());
 
-	// Token pagseguro (make variable public to access from outside)
-	public static final String KEY_TOKEN_PAGSEGURO = "token_pagseguro";
+        editor.putString(KEY_ROLE, user.getRole());
 
-	// Token pagseguro (make variable public to access from outside)
-	public static final String KEY_ID_FACEBOOK = "id_facebook";
+        editor.putString(KEY_USERNAME, user.getUsername());
 
-	// Token pagseguro (make variable public to access from outside)
-	public static final String KEY_ACCESS_TOKEN = "access_token";
-	// Constructor
-	@SuppressLint("CommitPrefEdits")
-	public SessionManager(Context context) {
-		this._context = context;
-		pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
-		editor = pref.edit();
-	}
+        editor.putInt(KEY_LAST_COMPLETED_EXERCISE, user.getLastCompletedExercise());
 
-	/**
-	 * Create login session
-	 * */
-	public void createLoginSession(String email, String id,
-			String emailPagSeguro, String tokenPagSeguro, String idFacebook, String accessToken) {
-		// Storing login value as TRUE
-		editor.putBoolean(IS_LOGIN, true);
+        // commit changes
+        editor.commit();
+    }
 
-		// Storing email in pref
-		editor.putString(KEY_EMAIL, email);
+    /**
+     * Get stored session data
+     */
+    public HashMap<String, String> getUserDetails() {
+        HashMap<String, String> user = new HashMap<String, String>();
+        user.put(KEY_ID, pref.getString(KEY_ID, null));
+        user.put(KEY_NAME, pref.getString(KEY_NAME, null));
+        user.put(KEY_ROLE, pref.getString(KEY_ROLE, null));
+        user.put(KEY_USERNAME, pref.getString(KEY_USERNAME, null));
+        user.put(KEY_LAST_COMPLETED_EXERCISE, pref.getString(KEY_LAST_COMPLETED_EXERCISE, null));
+        return user;
+    }
 
-		// Storing user id in pref
-		editor.putString(KEY_ID, id);
+    public boolean isLoggedIn() {
+        return pref.getBoolean(IS_LOGIN, false);
+    }
 
-		// Storing email pagseguro in pref
-		editor.putString(KEY_EMAIL_PAGSEGURO, emailPagSeguro);
-
-		// Storing token pagseguro in pref
-		editor.putString(KEY_TOKEN_PAGSEGURO, tokenPagSeguro);
-
-		// Storing facebook id in pref
-		editor.putString(KEY_ID_FACEBOOK, idFacebook);
-		
-		// Storing facebook id in pref
-		editor.putString(KEY_ACCESS_TOKEN, accessToken);
-
-		// commit changes
+    /**
+     * Clear session details
+     * */
+    /*public void logoutUser() {
+		// Clearing all data from Shared Preferences
+		editor.clear();
 		editor.commit();
-	}
 
-	/**
-	 * Check login method wil check user login status If false it will redirect
-	 * user to login page Else won't do anything
-	 * */
+		// After logout redirect user to Login Activity
+		Intent i = new Intent(_context, LoginActivity.class);
+		// Closing all the Activities
+		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+		// Add new Flag to start new Activity
+		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+		// Staring Login Activity
+		_context.startActivity(i);
+	}*/
+    /**
+     * Check login method wil check user login status If false it will redirect
+     * user to login page Else won't do anything
+     * */
 	/*public void checkLogin() {
 		// Check login status
 		if (!this.isLoggedIn()) {
@@ -104,58 +119,8 @@ public class SessionManager {
 
 	}
 */
-	/**
-	 * Get stored session data
-	 * */
-	public HashMap<String, String> getUserDetails() {
-		HashMap<String, String> user = new HashMap<String, String>();
-		// user id
-		user.put(KEY_ID, pref.getString(KEY_ID, null));
-
-		// user email
-		user.put(KEY_EMAIL, pref.getString(KEY_EMAIL, null));
-
-		// user email pagseguro
-		user.put(KEY_EMAIL_PAGSEGURO, pref.getString(KEY_EMAIL_PAGSEGURO, null));
-
-		// user token pagseguro
-		user.put(KEY_TOKEN_PAGSEGURO, pref.getString(KEY_TOKEN_PAGSEGURO, null));
-
-		// user token pagseguro
-		user.put(KEY_ID_FACEBOOK, pref.getString(KEY_ID_FACEBOOK, null));
-		
-		// user token pagseguro
-		user.put(KEY_ACCESS_TOKEN, pref.getString(KEY_ACCESS_TOKEN, null));
-
-		// return user
-		return user;
-	}
-
-	/**
-	 * Clear session details
-	 * */
-	/*public void logoutUser() {
-		// Clearing all data from Shared Preferences
-		editor.clear();
-		editor.commit();
-
-		// After logout redirect user to Login Activity
-		Intent i = new Intent(_context, LoginActivity.class);
-		// Closing all the Activities
-		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-		// Add new Flag to start new Activity
-		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-		// Staring Login Activity
-		_context.startActivity(i);
-	}*/
-
-	/**
-	 * Quick check for login
-	 * **/
-	// Get Login State
-	public boolean isLoggedIn() {
-		return pref.getBoolean(IS_LOGIN, false);
-	}
+    /**
+     * Quick check for login
+     * **/
+    // Get Login State
 }

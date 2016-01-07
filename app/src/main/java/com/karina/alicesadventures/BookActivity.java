@@ -30,14 +30,8 @@ public class BookActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book);
-
-        loadComponents();
-    }
-
-    private void loadComponents() {
         mListBooksTask = new ListBooksTask();
         mListBooksTask.execute("http://www.karinanishimura.com.br/cakephp/books/index_api.xml");
-
     }
 
     private class ListBooksTask extends AsyncTask<String, Void, List<Book>> {
@@ -50,7 +44,6 @@ public class BookActivity extends ActionBarActivity {
             try {
                 String result = httpConnection.sendGet(params[0]);
                 books = bookXmlParser.parse(new StringReader(result));
-                //  addBooksToList(result);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -25,6 +25,8 @@ public class HTTPConnection {
 
         System.out.println("\nTesting 2 - Send Http POST request");
         HashMap<String,String> hashMap=new HashMap<>();
+        hashMap.put("data[User][password]","t");
+        hashMap.put("data[User][username]","t");
         http.sendPost("http://karinanishimura.com.br/cakephp/users/login_api.xml",hashMap);
 
     }
@@ -79,7 +81,8 @@ public class HTTPConnection {
         // Send post request
         con.setDoOutput(true);
         DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-        wr.writeBytes(urlParameters.toString());
+        String sParams=getQuery(urlParameters);
+        wr.writeBytes(sParams);
         wr.flush();
         wr.close();
 
@@ -102,5 +105,24 @@ public class HTTPConnection {
         //print result
        return response.toString();
 
+    }
+    private String getQuery(HashMap<String ,String> params)
+    {
+        String result = "";
+        boolean first = true;
+
+        for (String pair : params.keySet())
+        {
+            if (first)
+                first = false;
+            else
+                result+="&";
+
+            result+=pair;
+            result+="=";
+            result+=params.get(pair);
+        }
+
+        return result;
     }
 }

@@ -6,19 +6,28 @@ package com.karina.alicesadventures.model;
 public class User {
     private Integer _id;
     private String name;
-    private String code;
-    private Integer lastCompletedLessonId;//change to exercise_id
+    private String role;
+    private String username;//email
+    private Integer lastCompletedExercise;//TODO:change to exercise_id
 
 
-    public User(){
+    public User() {
     }
 
-    public User(Integer _id, String name, String code,Integer lastCompletedLessonId){
+    //TODO add lastcompleted exercise
+    //  public User(Integer _id, String name, String code,Integer lastCompletedLessonId){
+    public User(Integer _id, String name, String role, String username,Integer lastCompletedExercise) {
         this._id = _id;
         this.name = name;
-        this.code = code;
-        this.lastCompletedLessonId=lastCompletedLessonId;
+        this.role = role;
+        this.username = username;
+        this.lastCompletedExercise = lastCompletedExercise;
     }
+
+    //legacy method for local database
+    public User(int id, String name, String userCode, int lastCompletedExercise) {
+    }
+
 
     public Integer get_id() {
         return _id;
@@ -36,19 +45,27 @@ public class User {
         this.name = name;
     }
 
-    public String getCode() {
-        return code;
+    public String getUsername() {
+        return username;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public Integer getLastCompletedLessonId() {
-        return lastCompletedLessonId;
+    public String getRole() {
+        return role;
     }
 
-    public void setLastCompletedLessonId(Integer lastCompletedLessonId) {
-        this.lastCompletedLessonId = lastCompletedLessonId;
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public Integer getLastCompletedExercise() {
+        return lastCompletedExercise;
+    }
+
+    public void setLastCompletedExercise(Integer lastCompletedExercise) {
+        this.lastCompletedExercise = lastCompletedExercise;
     }
 }
