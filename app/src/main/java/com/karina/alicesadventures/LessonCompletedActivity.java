@@ -1,8 +1,10 @@
 package com.karina.alicesadventures;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -43,20 +45,19 @@ public class LessonCompletedActivity extends ActionBarActivity {
         //no matter what happens, if the student gets here, he is rewarded.
         Integer totalPoints = 2;
         ImageView userPointsImage = (ImageView) findViewById(R.id.user_points);
-        userPointsImage.setImageDrawable(getDrawable(R.drawable.pointstwo));
-
+        changeDrawable(userPointsImage,"@drawable/pointstwo",LessonCompletedActivity.this,R.drawable.pointstwo);
         if (percentageWrong > 60 && percentageWrong <= 100) {
             totalPoints = 4;
-            userPointsImage.setImageDrawable(getDrawable(R.drawable.pointsfour));
+            changeDrawable(userPointsImage, "@drawable/pointsfour", LessonCompletedActivity.this, R.drawable.pointsfour);
         } else if (percentageWrong > 30 && percentageWrong <= 60) {
             totalPoints = 6;
-            userPointsImage.setImageDrawable(getDrawable(R.drawable.pointssix));
+            changeDrawable(userPointsImage, "@drawable/pointssix", LessonCompletedActivity.this, R.drawable.pointssix);
         } else if (percentageWrong > 10 && percentageWrong <= 30) {
             totalPoints = 8;
-            userPointsImage.setImageDrawable(getDrawable(R.drawable.pointseight));
+            changeDrawable(userPointsImage, "@drawable/pointseight", LessonCompletedActivity.this, R.drawable.pointseight);
         } else if (percentageWrong <= 10) {
             totalPoints = 10;
-            userPointsImage.setImageDrawable(getDrawable(R.drawable.pointsten));
+            changeDrawable(userPointsImage, "@drawable/pointsten", LessonCompletedActivity.this, R.drawable.pointsten);
         }
         DateFormat df = DateFormat.getTimeInstance();
         Date finishTime = new Date();
@@ -67,7 +68,16 @@ public class LessonCompletedActivity extends ActionBarActivity {
         savePracticeSummary(sharedPreferences.getInt("user_id", 0), sharedPreferences.getInt("lesson_id", 0),
                 totalHits, percentageWrong, startTime.getTime(), finishTime.getTime(), totalPoints);
     }
+    private void changeDrawable( ImageView view, String uri, Context context, int id) {
+        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) { //versao api >21
+            view.setImageDrawable(context.getDrawable(id));
+        } else {
+            int imageResource = context.getResources().getIdentifier(uri, null, context.getPackageName());
 
+            Drawable res = context.getResources().getDrawable(imageResource);
+            view.setImageDrawable(res);
+        }
+    }
     private void savePracticeSummary(int userId, int lessonId, Integer totalHits, Integer percentageWrong, Long startTime, Long finishTime, Integer totalPoints) {
         DBHandler db = null;
 
