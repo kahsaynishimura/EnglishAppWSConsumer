@@ -2,24 +2,29 @@ package com.karina.alicesadventures;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBar;
-import android.view.MenuItem;
+import android.widget.Toast;
 
-import com.karina.alicesadventures.dummy.DummyContent;
+import com.karina.alicesadventures.Util.HTTPConnection;
+import com.karina.alicesadventures.model.Product;
+import com.karina.alicesadventures.parsers.ProductXmlParser;
 
+import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,7 +36,8 @@ import java.util.List;
  * item details side-by-side using two vertical panes.
  */
 public class ProductListActivity extends AppCompatActivity {
-
+    private ListProductsTask mListProductsTask;
+    private List<Product> ITEMS = new ArrayList<Product>();
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
@@ -61,10 +67,6 @@ public class ProductListActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        View recyclerView = findViewById(R.id.product_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
-
         if (findViewById(R.id.product_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -72,6 +74,9 @@ public class ProductListActivity extends AppCompatActivity {
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
+        mListProductsTask = new ListProductsTask();
+        mListProductsTask.execute("http://karinanishimura.com.br/cakephp/products/index_api.xml");
+
     }
 
     @Override
@@ -92,15 +97,15 @@ public class ProductListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter( ITEMS));
     }
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private final List<DummyContent.DummyItem> mValues;
+        private final List<Product> mValues;
 
-        public SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items) {
+        public SimpleItemRecyclerViewAdapter(List<Product> items) {
             mValues = items;
         }
 
@@ -113,25 +118,25 @@ public class ProductListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mItem = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+            holder.product = mValues.get(position);
+            holder.mIdView.setText(mValues.get(position).getName());
+            holder.mNameView.setText(mValues.get(position).getName());
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mTwoPane) {
                         Bundle arguments = new Bundle();
-                        arguments.putString(ProductDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+                        arguments.putInt(ProductDetailFragment.ARG_ITEM_ID, holder.product.getId());
                         ProductDetailFragment fragment = new ProductDetailFragment();
                         fragment.setArguments(arguments);
-                        getSupportFragmentManager().beginTransaction()
+                       getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.product_detail_container, fragment)
                                 .commit();
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(context, ProductDetailActivity.class);
-                        intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+                        intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, holder.product.getId().toString());
 
                         context.startActivity(intent);
                     }
@@ -147,20 +152,54 @@ public class ProductListActivity extends AppCompatActivity {
         public class ViewHolder extends RecyclerView.ViewHolder {
             public final View mView;
             public final TextView mIdView;
-            public final TextView mContentView;
-            public DummyContent.DummyItem mItem;
+            public final TextView mNameView;
+            public Product product;
 
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
                 mIdView = (TextView) view.findViewById(R.id.id);
-                mContentView = (TextView) view.findViewById(R.id.content);
+                mNameView = (TextView) view.findViewById(R.id.name);
             }
 
             @Override
             public String toString() {
-                return super.toString() + " '" + mContentView.getText() + "'";
+                return super.toString() + " '" + mNameView.getText() + "'";
             }
         }
     }
+
+    private class ListProductsTask extends AsyncTask<String, Void, List<Product>> {
+        @Override
+        protected List<Product> doInBackground(String... params) {
+            List<Product> products = null;
+            HTTPConnection httpConnection = new HTTPConnection();
+            ProductXmlParser productXmlParser = new ProductXmlParser();
+
+            try {
+                String result = httpConnection.sendGet(params[0]);
+                products = productXmlParser.parse(new StringReader(result));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return products;
+        }
+
+
+        @Override
+        protected void onPostExecute(List<Product> products) {
+            mListProductsTask = null;
+            super.onPostExecute(products);
+            if (products == null) {
+                Toast.makeText(ProductListActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
+            } else {
+                View recyclerView = findViewById(R.id.product_list);
+                assert recyclerView != null;
+                ITEMS = products;
+                setupRecyclerView((RecyclerView) recyclerView);
+
+            }
+        }
+    }
+
 }

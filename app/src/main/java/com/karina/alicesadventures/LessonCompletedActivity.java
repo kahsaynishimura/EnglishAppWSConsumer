@@ -5,22 +5,33 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.karina.alicesadventures.Util.HTTPConnection;
+import com.karina.alicesadventures.model.Book;
 import com.karina.alicesadventures.model.DBHandler;
 import com.karina.alicesadventures.model.Lesson;
+import com.karina.alicesadventures.model.Product;
+import com.karina.alicesadventures.parsers.BookXmlParser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 public class LessonCompletedActivity extends ActionBarActivity {
@@ -156,6 +167,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
         }
         return null;
     }
+
 
 
 }
