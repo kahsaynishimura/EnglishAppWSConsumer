@@ -9,7 +9,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.SessionManager;
@@ -89,8 +88,8 @@ public class SelectUserActivity extends ActionBarActivity {
 
             HashMap<String, String> hashMap = new HashMap<>();
 
-            hashMap.put("data[User][password]", mEmail);
-            hashMap.put("data[User][username]", mPassword);
+            hashMap.put("data[User][password]", mPassword);
+            hashMap.put("data[User][username]", mEmail);
             try {
                 mLoginTask = new LoginTask("http://karinanishimura.com.br/cakephp/users/login_api.xml", hashMap);
                 mLoginTask.execute();
