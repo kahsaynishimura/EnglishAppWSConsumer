@@ -25,7 +25,7 @@
         </activity>
         <activity
             android:name=".PracticeActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".TransitionActivity"
             android:label="@string/title_activity_transition" />
@@ -37,7 +37,7 @@
             android:label="@string/title_activity_lesson_completed" />
         <activity
             android:name=".BookActivity"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"></activity>
         <activity
             android:name=".LessonActivity"
             android:label="@string/title_activity_lesson" />
@@ -49,24 +49,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.karina.alicesadventures.SelectUserActivity" />
-        </activity>
-        <activity
-            android:name=".ProductListActivity"
-            android:label="@string/title_product_list"
-            android:parentActivityName=".LessonCompletedActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.karina.alicesadventures.LessonCompletedActivity" />
-        </activity>
-        <activity
-            android:name=".ProductDetailActivity"
-            android:label="@string/title_product_detail"
-            android:parentActivityName=".ProductListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.karina.alicesadventures.ProductListActivity" />
         </activity>
     </application>
 
