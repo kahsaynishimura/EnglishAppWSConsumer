@@ -3,9 +3,11 @@ package com.karina.alicesadventures;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -16,7 +18,6 @@ import com.karina.alicesadventures.parsers.UserXmlParser;
 
 import java.io.StringReader;
 import java.util.HashMap;
-
 
 public class SelectUserActivity extends ActionBarActivity {
     private LoginTask mLoginTask;
@@ -39,6 +40,10 @@ public class SelectUserActivity extends ActionBarActivity {
 
     }
 
+    public void createAccount(View v) {
+        Intent i = new Intent(SelectUserActivity.this, AddUserActivity.class);
+        startActivity(i);
+    }
 
     public void login(View v) {
 
@@ -128,10 +133,11 @@ public class SelectUserActivity extends ActionBarActivity {
             super.onPostExecute(user);
             mLoginTask = null;
             if (user == null) {
-                Toast.makeText(SelectUserActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
+                Snackbar.make(((Button) findViewById(R.id.btn_login)), getText(R.string.verify_internet_connection), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             } else if (user.get_id() == null) {
-                Toast.makeText(SelectUserActivity.this, getText(R.string.not_found), Toast.LENGTH_LONG).show();
-
+                Snackbar.make(((Button) findViewById(R.id.btn_login)), getText(R.string.not_found), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             } else {
                 // save logged in user
                 sessionManager.createLoginSession(user);

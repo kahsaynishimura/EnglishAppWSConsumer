@@ -38,4 +38,6 @@
     <string name="error_invalid_email">A valid email is required</string>
     <string name="not_found">Usuário ou senha incorretos</string>
     <string name="action_logout">Log out</string>
+    <string name="title_activity_add_user">AddUserActivity</string>
+    <string name="create_account">Create Account</string>
 </resources>
