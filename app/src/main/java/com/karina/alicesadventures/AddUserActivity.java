@@ -27,4 +27,7 @@ public class AddUserActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    public void createAccount(View v) {
+
+    }
 }
