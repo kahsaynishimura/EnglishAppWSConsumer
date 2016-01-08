@@ -16,19 +16,11 @@
         tools:context="br.com.englishapp.LessonCompletedActivity">
 
 
-        <ImageView
-            android:id="@+id/user_points"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/pointseight" />
 
         <TextView
             android:id="@+id/txt_start_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/user_points"
             android:layout_centerHorizontal="true"
             android:text="@string/placeholder"
             android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -51,36 +43,18 @@
             android:text="@string/placeholder"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <TextView
-            android:id="@+id/txt_wrong_percentage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txt_correct"
-            android:layout_centerHorizontal="true"
-            android:text="@string/placeholder"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <ImageView
-            android:id="@+id/ponitstable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txt_wrong_percentage"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/pointstable" />
 
         <Button
             android:id="@+id/congrats_image_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/user_points"
-            android:layout_alignLeft="@+id/user_points"
-            android:layout_alignRight="@+id/user_points"
-            android:layout_alignStart="@+id/user_points"
-            android:layout_below="@+id/ponitstable"
             android:background="#0063CF"
             android:onClick="nextLesson"
             android:text="@string/go_to_next_lesson"
-            android:textColor="@android:color/white" />
+            android:padding="@dimen/activity_horizontal_margin"
+            android:textColor="@android:color/white"
+            android:layout_below="@+id/txt_correct"
+            android:layout_centerHorizontal="true" />
 
 
         <Button

@@ -49,49 +49,20 @@ public class LessonCompletedActivity extends ActionBarActivity {
         Date startTime = new Date(millis);
         Integer totalHits = sharedPreferences.getInt("correct_sentence_count", 0);
         Integer wrongSentenceCount = sharedPreferences.getInt("wrong_sentence_count", 0);
-        Integer percentageWrong = 0;
-        if (totalHits != 0) {//probably, there are no scripts for this lesson in the database
-            percentageWrong = (wrongSentenceCount * 100) / totalHits;
-        }
+
         //no matter what happens, if the student gets here, he is rewarded.
-        Integer totalPoints = 2;
-        ImageView userPointsImage = (ImageView) findViewById(R.id.user_points);
-        changeDrawable(userPointsImage, "@drawable/pointstwo", LessonCompletedActivity.this, R.drawable.pointstwo);
-        if (percentageWrong > 60 && percentageWrong <= 100) {
-            totalPoints = 4;
-            changeDrawable(userPointsImage, "@drawable/pointsfour", LessonCompletedActivity.this, R.drawable.pointsfour);
-        } else if (percentageWrong > 30 && percentageWrong <= 60) {
-            totalPoints = 6;
-            changeDrawable(userPointsImage, "@drawable/pointssix", LessonCompletedActivity.this, R.drawable.pointssix);
-        } else if (percentageWrong > 10 && percentageWrong <= 30) {
-            totalPoints = 8;
-            changeDrawable(userPointsImage, "@drawable/pointseight", LessonCompletedActivity.this, R.drawable.pointseight);
-        } else if (percentageWrong <= 10) {
-            totalPoints = 10;
-            changeDrawable(userPointsImage, "@drawable/pointsten", LessonCompletedActivity.this, R.drawable.pointsten);
-        }
+
         DateFormat df = DateFormat.getTimeInstance();
         Date finishTime = new Date();
         ((TextView) findViewById(R.id.txt_start_time)).setText(getString(R.string.start_time) + ": " + df.format(startTime));
         ((TextView) findViewById(R.id.txt_finish_time)).setText(getString(R.string.finish_time) + ": " + df.format(finishTime));
         ((TextView) findViewById(R.id.txt_correct)).setText(getString(R.string.correct) + ": " + totalHits);
-        ((TextView) findViewById(R.id.txt_wrong_percentage)).setText(getString(R.string.errors_percentage) + ": " + percentageWrong + "%");
-        savePracticeSummary(sharedPreferences.getInt("user_id", 0), sharedPreferences.getInt("lesson_id", 0),
-                totalHits, percentageWrong, startTime.getTime(), finishTime.getTime(), totalPoints);
+       savePracticeSummary(sharedPreferences.getInt("user_id", 0), sharedPreferences.getInt("lesson_id", 0),
+                totalHits, startTime.getTime(), finishTime.getTime(), totalHits);
     }
 
-    private void changeDrawable(ImageView view, String uri, Context context, int id) {
-        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) { //versao api >21
-            view.setImageDrawable(context.getDrawable(id));
-        } else {
-            int imageResource = context.getResources().getIdentifier(uri, null, context.getPackageName());
 
-            Drawable res = context.getResources().getDrawable(imageResource);
-            view.setImageDrawable(res);
-        }
-    }
-
-    private void savePracticeSummary(int userId, int lessonId, Integer totalHits, Integer percentageWrong, Long startTime, Long finishTime, Integer totalPoints) {
+    private void savePracticeSummary(int userId, int lessonId, Integer totalHits, Long startTime, Long finishTime, Integer totalPoints) {
         DBHandler db = null;
 
         try {
@@ -102,7 +73,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
             e.printStackTrace();
         }
         if (db != null) {
-            String id = db.addPracticeHistory(userId, lessonId, totalHits, percentageWrong, startTime.toString(), finishTime.toString(), totalPoints);
+            //String id = db.addPracticeHistory(userId, lessonId, totalHits, startTime.toString(), finishTime.toString(), totalPoints);
         }
     }
 
@@ -167,7 +138,6 @@ public class LessonCompletedActivity extends ActionBarActivity {
         }
         return null;
     }
-
 
 
 }
