@@ -109,6 +109,10 @@ public class LessonCompletedActivity extends ActionBarActivity {
         }
     }
 
+    public void viewProducts(View v) {
+        Intent i=new Intent(LessonCompletedActivity.this,ProductListActivity.class);
+        startActivity(i);
+    }
     public void nextLesson(View v) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LessonCompletedActivity.this);
 
