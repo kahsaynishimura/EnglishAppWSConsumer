@@ -121,6 +121,7 @@ public class SelectUserActivity extends ActionBarActivity {
                 user = userXmlParser.parse(new StringReader(result));
             } catch (Exception e) {
                 e.printStackTrace();
+                mLoginTask = null;
             }
             System.out.println(result);
             return user;

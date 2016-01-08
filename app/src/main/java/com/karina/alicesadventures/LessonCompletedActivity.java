@@ -45,7 +45,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
         //no matter what happens, if the student gets here, he is rewarded.
         Integer totalPoints = 2;
         ImageView userPointsImage = (ImageView) findViewById(R.id.user_points);
-        changeDrawable(userPointsImage,"@drawable/pointstwo",LessonCompletedActivity.this,R.drawable.pointstwo);
+        changeDrawable(userPointsImage, "@drawable/pointstwo", LessonCompletedActivity.this, R.drawable.pointstwo);
         if (percentageWrong > 60 && percentageWrong <= 100) {
             totalPoints = 4;
             changeDrawable(userPointsImage, "@drawable/pointsfour", LessonCompletedActivity.this, R.drawable.pointsfour);
@@ -68,7 +68,8 @@ public class LessonCompletedActivity extends ActionBarActivity {
         savePracticeSummary(sharedPreferences.getInt("user_id", 0), sharedPreferences.getInt("lesson_id", 0),
                 totalHits, percentageWrong, startTime.getTime(), finishTime.getTime(), totalPoints);
     }
-    private void changeDrawable( ImageView view, String uri, Context context, int id) {
+
+    private void changeDrawable(ImageView view, String uri, Context context, int id) {
         if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) { //versao api >21
             view.setImageDrawable(context.getDrawable(id));
         } else {
@@ -78,6 +79,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
             view.setImageDrawable(res);
         }
     }
+
     private void savePracticeSummary(int userId, int lessonId, Integer totalHits, Integer percentageWrong, Long startTime, Long finishTime, Integer totalPoints) {
         DBHandler db = null;
 
@@ -107,6 +109,11 @@ public class LessonCompletedActivity extends ActionBarActivity {
         if (db != null) {
             db.saveLastLessonCompletedId(sharedPreferences.getInt("user_id", 0), sharedPreferences.getInt("lesson_id", 0));
         }
+    }
+
+    public void viewPrizes(View v) {
+        Intent i = new Intent(LessonCompletedActivity.this, ProductListActivity.class);
+        startActivity(i);
     }
 
     public void nextLesson(View v) {
