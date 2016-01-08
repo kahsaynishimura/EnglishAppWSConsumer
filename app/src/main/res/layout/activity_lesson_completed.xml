@@ -32,16 +32,14 @@
             android:layout_centerHorizontal="true"
             android:text="@string/placeholder"
             android:textAppearance="?android:attr/textAppearanceLarge" />
-
         <TextView
             android:id="@+id/txt_finish_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/placeholder"
             android:layout_below="@+id/txt_start_time"
             android:layout_centerHorizontal="true"
-            android:text="@string/placeholder"
             android:textAppearance="?android:attr/textAppearanceLarge" />
-
         <TextView
             android:id="@+id/txt_correct"
             android:layout_width="wrap_content"
@@ -72,27 +70,14 @@
             android:id="@+id/congrats_image_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/user_points"
-            android:layout_alignLeft="@+id/user_points"
-            android:layout_alignRight="@+id/user_points"
-            android:layout_alignStart="@+id/user_points"
             android:layout_below="@+id/ponitstable"
             android:background="#0063CF"
             android:onClick="nextLesson"
             android:text="@string/go_to_next_lesson"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:layout_alignEnd="@+id/user_points"
+            android:layout_alignStart="@+id/user_points" />
 
-        <Button
-            android:id="@+id/view_products"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/congrats_image_btn"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="@dimen/activity_horizontal_margin"
-            android:background="#0063CF"
-            android:onClick="viewProducts"
-            android:text="@string/view_prizes"
-            android:textColor="@android:color/white" />
 
     </RelativeLayout>
 

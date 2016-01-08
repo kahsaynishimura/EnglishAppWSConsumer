@@ -38,6 +38,5 @@
     <string name="name">Name:</string>
     <string name="title_product_list">Products</string>
     <string name="title_product_detail">Product Detail</string>
-    <string name="view_prizes">View Prizes</string>
 
 </resources>
