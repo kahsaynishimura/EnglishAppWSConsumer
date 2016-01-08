@@ -37,8 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="tryAgain"
-            android:src="@drawable/mic_disabled"
-            android:stateListAnimator="@anim/abc_fade_in" />
+            android:src="@drawable/mic_disabled" />
 
         <LinearLayout
             android:layout_width="match_parent"
