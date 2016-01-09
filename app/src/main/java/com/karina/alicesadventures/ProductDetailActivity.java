@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
@@ -142,6 +143,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
                 try {
                     ((ImageView) findViewById(R.id.qr_code)).setVisibility(View.VISIBLE);
+                    ((TextView) findViewById(R.id.qr_code_instructions)).setVisibility(View.VISIBLE);
                     Bitmap bitmap = encodeAsBitmap("karinanishimura.com.br");
                     ((ImageView) findViewById(R.id.qr_code)).setImageBitmap(bitmap);
 

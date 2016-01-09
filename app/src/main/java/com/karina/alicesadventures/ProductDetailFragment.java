@@ -76,8 +76,6 @@ public class ProductDetailFragment extends Fragment {
         if (mItem != null) {
             ((TextView) rootView.findViewById(R.id.product_detail)).setText(mItem.getDescription());
             ((TextView) rootView.findViewById(R.id.tvPoints)).setText(getText(R.string.you_have) + " " + sessionManager.getUserDetails().get(SessionManager.KEY_TOTAL_POINTS) + " " + getText(R.string.points));
-
-            //   ((TextView) rootView.findViewById(R.id.qr_code_instructions)).setVisibility(View.VISIBLE);
         }
 
         return rootView;
