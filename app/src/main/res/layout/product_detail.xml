@@ -12,45 +12,45 @@
             style="?android:attr/textAppearanceLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
             android:padding="16dp"
             android:text="@string/name"
             android:textIsSelectable="true"
-            tools:context="com.karina.alicesadventures.ProductDetailFragment"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
+            tools:context="com.karina.alicesadventures.ProductDetailFragment" />
 
 
-            <TextView
-                android:id="@+id/tvPoints"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_below="@+id/product_detail"
-                android:padding="@dimen/activity_vertical_margin"
-                android:text="@string/name"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true" />
-
-        <ImageView
+        <TextView
+            android:id="@+id/tvPoints"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/product_detail"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_horizontal"
+            android:padding="@dimen/activity_vertical_margin"
+            android:text="@string/name" />
+
+        <ImageView
             android:id="@+id/qr_code"
-            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/tvPoints"
             android:layout_margin="@dimen/activity_horizontal_margin"
             android:padding="@dimen/activity_horizontal_margin"
-            android:src="@drawable/first_screen" />
+            android:src="@drawable/first_screen"
+            android:visibility="visible" />
 
         <Button
             android:id="@+id/btn_trade"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/qr_code"
+            android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
             android:background="@android:color/white"
             android:onClick="trade"
-            android:text="@string/log_in"
-            android:layout_below="@+id/qr_code"
-            android:layout_centerHorizontal="true" />
+            android:text="@string/log_in" />
 
 
     </RelativeLayout>

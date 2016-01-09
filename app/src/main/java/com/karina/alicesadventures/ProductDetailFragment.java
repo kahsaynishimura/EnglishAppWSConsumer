@@ -2,7 +2,9 @@ package com.karina.alicesadventures;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -13,6 +15,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
 import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.Product;
 import com.karina.alicesadventures.parsers.ProductXmlParser;
@@ -70,22 +76,45 @@ public class ProductDetailFragment extends Fragment {
         if (mItem != null) {
             ((TextView) rootView.findViewById(R.id.product_detail)).setText(mItem.getDescription());
             ((TextView) rootView.findViewById(R.id.tvPoints)).setText(getText(R.string.you_have) + " " + sessionManager.getUserDetails().get(SessionManager.KEY_TOTAL_POINTS) + " " + getText(R.string.points));
-          //  ((ImageView) rootView.findViewById(R.id.qr_code)).changeDrawable((ImageView) rootView.findViewById(R.id.qr_code));
-         //   ((TextView) rootView.findViewById(R.id.product_detail)).setText(mItem.getDesption());
+            try {
+                Bitmap bitmap = encodeAsBitmap("karinanishimura.com.br");
+                ((ImageView) rootView.findViewById(R.id.qr_code)).setImageBitmap(bitmap);
+
+            } catch (WriterException e) {
+                e.printStackTrace();
+            }
+            //  ((ImageView) rootView.findViewById(R.id.qr_code)).changeDrawable((ImageView) rootView.findViewById(R.id.qr_code));
+            //   ((TextView) rootView.findViewById(R.id.product_detail)).setText(mItem.getDesption());
         }
 
         return rootView;
     }
 
-    private void changeDrawable( ImageView view, String uri,  int id) {
-        Activity context = this.getActivity();
-        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) { //versao api >21
-            view.setImageDrawable(context.getDrawable(id));
-        } else {
-            int imageResource = context.getResources().getIdentifier(uri, null, context.getPackageName());
+    Bitmap encodeAsBitmap(String str) throws WriterException {
+        BitMatrix result;
 
-            Drawable res = context.getResources().getDrawable(imageResource);
-            view.setImageDrawable(res);
+        int WHITE = 0xFFFFFFFF;
+        int BLACK = 0xFF000000;
+        int WIDTH = 150;
+        int HEIGHT = 150;
+        try {
+            result = new MultiFormatWriter().encode(str,
+                    BarcodeFormat.QR_CODE, WIDTH, WIDTH, null);
+        } catch (IllegalArgumentException iae) {
+            // Unsupported format
+            return null;
         }
+        int w = result.getWidth();
+        int h = result.getHeight();
+        int[] pixels = new int[w * h];
+        for (int y = 0; y < h; y++) {
+            int offset = y * w;
+            for (int x = 0; x < w; x++) {
+                pixels[offset + x] = result.get(x, y) ? BLACK : WHITE;
+            }
+        }
+        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        bitmap.setPixels(pixels, 0, WIDTH, 0, 0, w, h);
+        return bitmap;
     }
 }
