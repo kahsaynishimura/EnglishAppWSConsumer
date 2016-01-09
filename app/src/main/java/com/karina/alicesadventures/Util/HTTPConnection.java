@@ -69,14 +69,10 @@ public class HTTPConnection {
 //        HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-        //add reuqest header
         con.setRequestMethod("POST");
-     //   con.setRequestProperty("User-Agent", USER_AGENT);
         con.setRequestProperty("Accept", "text/xml; charset=utf-8");
-     //   con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-        //   urlParameters.
-        //        ;= "data[User][username]=thiago&data[User][password]=thiago";
+        //   urlParameters= "data[User][username]=thiago&data[User][password]=thiago";
 
         // Send post request
         con.setDoOutput(true);

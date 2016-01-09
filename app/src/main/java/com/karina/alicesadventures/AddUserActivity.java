@@ -135,6 +135,7 @@ public class AddUserActivity extends AppCompatActivity {
                 message = messageXmlParser.parse(new StringReader(result));
             } catch (Exception e) {
                 e.printStackTrace();
+                mAddUserTask = null;
             }
             System.out.println(result);
             return message;

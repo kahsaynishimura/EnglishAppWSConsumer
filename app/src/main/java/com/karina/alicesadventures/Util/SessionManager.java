@@ -51,13 +51,13 @@ public class SessionManager {
 
         editor.putString(KEY_NAME, user.getName());
 
-        editor.putInt(KEY_ID, user.get_id());
+        editor.putString(KEY_ID, (user.get_id().toString()));
 
         editor.putString(KEY_ROLE, user.getRole());
 
         editor.putString(KEY_USERNAME, user.getUsername());
 
-        editor.putInt(KEY_LAST_COMPLETED_EXERCISE, user.getLastCompletedExercise());
+        editor.putString(KEY_LAST_COMPLETED_EXERCISE, user.getLastCompletedExercise().toString());
 
         // commit changes
         editor.commit();

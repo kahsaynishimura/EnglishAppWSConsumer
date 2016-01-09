@@ -4,11 +4,14 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInstaller;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,22 +22,27 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.karina.alicesadventures.Util.HTTPConnection;
+import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.Book;
 import com.karina.alicesadventures.model.DBHandler;
 import com.karina.alicesadventures.model.Lesson;
 import com.karina.alicesadventures.model.Product;
 import com.karina.alicesadventures.parsers.BookXmlParser;
+import com.karina.alicesadventures.parsers.MessageXmlParser;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 
 public class LessonCompletedActivity extends ActionBarActivity {
+    private AddPracticeTask mAddPracticeTask;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -57,8 +65,21 @@ public class LessonCompletedActivity extends ActionBarActivity {
         ((TextView) findViewById(R.id.txt_start_time)).setText(getString(R.string.start_time) + ": " + df.format(startTime));
         ((TextView) findViewById(R.id.txt_finish_time)).setText(getString(R.string.finish_time) + ": " + df.format(finishTime));
         ((TextView) findViewById(R.id.txt_correct)).setText(getString(R.string.correct) + ": " + totalHits);
-       savePracticeSummary(sharedPreferences.getInt("user_id", 0), sharedPreferences.getInt("lesson_id", 0),
-                totalHits, startTime.getTime(), finishTime.getTime(), totalHits);
+
+        df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SessionManager sessionManager = new SessionManager(LessonCompletedActivity.this);
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("data[Practice][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
+
+        hashMap.put("data[Practice][start_time]", df.format(startTime));
+        hashMap.put("data[Practice][finish_time]", df.format(finishTime));
+        hashMap.put("data[Practice][points]", totalHits.toString());
+        try {
+            mAddPracticeTask = new AddPracticeTask("http://karinanishimura.com.br/cakephp/practices/add_api.xml", hashMap);
+            mAddPracticeTask.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -139,5 +160,57 @@ public class LessonCompletedActivity extends ActionBarActivity {
         return null;
     }
 
+
+    private class AddPracticeTask extends AsyncTask<Void, Void, String> {
+
+        private final String url;
+        HashMap hashMap;
+
+        public AddPracticeTask(String url, HashMap<String, String> hashMap) {
+            this.hashMap = hashMap;
+            this.url = url;
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String message = null;
+            HTTPConnection httpConnection = new HTTPConnection();
+            MessageXmlParser messageXmlParser = new MessageXmlParser();
+            String result = "";
+            try {
+                result = httpConnection.sendPost(url, hashMap);
+                message = messageXmlParser.parse(new StringReader(result));
+            } catch (Exception e) {
+                e.printStackTrace();
+                mAddPracticeTask = null;
+
+            }
+            System.out.println(result);
+            return message;
+        }
+
+
+        @Override
+        protected void onPostExecute(String message) {
+            super.onPostExecute(message);
+            mAddPracticeTask = null;
+            if (message == null) {
+                Snackbar.make(((FloatingActionButton) findViewById(R.id.fab)), getText(R.string.verify_internet_connection), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            } else {
+                Toast.makeText(LessonCompletedActivity.this, message, Toast.LENGTH_LONG).show();
+
+
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+
+            mAddPracticeTask = null;
+
+        }
+    }
 
 }
