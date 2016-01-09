@@ -72,7 +72,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         }
     }
 
-    public void getProduct(View v) {
+    public void trade(View v) {
         SessionManager sessionManager = new SessionManager(ProductDetailActivity.this);
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Trade][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));

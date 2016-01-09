@@ -1,13 +1,19 @@
 package com.karina.alicesadventures;
 
 import android.app.Activity;
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.Product;
 import com.karina.alicesadventures.parsers.ProductXmlParser;
 
@@ -50,7 +56,7 @@ public class ProductDetailFragment extends Fragment {
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(mItem.getName());
+                appBarLayout.setTitle(mItem.getName() + " (" + mItem.getPoints_value() + ")");
             }
         }
     }
@@ -59,12 +65,27 @@ public class ProductDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.product_detail, container, false);
-
+        SessionManager sessionManager = new SessionManager(getActivity());
         // Show the dummy content as text in a TextView.
         if (mItem != null) {
             ((TextView) rootView.findViewById(R.id.product_detail)).setText(mItem.getDescription());
+            ((TextView) rootView.findViewById(R.id.tvPoints)).setText(getText(R.string.you_have) + " " + sessionManager.getUserDetails().get(SessionManager.KEY_TOTAL_POINTS) + " " + getText(R.string.points));
+          //  ((ImageView) rootView.findViewById(R.id.qr_code)).changeDrawable((ImageView) rootView.findViewById(R.id.qr_code));
+         //   ((TextView) rootView.findViewById(R.id.product_detail)).setText(mItem.getDesption());
         }
 
         return rootView;
+    }
+
+    private void changeDrawable( ImageView view, String uri,  int id) {
+        Activity context = this.getActivity();
+        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) { //versao api >21
+            view.setImageDrawable(context.getDrawable(id));
+        } else {
+            int imageResource = context.getResources().getIdentifier(uri, null, context.getPackageName());
+
+            Drawable res = context.getResources().getDrawable(imageResource);
+            view.setImageDrawable(res);
+        }
     }
 }

@@ -46,8 +46,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|start"
         android:layout_margin="@dimen/fab_margin"
-        android:onClick="getProduct"
-        android:src="@android:drawable/stat_notify_chat"
+        android:onClick="trade"
+        android:src="@android:drawable/ic_menu_add"
         app:layout_anchor="@+id/product_detail_container"
         app:layout_anchorGravity="top|end" />
 

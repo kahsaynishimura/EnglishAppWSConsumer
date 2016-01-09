@@ -33,6 +33,7 @@ public class SessionManager {
     public static final String KEY_ROLE = "role";
     public static final String KEY_USERNAME = "username";
     public static final String KEY_LAST_COMPLETED_EXERCISE = "last_completed_exercise";
+    public static final String KEY_TOTAL_POINTS ="total_points" ;
 
     // Constructor
     @SuppressLint("CommitPrefEdits")
@@ -48,16 +49,12 @@ public class SessionManager {
     public void createLoginSession(User user) {
 
         editor.putBoolean(IS_LOGIN, true);
-
         editor.putString(KEY_NAME, user.getName());
-
         editor.putString(KEY_ID, (user.get_id().toString()));
-
         editor.putString(KEY_ROLE, user.getRole());
-
         editor.putString(KEY_USERNAME, user.getUsername());
-
         editor.putString(KEY_LAST_COMPLETED_EXERCISE, user.getLastCompletedExercise().toString());
+        editor.putString(KEY_TOTAL_POINTS, user.getTotal_points().toString());
 
         // commit changes
         editor.commit();
@@ -73,6 +70,7 @@ public class SessionManager {
         user.put(KEY_ROLE, pref.getString(KEY_ROLE, null));
         user.put(KEY_USERNAME, pref.getString(KEY_USERNAME, null));
         user.put(KEY_LAST_COMPLETED_EXERCISE, pref.getString(KEY_LAST_COMPLETED_EXERCISE, null));
+        user.put(KEY_TOTAL_POINTS, pref.getString(KEY_TOTAL_POINTS, null));
         return user;
     }
 

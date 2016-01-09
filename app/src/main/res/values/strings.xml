@@ -39,5 +39,7 @@
     <string name="title_product_list">Products</string>
     <string name="title_product_detail">Product Detail</string>
     <string name="view_prizes">View Prizes</string>
+    <string name="you_have">You have</string>
+    <string name="points">points</string>
 
 </resources>

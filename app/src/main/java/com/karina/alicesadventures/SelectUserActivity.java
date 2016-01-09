@@ -28,7 +28,9 @@ public class SelectUserActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         sessionManager = new SessionManager(SelectUserActivity.this);
         if (sessionManager.isLoggedIn()) {
-            Intent i = new Intent(SelectUserActivity.this, BookActivity.class);
+            Intent i = new Intent(SelectUserActivity.this, ProductListActivity.class);
+
+          //  Intent i = new Intent(SelectUserActivity.this, BookActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);

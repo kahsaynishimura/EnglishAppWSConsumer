@@ -57,6 +57,7 @@ public class UserXmlParser { // We don't use namespaces
         String role = null;
         String username = null;
         Integer lastCompletedExercise = null;
+        Integer totalPoints = null;
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
@@ -72,11 +73,13 @@ public class UserXmlParser { // We don't use namespaces
                 username = readText(parser);
             } else if (tagName.equals("last_completed_lesson")) {
                 lastCompletedExercise = Integer.parseInt(readText(parser));
+            } else if (tagName.equals("total_points")) {
+                totalPoints = Integer.parseInt(readText(parser));
             } else {
                 skip(parser);
             }
         }
-        return new User(id, name, role, username, lastCompletedExercise);
+        return new User(id, name, role, username, lastCompletedExercise,totalPoints);
     }
 
     private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
