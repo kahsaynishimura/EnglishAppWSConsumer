@@ -35,11 +35,11 @@
             android:id="@+id/qr_code"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tvPoints"
-            android:layout_margin="@dimen/activity_horizontal_margin"
             android:padding="@dimen/activity_horizontal_margin"
-            android:src="@drawable/first_screen"
-            android:visibility="visible" />
+            android:src="@drawable/check"
+            android:visibility="visible"
+            android:layout_below="@+id/tvPoints"
+            android:layout_centerHorizontal="true" />
 
         <Button
             android:id="@+id/btn_trade"
@@ -51,6 +51,15 @@
             android:background="@android:color/white"
             android:onClick="trade"
             android:text="@string/log_in" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/qr_code_instructions"
+            android:id="@+id/qr_code_instructions"
+            android:layout_below="@+id/btn_trade"
+            android:layout_centerHorizontal="true" />
 
 
     </RelativeLayout>

@@ -76,45 +76,12 @@ public class ProductDetailFragment extends Fragment {
         if (mItem != null) {
             ((TextView) rootView.findViewById(R.id.product_detail)).setText(mItem.getDescription());
             ((TextView) rootView.findViewById(R.id.tvPoints)).setText(getText(R.string.you_have) + " " + sessionManager.getUserDetails().get(SessionManager.KEY_TOTAL_POINTS) + " " + getText(R.string.points));
-            try {
-                Bitmap bitmap = encodeAsBitmap("karinanishimura.com.br");
-                ((ImageView) rootView.findViewById(R.id.qr_code)).setImageBitmap(bitmap);
 
-            } catch (WriterException e) {
-                e.printStackTrace();
-            }
-            //  ((ImageView) rootView.findViewById(R.id.qr_code)).changeDrawable((ImageView) rootView.findViewById(R.id.qr_code));
-            //   ((TextView) rootView.findViewById(R.id.product_detail)).setText(mItem.getDesption());
+            //   ((TextView) rootView.findViewById(R.id.qr_code_instructions)).setVisibility(View.VISIBLE);
         }
 
         return rootView;
     }
 
-    Bitmap encodeAsBitmap(String str) throws WriterException {
-        BitMatrix result;
 
-        int WHITE = 0xFFFFFFFF;
-        int BLACK = 0xFF000000;
-        int WIDTH = 150;
-        int HEIGHT = 150;
-        try {
-            result = new MultiFormatWriter().encode(str,
-                    BarcodeFormat.QR_CODE, WIDTH, WIDTH, null);
-        } catch (IllegalArgumentException iae) {
-            // Unsupported format
-            return null;
-        }
-        int w = result.getWidth();
-        int h = result.getHeight();
-        int[] pixels = new int[w * h];
-        for (int y = 0; y < h; y++) {
-            int offset = y * w;
-            for (int x = 0; x < w; x++) {
-                pixels[offset + x] = result.get(x, y) ? BLACK : WHITE;
-            }
-        }
-        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        bitmap.setPixels(pixels, 0, WIDTH, 0, 0, w, h);
-        return bitmap;
-    }
 }

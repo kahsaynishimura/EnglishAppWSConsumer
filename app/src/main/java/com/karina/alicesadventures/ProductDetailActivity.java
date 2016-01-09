@@ -1,6 +1,7 @@
 package com.karina.alicesadventures;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,8 +12,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.Product;
@@ -28,6 +34,7 @@ import java.util.HashMap;
  * in a {@link ProductListActivity}.
  */
 public class ProductDetailActivity extends AppCompatActivity {
+    private static final String QR_CODE =  "todo";
     private AddTradeTask mAddTradeTask;
     private Product product = null;
 
@@ -77,7 +84,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Trade][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
         hashMap.put("data[Trade][product_id]", product.getId().toString());
-        hashMap.put("data[Trade][qr_code]", "todo");//TODO
+        hashMap.put("data[Trade][qr_code]",QR_CODE);//TODO
         hashMap.put("data[Trade][validated]", "0");
 
 
@@ -133,6 +140,14 @@ public class ProductDetailActivity extends AppCompatActivity {
                 //update user points field
                 Snackbar.make((findViewById(R.id.fab)), message, Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                try {
+                    ((ImageView) findViewById(R.id.qr_code)).setVisibility(View.VISIBLE);
+                    Bitmap bitmap = encodeAsBitmap("karinanishimura.com.br");
+                    ((ImageView) findViewById(R.id.qr_code)).setImageBitmap(bitmap);
+
+                } catch (WriterException e) {
+                    e.printStackTrace();
+                }
 
             }
         }
@@ -144,7 +159,33 @@ public class ProductDetailActivity extends AppCompatActivity {
             mAddTradeTask = null;
 
         }
-    }
+        Bitmap encodeAsBitmap(String str) throws WriterException {
+            BitMatrix result;
+
+            int WHITE = 0xFFFFFFFF;
+            int BLACK = 0xFF000000;
+            int WIDTH = 150;
+            int HEIGHT = 150;
+            try {
+                result = new MultiFormatWriter().encode(str,
+                        BarcodeFormat.QR_CODE, WIDTH, WIDTH, null);
+            } catch (IllegalArgumentException iae) {
+                // Unsupported format
+                return null;
+            }
+            int w = result.getWidth();
+            int h = result.getHeight();
+            int[] pixels = new int[w * h];
+            for (int y = 0; y < h; y++) {
+                int offset = y * w;
+                for (int x = 0; x < w; x++) {
+                    pixels[offset + x] = result.get(x, y) ? BLACK : WHITE;
+                }
+            }
+            Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, WIDTH, 0, 0, w, h);
+            return bitmap;
+        }}
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -41,5 +41,6 @@
     <string name="view_prizes">View Prizes</string>
     <string name="you_have">You have</string>
     <string name="points">points</string>
+    <string name="qr_code_instructions">In order to get your prize, present this QrCode to the partner offering it</string>
 
 </resources>
