@@ -57,9 +57,9 @@ public class ProductDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            String id=
+            String id =
                     getIntent().getStringExtra(ProductDetailFragment.ARG_ITEM_ID);
-            if(id!=null) {
+            if (id != null) {
                 product = new Product();
                 product.setId(Integer.parseInt(id));
                 arguments.putString(ProductDetailFragment.ARG_ITEM_ID, product.getId().toString());
@@ -77,22 +77,20 @@ public class ProductDetailActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Trade][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
         hashMap.put("data[Trade][product_id]", product.getId().toString());
-        hashMap.put("data[Trade][qr_code]", "todo");//[]
-        hashMap.put("data[Trade][validated]", "false");
+        hashMap.put("data[Trade][qr_code]", "todo");//TODO
+        hashMap.put("data[Trade][validated]", "0");
 
 
         //   discount points
 
-/*
+
         try {
             mAddTradeTask = new AddTradeTask("http://karinanishimura.com.br/cakephp/trades/add_api.xml", hashMap);
             mAddTradeTask.execute();
         } catch (Exception e) {
             e.printStackTrace();
         }
-*/
-        Snackbar.make(v, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
+
     }
 
     private class AddTradeTask extends AsyncTask<Void, Void, String> {
@@ -129,11 +127,11 @@ public class ProductDetailActivity extends AppCompatActivity {
             super.onPostExecute(message);
             mAddTradeTask = null;
             if (message == null) {
-                Snackbar.make(((FloatingActionButton) findViewById(R.id.fab)), getText(R.string.verify_internet_connection), Snackbar.LENGTH_LONG)
+                Snackbar.make((findViewById(R.id.fab)), getText(R.string.verify_internet_connection), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             } else {
-
-                Snackbar.make(((FloatingActionButton) findViewById(R.id.fab)), message, Snackbar.LENGTH_LONG)
+                //update user points field
+                Snackbar.make((findViewById(R.id.fab)), message, Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
             }
