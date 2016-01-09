@@ -1,6 +1,7 @@
 package com.karina.alicesadventures;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -10,6 +11,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.karina.alicesadventures.Util.HTTPConnection;
+import com.karina.alicesadventures.Util.SessionManager;
+import com.karina.alicesadventures.parsers.MessageXmlParser;
+
+import java.io.StringReader;
+import java.util.HashMap;
 
 /**
  * An activity representing a single Product detail screen. This
@@ -18,6 +27,8 @@ import android.view.MenuItem;
  * in a {@link ProductListActivity}.
  */
 public class ProductDetailActivity extends AppCompatActivity {
+    private AddTradeTask mAddTradeTask;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,15 +36,6 @@ public class ProductDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_product_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -61,6 +63,83 @@ public class ProductDetailActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.product_detail_container, fragment)
                     .commit();
+        }
+    }
+
+    public void getProduct(View v) {
+        SessionManager sessionManager = new SessionManager(ProductDetailActivity.this);
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("data[Trade][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
+
+        hashMap.put("data[Trade][product_id]", df.format(startTime));
+        hashMap.put("data[Trade][qr_code]", generated);//[]
+        hashMap.put("data[Trade][validated]", "false");
+
+
+     //   discount points
+
+
+        try {
+            mAddPracticeTask = new AddPracticeTask("http://karinanishimura.com.br/cakephp/practices/add_api.xml", hashMap);
+            mAddPracticeTask.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Snackbar.make(v, "Replace with your own detail action", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+    }
+
+    private class AddTradeTask extends AsyncTask<Void, Void, String> {
+
+        private final String url;
+        HashMap hashMap;
+
+        public AddTradeTask(String url, HashMap<String, String> hashMap) {
+            this.hashMap = hashMap;
+            this.url = url;
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String message = null;
+            HTTPConnection httpConnection = new HTTPConnection();
+            MessageXmlParser messageXmlParser = new MessageXmlParser();
+            String result = "";
+            try {
+                result = httpConnection.sendPost(url, hashMap);
+                message = messageXmlParser.parse(new StringReader(result));
+            } catch (Exception e) {
+                e.printStackTrace();
+                mAddTradeTask = null;
+
+            }
+            System.out.println(result);
+            return message;
+        }
+
+
+        @Override
+        protected void onPostExecute(String message) {
+            super.onPostExecute(message);
+            mAddTradeTask = null;
+            if (message == null) {
+                Snackbar.make(((FloatingActionButton) findViewById(R.id.fab)), getText(R.string.verify_internet_connection), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            } else {
+
+                Snackbar.make(((FloatingActionButton) findViewById(R.id.fab)), message, Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+
+            mAddTradeTask = null;
+
         }
     }
 
