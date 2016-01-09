@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.SessionManager;
+import com.karina.alicesadventures.model.Product;
 import com.karina.alicesadventures.parsers.MessageXmlParser;
 
 import java.io.StringReader;
@@ -28,7 +29,7 @@ import java.util.HashMap;
  */
 public class ProductDetailActivity extends AppCompatActivity {
     private AddTradeTask mAddTradeTask;
-
+    private Product product = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,13 +57,18 @@ public class ProductDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(ProductDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(ProductDetailFragment.ARG_ITEM_ID));
-            ProductDetailFragment fragment = new ProductDetailFragment();
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.product_detail_container, fragment)
-                    .commit();
+            String id=
+                    getIntent().getStringExtra(ProductDetailFragment.ARG_ITEM_ID);
+            if(id!=null) {
+                product = new Product();
+                product.setId(Integer.parseInt(id));
+                arguments.putString(ProductDetailFragment.ARG_ITEM_ID, product.getId().toString());
+                ProductDetailFragment fragment = new ProductDetailFragment();
+                fragment.setArguments(arguments);
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.product_detail_container, fragment)
+                        .commit();
+            }
         }
     }
 
@@ -70,22 +76,21 @@ public class ProductDetailActivity extends AppCompatActivity {
         SessionManager sessionManager = new SessionManager(ProductDetailActivity.this);
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Trade][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
-
-        hashMap.put("data[Trade][product_id]", df.format(startTime));
-        hashMap.put("data[Trade][qr_code]", generated);//[]
+        hashMap.put("data[Trade][product_id]", product.getId().toString());
+        hashMap.put("data[Trade][qr_code]", "todo");//[]
         hashMap.put("data[Trade][validated]", "false");
 
 
-     //   discount points
+        //   discount points
 
-
+/*
         try {
-            mAddPracticeTask = new AddPracticeTask("http://karinanishimura.com.br/cakephp/practices/add_api.xml", hashMap);
-            mAddPracticeTask.execute();
+            mAddTradeTask = new AddTradeTask("http://karinanishimura.com.br/cakephp/trades/add_api.xml", hashMap);
+            mAddTradeTask.execute();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+*/
         Snackbar.make(v, "Replace with your own detail action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
     }
