@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +26,7 @@ import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.Product;
 import com.karina.alicesadventures.parsers.MessageXmlParser;
+import com.karina.alicesadventures.parsers.ProductXmlParser;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -151,7 +153,14 @@ public class ProductDetailActivity extends AppCompatActivity {
                     } catch (WriterException e) {
                         e.printStackTrace();
                     }
-
+                    //update screen values
+                    Product mProduct = ProductXmlParser.ITEM_MAP.get(product.getId().toString());
+                    mProduct.setQuantity_available(mProduct.getQuantity_available() - 1);
+                    ProductXmlParser.ITEM_MAP.put(product.getId().toString(), mProduct);
+                    CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+                    if (appBarLayout != null) {
+                        appBarLayout.setTitle(mProduct.getName() + " (" + mProduct.getQuantity_available() + ")");
+                    }
                 }
             }
         }
