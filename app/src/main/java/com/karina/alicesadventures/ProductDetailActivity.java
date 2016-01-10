@@ -7,16 +7,15 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -24,8 +23,9 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.SessionManager;
+import com.karina.alicesadventures.model.GeneralResponse;
 import com.karina.alicesadventures.model.Product;
-import com.karina.alicesadventures.parsers.MessageXmlParser;
+import com.karina.alicesadventures.parsers.GeneralResponseXmlParser;
 import com.karina.alicesadventures.parsers.ProductXmlParser;
 
 import java.io.StringReader;
@@ -38,7 +38,6 @@ import java.util.HashMap;
  * in a {@link ProductListActivity}.
  */
 public class ProductDetailActivity extends AppCompatActivity {
-    private static final String QR_CODE = "karinanishimura.com.br";
     private AddTradeTask mAddTradeTask;
     private Product product = null;
 
@@ -88,8 +87,6 @@ public class ProductDetailActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Trade][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
         hashMap.put("data[Trade][product_id]", product.getId().toString());
-        hashMap.put("data[Trade][qr_code]", QR_CODE);//TODO: generate hashed string
-        hashMap.put("data[Trade][validated]", "0");
 
         try {
             mAddTradeTask = new AddTradeTask("http://karinanishimura.com.br/cakephp/trades/add_api.xml", hashMap);
@@ -100,7 +97,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     }
 
-    private class AddTradeTask extends AsyncTask<Void, Void, String> {
+    private class AddTradeTask extends AsyncTask<Void, Void, GeneralResponse> {
 
         private final String url;
         HashMap hashMap;
@@ -111,43 +108,43 @@ public class ProductDetailActivity extends AppCompatActivity {
         }
 
         @Override
-        protected String doInBackground(Void... params) {
-            String message = null;
+        protected GeneralResponse doInBackground(Void... params) {
+            GeneralResponse generalResponse = null;
             HTTPConnection httpConnection = new HTTPConnection();
-            MessageXmlParser messageXmlParser = new MessageXmlParser();
+            GeneralResponseXmlParser generalXmlParser = new GeneralResponseXmlParser();
             String result = "";
             try {
                 result = httpConnection.sendPost(url, hashMap);
-                message = messageXmlParser.parse(new StringReader(result));
+                generalResponse = generalXmlParser.parse(new StringReader(result));
             } catch (Exception e) {
                 e.printStackTrace();
                 mAddTradeTask = null;
 
             }
             System.out.println(result);
-            return message;
+            return generalResponse;
         }
 
 
         @Override
-        protected void onPostExecute(String message) {
-            super.onPostExecute(message);
+        protected void onPostExecute(GeneralResponse response) {
+            super.onPostExecute(response);
             mAddTradeTask = null;
-            if (message == null) {
+            if (response == null) {
                 Snackbar.make((findViewById(R.id.fab)), getText(R.string.verify_internet_connection), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             } else {
-                Snackbar.make((findViewById(R.id.fab)), message, Snackbar.LENGTH_LONG)
+                Snackbar.make((findViewById(R.id.fab)), response.getMessage(), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                if (message.equals("The trade has been saved.")) {
+                if ( response.getStatus().equals("success")) {
 
-                    //update session total points
                     try {
                         ((ImageView) findViewById(R.id.qr_code)).setVisibility(View.VISIBLE);
                         ((TextView) findViewById(R.id.qr_code_instructions)).setVisibility(View.VISIBLE);
                         ((Button) findViewById(R.id.btn_trade)).setVisibility(View.GONE);
                         ((FloatingActionButton) findViewById(R.id.fab)).setVisibility(View.GONE);
-                        Bitmap bitmap = encodeAsBitmap(QR_CODE);
+
+                        Bitmap bitmap = encodeAsBitmap( response.getData() );
                         ((ImageView) findViewById(R.id.qr_code)).setImageBitmap(bitmap);
 
                     } catch (WriterException e) {
