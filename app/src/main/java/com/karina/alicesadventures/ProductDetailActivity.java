@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +36,7 @@ import java.util.HashMap;
  * in a {@link ProductListActivity}.
  */
 public class ProductDetailActivity extends AppCompatActivity {
-    private static final String QR_CODE =  "todo";
+    private static final String QR_CODE = "karinanishimura.com.br";
     private AddTradeTask mAddTradeTask;
     private Product product = null;
 
@@ -85,12 +86,8 @@ public class ProductDetailActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Trade][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
         hashMap.put("data[Trade][product_id]", product.getId().toString());
-        hashMap.put("data[Trade][qr_code]",QR_CODE);//TODO
+        hashMap.put("data[Trade][qr_code]", QR_CODE);//TODO: generate hashed string
         hashMap.put("data[Trade][validated]", "0");
-
-
-        //   discount points
-
 
         try {
             mAddTradeTask = new AddTradeTask("http://karinanishimura.com.br/cakephp/trades/add_api.xml", hashMap);
@@ -138,19 +135,24 @@ public class ProductDetailActivity extends AppCompatActivity {
                 Snackbar.make((findViewById(R.id.fab)), getText(R.string.verify_internet_connection), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             } else {
-                //update user points field
                 Snackbar.make((findViewById(R.id.fab)), message, Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                try {
-                    ((ImageView) findViewById(R.id.qr_code)).setVisibility(View.VISIBLE);
-                    ((TextView) findViewById(R.id.qr_code_instructions)).setVisibility(View.VISIBLE);
-                    Bitmap bitmap = encodeAsBitmap("karinanishimura.com.br");
-                    ((ImageView) findViewById(R.id.qr_code)).setImageBitmap(bitmap);
+                if (message.equals("The trade has been saved.")) {
 
-                } catch (WriterException e) {
-                    e.printStackTrace();
+                    //update session total points
+                    try {
+                        ((ImageView) findViewById(R.id.qr_code)).setVisibility(View.VISIBLE);
+                        ((TextView) findViewById(R.id.qr_code_instructions)).setVisibility(View.VISIBLE);
+                        ((Button) findViewById(R.id.btn_trade)).setVisibility(View.GONE);
+                        ((FloatingActionButton) findViewById(R.id.fab)).setVisibility(View.GONE);
+                        Bitmap bitmap = encodeAsBitmap(QR_CODE);
+                        ((ImageView) findViewById(R.id.qr_code)).setImageBitmap(bitmap);
+
+                    } catch (WriterException e) {
+                        e.printStackTrace();
+                    }
+
                 }
-
             }
         }
 
@@ -161,6 +163,7 @@ public class ProductDetailActivity extends AppCompatActivity {
             mAddTradeTask = null;
 
         }
+
         Bitmap encodeAsBitmap(String str) throws WriterException {
             BitMatrix result;
 
@@ -187,7 +190,8 @@ public class ProductDetailActivity extends AppCompatActivity {
             Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
             bitmap.setPixels(pixels, 0, WIDTH, 0, 0, w, h);
             return bitmap;
-        }}
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

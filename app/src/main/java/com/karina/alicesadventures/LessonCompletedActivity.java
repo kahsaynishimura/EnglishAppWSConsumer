@@ -70,23 +70,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
             e.printStackTrace();
         }
     }
-
-
-    private void savePracticeSummary(int userId, int lessonId, Integer totalHits, Long startTime, Long finishTime, Integer totalPoints) {
-        DBHandler db = null;
-
-        try {
-            InputStream is = getBaseContext().getAssets()
-                    .open(DBHandler.DATABASE_NAME);
-            db = new DBHandler(this, is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (db != null) {
-            //String id = db.addPracticeHistory(userId, lessonId, totalHits, startTime.toString(), finishTime.toString(), totalPoints);
-        }
-    }
-
+    
     public void saveLastLessonCompletedId(SharedPreferences sharedPreferences) {
 
         DBHandler db = null;

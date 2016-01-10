@@ -151,14 +151,9 @@ public class AddUserActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             } else {
                 Toast.makeText(AddUserActivity.this, message, Toast.LENGTH_LONG).show();
-                // save logged in user
                 //confirm email
 
-           //     sessionManager.createLoginSession(user);
-
                 Intent i = new Intent(AddUserActivity.this, SelectUserActivity.class);
-                //i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-               // i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
                 finish();
             }
