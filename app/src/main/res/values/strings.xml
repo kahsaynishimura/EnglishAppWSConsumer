@@ -39,9 +39,9 @@
     <string name="title_product_list">Products</string>
     <string name="title_product_detail">Product Detail</string>
     <string name="view_prizes">View Prizes</string>
-    <string name="you_have">You have</string>
-    <string name="points">points</string>
+    <string name="points">point(s)</string>
     <string name="qr_code_instructions">In order to get your prize, present this QrCode to the partner offering it</string>
     <string name="get_this_product">Get this prize</string>
+    <string name="cost">Cost:</string>
 
 </resources>
