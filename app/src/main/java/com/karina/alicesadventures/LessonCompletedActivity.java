@@ -59,7 +59,6 @@ public class LessonCompletedActivity extends ActionBarActivity {
         SessionManager sessionManager = new SessionManager(LessonCompletedActivity.this);
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Practice][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
-
         hashMap.put("data[Practice][start_time]", df.format(startTime));
         hashMap.put("data[Practice][finish_time]", df.format(finishTime));
         hashMap.put("data[Practice][points]", totalHits.toString());
