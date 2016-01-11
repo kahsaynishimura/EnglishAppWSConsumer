@@ -2,29 +2,48 @@ package com.karina.alicesadventures;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
 import com.karina.alicesadventures.Util.HTTPConnection;
+import com.karina.alicesadventures.Util.IntentIntegrator;
+import com.karina.alicesadventures.Util.IntentResult;
 import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.Book;
+import com.karina.alicesadventures.model.GeneralResponse;
+import com.karina.alicesadventures.model.Product;
 import com.karina.alicesadventures.parsers.BookXmlParser;
+import com.karina.alicesadventures.parsers.GeneralResponseXmlParser;
+import com.karina.alicesadventures.parsers.ProductXmlParser;
 
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.List;
 
 public class BookActivity extends ActionBarActivity {
 
     private ListBooksTask mListBooksTask;
+    private ValidateCodeTask mValidateCodeTask;
     private SessionManager sessionManager;
 
     @Override
@@ -88,7 +107,7 @@ public class BookActivity extends ActionBarActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_book, menu);
 
-        if (!"partner" .equals(sessionManager.getUserDetails().get(
+        if (!"partner".equals(sessionManager.getUserDetails().get(
                 SessionManager.KEY_ROLE))) {
             menu.removeItem(R.id.action_validate_code);
         }
@@ -105,8 +124,124 @@ public class BookActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
             sessionManager.logoutUser();
+        } else if (id == R.id.action_validate_code) {
+            IntentIntegrator scanIntegrator = new IntentIntegrator(BookActivity.this);
+            scanIntegrator.initiateScan();
         }
-
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if (scanningResult != null) {
+            String scanContent = scanningResult.getContents();
+            String scanFormat = scanningResult.getFormatName();
+            if(scanFormat.equals("QR_CODE")){
+                HashMap<String, String> hashMap = new HashMap<>();
+                hashMap.put("data[Trade][qr_code]", scanContent);
+
+                try {
+                    mValidateCodeTask = new ValidateCodeTask("http://karinanishimura.com.br/cakephp/trades/validateQR.xml", hashMap);
+                    mValidateCodeTask.execute();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }else{
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "No scan data received!", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
+
+    private class ValidateCodeTask extends AsyncTask<Void, Void, GeneralResponse> {
+
+        private final String url;
+        HashMap hashMap;
+
+        public ValidateCodeTask(String url, HashMap<String, String> hashMap) {
+            this.hashMap = hashMap;
+            this.url = url;
+        }
+
+        @Override
+        protected GeneralResponse doInBackground(Void... params) {
+            GeneralResponse generalResponse = null;
+            HTTPConnection httpConnection = new HTTPConnection();
+            GeneralResponseXmlParser generalXmlParser = new GeneralResponseXmlParser();
+            String result = "";
+            try {
+                result = httpConnection.sendPost(url, hashMap);
+                generalResponse = generalXmlParser.parse(new StringReader(result));
+            } catch (Exception e) {
+                e.printStackTrace();
+                mValidateCodeTask = null;
+
+            }
+            System.out.println(result);
+            return generalResponse;
+        }
+
+
+        @Override
+        protected void onPostExecute(GeneralResponse response) {
+            super.onPostExecute(response);
+            mValidateCodeTask = null;
+            if (response == null) {
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        getText(R.string.verify_internet_connection), Toast.LENGTH_SHORT);
+                toast.show();
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        response.getMessage(), Toast.LENGTH_SHORT).show();
+
+                if (response.getStatus().equals("success")) {
+
+                    Toast.makeText(getApplicationContext(),
+                            response.getStatus(), Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+
+            mValidateCodeTask = null;
+
+        }
+
+        Bitmap encodeAsBitmap(String str) throws WriterException {
+            BitMatrix result;
+
+            int WHITE = 0xFFFFFFFF;
+            int BLACK = 0xFF000000;
+            int WIDTH = 150;
+            int HEIGHT = 150;
+            try {
+                result = new MultiFormatWriter().encode(str,
+                        BarcodeFormat.QR_CODE, WIDTH, WIDTH, null);
+            } catch (IllegalArgumentException iae) {
+                // Unsupported format
+                return null;
+            }
+            int w = result.getWidth();
+            int h = result.getHeight();
+            int[] pixels = new int[w * h];
+            for (int y = 0; y < h; y++) {
+                int offset = y * w;
+                for (int x = 0; x < w; x++) {
+                    pixels[offset + x] = result.get(x, y) ? BLACK : WHITE;
+                }
+            }
+            Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, WIDTH, 0, 0, w, h);
+            return bitmap;
+        }
+    }
+
 }

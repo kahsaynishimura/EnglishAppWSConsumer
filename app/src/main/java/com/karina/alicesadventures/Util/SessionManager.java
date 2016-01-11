@@ -71,6 +71,11 @@ public class SessionManager {
         return user;
     }
 
+
+    /**
+     * Quick check for login
+     * **/
+    // Get Login State
     public boolean isLoggedIn() {
         return pref.getBoolean(IS_LOGIN, false);
     }
@@ -88,6 +93,7 @@ public class SessionManager {
 
 		_context.startActivity(i);
 	}
+
     /**
      * Check login method will check user login status If false it will redirect
      * user to login page Else won't do anything
@@ -105,9 +111,4 @@ public class SessionManager {
 		}
 
 	}
-
-    /**
-     * Quick check for login
-     * **/
-    // Get Login State
 }
