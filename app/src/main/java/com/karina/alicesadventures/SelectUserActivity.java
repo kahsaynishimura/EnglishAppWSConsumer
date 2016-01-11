@@ -30,11 +30,11 @@ public class SelectUserActivity extends ActionBarActivity {
         if (sessionManager.isLoggedIn()) {
             //Intent i = new Intent(SelectUserActivity.this, ProductListActivity.class);
 
-             Intent i = new Intent(SelectUserActivity.this, BookActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Intent i = new Intent(SelectUserActivity.this, BookActivity.class);
+
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
-            finish();
+
         } else {
             setContentView(R.layout.activity_select_user);
         }

@@ -31,7 +31,7 @@ public class BookActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book);
-        sessionManager=new SessionManager(BookActivity.this);
+        sessionManager = new SessionManager(BookActivity.this);
         sessionManager.checkLogin();
         mListBooksTask = new ListBooksTask();
         mListBooksTask.execute("http://www.karinanishimura.com.br/cakephp/books/index_api.xml");
@@ -56,7 +56,7 @@ public class BookActivity extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(List<Book> books) {
-            mListBooksTask=null;
+            mListBooksTask = null;
             super.onPostExecute(books);
             if (books == null) {
                 Toast.makeText(BookActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
@@ -87,6 +87,11 @@ public class BookActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_book, menu);
+
+        if (!"partner" .equals(sessionManager.getUserDetails().get(
+                SessionManager.KEY_ROLE))) {
+            menu.removeItem(R.id.action_validate_code);
+        }
         return true;
     }
 
@@ -99,7 +104,7 @@ public class BookActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
-           sessionManager. logoutUser();
+            sessionManager.logoutUser();
         }
 
         return super.onOptionsItemSelected(item);
