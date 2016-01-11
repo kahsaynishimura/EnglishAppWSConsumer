@@ -44,5 +44,8 @@
     <string name="get_this_product">Get this prize</string>
     <string name="cost">Cost:</string>
     <string name="action_validate_code">Validate QRCode</string>
+    <string name="action_view_prizes">My Prizes</string>
+    <string name="title_activity_prizes">PrizesActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 
 </resources>

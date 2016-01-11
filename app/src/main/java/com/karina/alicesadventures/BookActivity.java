@@ -119,6 +119,9 @@ public class BookActivity extends ActionBarActivity {
         } else if (id == R.id.action_validate_code) {
             IntentIntegrator scanIntegrator = new IntentIntegrator(BookActivity.this);
             scanIntegrator.initiateScan();
+        } else if (id == R.id.action_view_prizes) {
+            Intent i = new Intent(BookActivity.this, PrizesActivity.class);
+            startActivity(i);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -130,7 +133,7 @@ public class BookActivity extends ActionBarActivity {
         if (scanningResult != null) {
             String scanContent = scanningResult.getContents();
             String scanFormat = scanningResult.getFormatName();
-            if(scanFormat.equals("QR_CODE")){
+            if (scanFormat.equals("QR_CODE")) {
                 HashMap<String, String> hashMap = new HashMap<>();
                 hashMap.put("data[Trade][qr_code]", scanContent);
 
@@ -141,7 +144,7 @@ public class BookActivity extends ActionBarActivity {
                     e.printStackTrace();
                 }
             }
-        }else{
+        } else {
             Toast toast = Toast.makeText(getApplicationContext(),
                     "No scan data received!", Toast.LENGTH_SHORT);
             toast.show();

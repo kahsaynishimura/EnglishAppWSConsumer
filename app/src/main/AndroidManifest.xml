@@ -68,6 +68,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.karina.alicesadventures.ProductListActivity" />
         </activity>
+        <activity
+            android:name=".PrizesActivity"
+            android:label="@string/title_activity_prizes"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
