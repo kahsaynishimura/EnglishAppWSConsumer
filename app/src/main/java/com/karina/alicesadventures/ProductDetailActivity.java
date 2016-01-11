@@ -25,8 +25,11 @@ import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.GeneralResponse;
 import com.karina.alicesadventures.model.Product;
+import com.karina.alicesadventures.model.User;
 import com.karina.alicesadventures.parsers.GeneralResponseXmlParser;
 import com.karina.alicesadventures.parsers.ProductXmlParser;
+import com.karina.alicesadventures.parsers.ProductsXmlParser;
+import com.karina.alicesadventures.parsers.UserXmlParser;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -39,6 +42,8 @@ import java.util.HashMap;
  */
 public class ProductDetailActivity extends AppCompatActivity {
     private AddTradeTask mAddTradeTask;
+    private ViewProductTask mViewProductTask;
+
     private Product product = null;
 
     @Override
@@ -72,12 +77,23 @@ public class ProductDetailActivity extends AppCompatActivity {
             if (id != null) {
                 product = new Product();
                 product.setId(Integer.parseInt(id));
-                arguments.putString(ProductDetailFragment.ARG_ITEM_ID, product.getId().toString());
-                ProductDetailFragment fragment = new ProductDetailFragment();
-                fragment.setArguments(arguments);
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.product_detail_container, fragment)
-                        .commit();
+
+                if (ProductsXmlParser.ITEM_MAP.get(id) == null) {
+                    try {
+                        mViewProductTask = new ViewProductTask("http://karinanishimura.com.br/cakephp/products/view_api/" + id + ".xml", null);
+                        mViewProductTask.execute();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    arguments.putString(ProductDetailFragment.ARG_ITEM_ID, id);
+                    ProductDetailFragment fragment = new ProductDetailFragment();
+                    fragment.setArguments(arguments);
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.product_detail_container, fragment)
+                            .commit();
+                }
             }
         }
     }
@@ -95,6 +111,60 @@ public class ProductDetailActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
+
+    private class ViewProductTask extends AsyncTask<Void, Void, Product> {
+
+        private final String url;
+        HashMap hashMap;
+
+        public ViewProductTask(String url, HashMap<String, String> hashMap) {
+            this.hashMap = hashMap;
+            this.url = url;
+        }
+
+        @Override
+        protected Product doInBackground(Void... params) {
+            Product product = null;
+            HTTPConnection httpConnection = new HTTPConnection();
+            ProductXmlParser productXmlParser = new ProductXmlParser();
+            String result = "";
+            try {
+                result = httpConnection.sendGet(url);
+                product = productXmlParser.parse(new StringReader(result));
+            } catch (Exception e) {
+                e.printStackTrace();
+                mViewProductTask = null;
+            }
+            System.out.println(result);
+            return product;
+        }
+
+
+        @Override
+        protected void onPostExecute(Product product) {
+            super.onPostExecute(product);
+            mViewProductTask = null;
+            if (product != null) {
+               // ProductsXmlParser.ITEM_MAP.put(product.getId().toString(), product);
+                Bundle arguments = new Bundle();
+                arguments.putString(ProductDetailFragment.ARG_ITEM_ID, product.getId().toString());
+                ProductDetailFragment fragment = new ProductDetailFragment();
+                fragment.setArguments(arguments);
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.product_detail_container, fragment)
+                        .commit();
+
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+
+            mViewProductTask = null;
+
+        }
     }
 
     private class AddTradeTask extends AsyncTask<Void, Void, GeneralResponse> {
@@ -136,7 +206,7 @@ public class ProductDetailActivity extends AppCompatActivity {
             } else {
                 Snackbar.make((findViewById(R.id.fab)), response.getMessage(), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                if ( response.getStatus().equals("success")) {
+                if (response.getStatus().equals("success")) {
 
                     try {
                         ((ImageView) findViewById(R.id.qr_code)).setVisibility(View.VISIBLE);
@@ -144,16 +214,16 @@ public class ProductDetailActivity extends AppCompatActivity {
                         ((Button) findViewById(R.id.btn_trade)).setVisibility(View.GONE);
                         ((FloatingActionButton) findViewById(R.id.fab)).setVisibility(View.GONE);
 
-                        Bitmap bitmap = encodeAsBitmap( response.getData() );
+                        Bitmap bitmap = encodeAsBitmap(response.getData());
                         ((ImageView) findViewById(R.id.qr_code)).setImageBitmap(bitmap);
 
                     } catch (WriterException e) {
                         e.printStackTrace();
                     }
                     //update screen values
-                    Product mProduct = ProductXmlParser.ITEM_MAP.get(product.getId().toString());
+                    Product mProduct = ProductsXmlParser.ITEM_MAP.get(product.getId().toString());
                     mProduct.setQuantity_available(mProduct.getQuantity_available() - 1);
-                    ProductXmlParser.ITEM_MAP.put(product.getId().toString(), mProduct);
+                    ProductsXmlParser.ITEM_MAP.put(product.getId().toString(), mProduct);
                     CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
                     if (appBarLayout != null) {
                         appBarLayout.setTitle(mProduct.getName() + " (" + mProduct.getQuantity_available() + ")");

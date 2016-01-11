@@ -14,22 +14,23 @@ import javax.net.ssl.HttpsURLConnection;
  * Created by karina on 2016-01-06.
  */
 public class HTTPConnection {
-   // private final String USER_AGENT = "Mozilla/5.0";
+    // private final String USER_AGENT = "Mozilla/5.0";
 
     public static void main(String[] args) throws Exception {
 
         HTTPConnection http = new HTTPConnection();
 
-       // System.out.println("Testing 1 - Send Http GET request");
-       // http.sendGet();
+        // System.out.println("Testing 1 - Send Http GET request");
+        // http.sendGet();
 
         System.out.println("\nTesting 2 - Send Http POST request");
-        HashMap<String,String> hashMap=new HashMap<>();
-        hashMap.put("data[User][password]","t");
-        hashMap.put("data[User][username]","t");
-        http.sendPost("http://karinanishimura.com.br/cakephp/users/login_api.xml",hashMap);
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("data[User][password]", "t");
+        hashMap.put("data[User][username]", "t");
+        http.sendPost("http://karinanishimura.com.br/cakephp/users/login_api.xml", hashMap);
 
     }
+
     public HTTPConnection() {
     }
 
@@ -42,7 +43,7 @@ public class HTTPConnection {
         con.setRequestMethod("GET");
 
         //add request header
-     //   con.setRequestProperty("User-Agent", USER_AGENT);
+        //   con.setRequestProperty("User-Agent", USER_AGENT);
         con.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
         con.setRequestProperty("Accept", "text/xml; charset=utf-8");
 
@@ -63,60 +64,60 @@ public class HTTPConnection {
     }
 
     // HTTP POST request
-    public String sendPost(String url , HashMap<String, String> urlParameters) throws Exception {
-
-        URL obj = new URL(url);
+    public String sendPost(String url, HashMap<String, String> urlParameters) throws Exception {
+        if (url != null) {
+            URL obj = new URL(url);
 //        HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Accept", "text/xml; charset=utf-8");
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Accept", "text/xml; charset=utf-8");
 
-        //   urlParameters= "data[User][username]=thiago&data[User][password]=thiago";
+            //   urlParameters= "data[User][username]=thiago&data[User][password]=thiago";
 
-        // Send post request
-        con.setDoOutput(true);
-        DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-        String sParams=getQuery(urlParameters);
-        wr.writeBytes(sParams);
-        wr.flush();
-        wr.close();
+            // Send post request
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            String sParams = getQuery(urlParameters);
+            wr.writeBytes(sParams);
+            wr.flush();
+            wr.close();
 
-        int responseCode = con.getResponseCode();
-        System.out.println("\nSending 'POST' request to URL : " + url);
-        System.out.println("Post parameters : " + urlParameters);
-        System.out.println("Response Code : " + responseCode);
+            int responseCode = con.getResponseCode();
+            System.out.println("\nSending 'POST' request to URL : " + url);
+            System.out.println("Post parameters : " + urlParameters);
+            System.out.println("Response Code : " + responseCode);
 
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
 
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            System.out.println("Response Code : " + response.toString());
+
+            //print result
+            return response.toString();
         }
-        in.close();
-        System.out.println("Response Code : " + response.toString());
-
-        //print result
-       return response.toString();
-
+        return null;
     }
-    private String getQuery(HashMap<String ,String> params)
-    {
+
+    private String getQuery(HashMap<String, String> params) {
         String result = "";
         boolean first = true;
 
-        for (String pair : params.keySet())
-        {
+        for (String pair : params.keySet()) {
             if (first)
                 first = false;
             else
-                result+="&";
+                result += "&";
 
-            result+=pair;
-            result+="=";
-            result+=params.get(pair);
+            result += pair;
+            result += "=";
+            result += params.get(pair);
         }
 
         return result;

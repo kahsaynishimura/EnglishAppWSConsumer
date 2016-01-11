@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.Product;
-import com.karina.alicesadventures.parsers.ProductXmlParser;
+import com.karina.alicesadventures.parsers.ProductsXmlParser;
 
 /**
  * A fragment representing a single Product detail screen.
@@ -47,7 +47,7 @@ public class ProductDetailFragment extends Fragment {
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
             String key = getArguments().getString(ARG_ITEM_ID);
-            mItem = ProductXmlParser.ITEM_MAP.get(key);
+            mItem = ProductsXmlParser.ITEM_MAP.get(key);
 
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);

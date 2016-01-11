@@ -24,7 +24,6 @@ public class Product {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.partner = partner;
         this.quantity_available = quantity_available;
         this.points_value = points_value;
         this.payment_status = payment_status;
@@ -34,6 +33,14 @@ public class Product {
     }
 
     public Product(int position, String s, String s1) {
+    }
+
+    public Product(Integer id, String name, String description, Integer quantity_available, Integer points_value) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.quantity_available = quantity_available;
+        this.points_value = points_value;
     }
 
 

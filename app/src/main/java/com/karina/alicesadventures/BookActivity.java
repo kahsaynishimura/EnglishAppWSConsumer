@@ -6,19 +6,13 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
@@ -31,10 +25,8 @@ import com.karina.alicesadventures.Util.IntentResult;
 import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.Book;
 import com.karina.alicesadventures.model.GeneralResponse;
-import com.karina.alicesadventures.model.Product;
 import com.karina.alicesadventures.parsers.BookXmlParser;
 import com.karina.alicesadventures.parsers.GeneralResponseXmlParser;
-import com.karina.alicesadventures.parsers.ProductXmlParser;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -200,8 +192,10 @@ public class BookActivity extends ActionBarActivity {
 
                 if (response.getStatus().equals("success")) {
 
-                    Toast.makeText(getApplicationContext(),
-                            response.getStatus(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(BookActivity.this, ProductDetailActivity.class);
+                    intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, response.getData());
+
+                    startActivity(intent);
 
                 }
             }

@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.model.Product;
-import com.karina.alicesadventures.parsers.ProductXmlParser;
+import com.karina.alicesadventures.parsers.ProductsXmlParser;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -174,11 +174,11 @@ public class ProductListActivity extends AppCompatActivity {
         protected List<Product> doInBackground(String... params) {
             List<Product> products = null;
             HTTPConnection httpConnection = new HTTPConnection();
-            ProductXmlParser productXmlParser = new ProductXmlParser();
+            ProductsXmlParser productsXmlParser = new ProductsXmlParser();
 
             try {
                 String result = httpConnection.sendGet(params[0]);
-                products = productXmlParser.parse(new StringReader(result));
+                products = productsXmlParser.parse(new StringReader(result));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -199,6 +199,12 @@ public class ProductListActivity extends AppCompatActivity {
                 setupRecyclerView((RecyclerView) recyclerView);
 
             }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            mListProductsTask=null;
         }
     }
 
