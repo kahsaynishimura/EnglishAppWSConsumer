@@ -4,21 +4,24 @@ package com.karina.alicesadventures.model;
  * Created by karina on 2016-01-09.
  */
 public class Trade {
-
+    private Integer id;
     private Product product;
     private User user;
     private String qr_code;
     private Integer validated;
-    private String created;
-    private String modified;
 
-    public Trade(Product product, User user, String qr_code, Integer validated, String created, String modified) {
-        this.product = product;
-        this.user = user;
+    public Trade(Integer id,   String qr_code, Integer validated) {
+        this.id = id;
         this.qr_code = qr_code;
         this.validated = validated;
-        this.created = created;
-        this.modified = modified;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public Product getProduct() {
@@ -51,21 +54,5 @@ public class Trade {
 
     public void setValidated(Integer validated) {
         this.validated = validated;
-    }
-
-    public String getCreated() {
-        return created;
-    }
-
-    public void setCreated(String created) {
-        this.created = created;
-    }
-
-    public String getModified() {
-        return modified;
-    }
-
-    public void setModified(String modified) {
-        this.modified = modified;
     }
 }

@@ -32,7 +32,10 @@ public class Product {
         this.modified = modified;
     }
 
-    public Product(int position, String s, String s1) {
+    public Product(Integer id, String name,Partner partner) {
+        this.id = id;
+        this.name = name;
+        this.partner = partner;
     }
 
     public Product(Integer id, String name, String description, Integer quantity_available, Integer points_value) {

@@ -11,6 +11,13 @@ public class Partner {
     private User user;
 
     public Partner(){}
+
+    public Partner(String companyName, String phone, String address) {
+        this.companyName = companyName;
+        this.phone = phone;
+        this.address = address;
+    }
+
     public Partner(int id, String companyName, String phone, String address, User user) {
         this.id = id;
         this.companyName = companyName;
