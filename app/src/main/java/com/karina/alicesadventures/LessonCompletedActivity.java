@@ -7,13 +7,19 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.DBHandler;
@@ -23,11 +29,14 @@ import com.karina.alicesadventures.parsers.MessageXmlParser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 
 public class LessonCompletedActivity extends ActionBarActivity {
@@ -68,8 +77,48 @@ public class LessonCompletedActivity extends ActionBarActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        AdView mAdView = (AdView) findViewById(R.id.ad_view);
+
+        AdRequest.Builder b=new AdRequest.Builder();
+
+            String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+            String deviceId = md5(android_id).toUpperCase();
+            b.addTestDevice(deviceId);
+        
+        AdRequest adRequest = b.build();
+        b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+        mAdView.loadAd(adRequest);
+        mAdView.setAdListener(new AdListener() {
+            @Override
+
+            public void onAdLoaded() {
+                //Toast.makeText(LessonCompletedActivity.this, "entrou", Toast.LENGTH_LONG).show();
+            }
+        });
     }
-    
+    public static final String md5(final String s) {
+        try {
+            // Create MD5 Hash
+            MessageDigest digest = java.security.MessageDigest
+                    .getInstance("MD5");
+            digest.update(s.getBytes());
+            byte messageDigest[] = digest.digest();
+
+            // Create Hex String
+            StringBuffer hexString = new StringBuffer();
+            for (int i = 0; i < messageDigest.length; i++) {
+                String h = Integer.toHexString(0xFF & messageDigest[i]);
+                while (h.length() < 2)
+                    h = "0" + h;
+                hexString.append(h);
+            }
+            return hexString.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+          e.printStackTrace();
+        }
+        return "";
+    }
     public void saveLastLessonCompletedId(SharedPreferences sharedPreferences) {
 
         DBHandler db = null;
