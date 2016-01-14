@@ -50,5 +50,6 @@
     <string name="partner_name">Partner: %1$s</string>
     <string name="partner_address">Address: %1$s</string>
     <string name="partner_phone">Phone: %1$s</string>
+    <string name="no_prizes">You got no prizes so far. Keep practicing and trade your points.</string>
 
 </resources>

@@ -105,7 +105,10 @@ public class PrizesActivity extends AppCompatActivity {
             super.onPostExecute(trades);
             if (trades == null) {
                 Toast.makeText(PrizesActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
-            } else {
+            } else if(trades.get(0)==null){
+                Toast.makeText(PrizesActivity.this, getText(R.string.no_prizes), Toast.LENGTH_LONG).show();
+                finish();
+            }else {
                 mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), trades);
 
                 // Set up the ViewPager with the sections adapter.
