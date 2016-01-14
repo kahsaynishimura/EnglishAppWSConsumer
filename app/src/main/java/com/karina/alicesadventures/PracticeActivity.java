@@ -1,7 +1,6 @@
 package com.karina.alicesadventures;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,6 +12,7 @@ import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,25 +36,30 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
-
+import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.model.CurrentPracticeData;
 import com.karina.alicesadventures.model.DBHandler;
 import com.karina.alicesadventures.model.Exercise;
 import com.karina.alicesadventures.model.Lesson;
 import com.karina.alicesadventures.model.ScriptEntry;
+import com.karina.alicesadventures.parsers.ExercisesXmlParser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 public class PracticeActivity extends AppCompatActivity {
 
+    private ListExercisesTask mListExercisesTask;
     private static final long TRANSITION_PAUSE = 1000;
     private static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 100;
     private SpeechRecognizer speech = null;
@@ -63,49 +68,103 @@ public class PracticeActivity extends AppCompatActivity {
     private String LOG_TAG = "PracticeActivity";
 
     CurrentPracticeData current;//stores current screen info - current screen state
-    private ArrayList<Exercise> exercises;
+    public static List<Exercise> exercises;
     private TextToSpeech TTS;
     private DBHandler db;
-    private RelativeLayout listLayout;
     public final long INSTRUCTION_PAUSE = 1000;
 
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         checkConnection();
         current = new CurrentPracticeData();
         Integer lessonId = sharedPreferences.getInt("lesson_id", 0);
         updateTitleWithLessonName(lessonId);
         loadExercises(lessonId);
-        if (exercises.size() <= sharedPreferences.getInt("exercise_count", 0)) {
-            finish();
-        } else {
-            Exercise e = exercises.get(sharedPreferences.getInt("exercise_count", 0));
-            current.setCurrentExercise(e);
-            setContentView(R.layout.activity_practice);
 
-            speech = SpeechRecognizer.createSpeechRecognizer(PracticeActivity.this);
-            speech.setRecognitionListener(new CustomSpeechRecognition());
-            recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, (Locale.US).toString());
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, this.getPackageName());
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
+    }
 
+    private class ListExercisesTask extends AsyncTask<Void, Void, List<Exercise>> {
+        private final String url;
+        HashMap hashMap;
 
-            if (hasMoreExercises()) {
-                selectNextExercise();
-                TTS = new TextToSpeech(PracticeActivity.this, new TextToSpeech.OnInitListener() {
-                    @Override
-                    public void onInit(int status) {
-                        startExercise();
-                    }
-                });
+        public ListExercisesTask(String url, HashMap<String, String> hashMap) {
+            this.hashMap = hashMap;
+            this.url = url;
+        }
+
+        @Override
+        protected List<Exercise> doInBackground(Void... params) {
+            List<Exercise> exercises = null;
+            HTTPConnection httpConnection = new HTTPConnection();
+            ExercisesXmlParser exercisesXmlParser = new ExercisesXmlParser();
+
+            try {
+                String result = httpConnection.sendPost(url, hashMap);
+                exercises = exercisesXmlParser.parse(new StringReader(result));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            return exercises;
+        }
+
+
+        @Override
+        protected void onPostExecute(List<Exercise> exercises) {
+            mListExercisesTask = null;
+            super.onPostExecute(exercises);
+            if (exercises == null) {
+                Toast.makeText(PracticeActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
+            } else {
+                if (exercises.size() <= sharedPreferences.getInt("exercise_count", 0)) {
+                    finish();
+                } else {
+                    for (Exercise e : exercises) {
+                        ArrayList<ScriptEntry> scripts = db.findScripts(e.get_id());
+                        Collections.sort(scripts);
+                        int i = 0;
+                        for (ScriptEntry s : scripts) {
+                            s.setScriptIndex(i);
+                            i++;
+                        }
+                        e.setScriptEntries(scripts);
+                    }
+                    PracticeActivity.exercises=exercises;
+                    Exercise e = exercises.get(sharedPreferences.getInt("exercise_count", 0));
+                    current.setCurrentExercise(e);
+                    setContentView(R.layout.activity_practice);
+
+                    speech = SpeechRecognizer.createSpeechRecognizer(PracticeActivity.this);
+                    speech.setRecognitionListener(new CustomSpeechRecognition());
+                    recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                    recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, (Locale.US).toString());
+                    recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, PracticeActivity.this.getPackageName());
+                    recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                    recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
+
+
+                    if (hasMoreExercises()) {
+                        selectNextExercise();
+                        TTS = new TextToSpeech(PracticeActivity.this, new TextToSpeech.OnInitListener() {
+                            @Override
+                            public void onInit(int status) {
+                                startExercise();
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            mListExercisesTask = null;
         }
     }
 
@@ -149,26 +208,31 @@ public class PracticeActivity extends AppCompatActivity {
 
     private void loadExercises(Integer lessonId) {
         //retrieve sentences to practice from db for each exercise
-        try {
-            InputStream is = getAssets()
-                    .open(DBHandler.DATABASE_NAME);
-            db = new DBHandler(PracticeActivity.this, is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (db != null) {
-            exercises = db.findExercises(lessonId);
-            for (Exercise e : exercises) {
-                ArrayList<ScriptEntry> scripts = db.findScripts(e.get_id());
-                Collections.sort(scripts);
-                int i = 0;
-                for (ScriptEntry s : scripts) {
-                    s.setScriptIndex(i);
-                    i++;
-                }
-                e.setScriptEntries(scripts);
-            }
-        }
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("data[Exercise][lesson_id]", lessonId.toString());
+
+        mListExercisesTask = new ListExercisesTask("http://www.karinanishimura.com.br/cakephp/exercises/index_api.xml", hashMap);
+        mListExercisesTask.execute();
+//        try {
+//            InputStream is = getAssets()
+//                    .open(DBHandler.DATABASE_NAME);
+//            db = new DBHandler(PracticeActivity.this, is);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        if (db != null) {
+//            exercises = db.findExercises(lessonId);
+//            for (Exercise e : exercises) {
+//                ArrayList<ScriptEntry> scripts = db.findScripts(e.get_id());
+//                Collections.sort(scripts);
+//                int i = 0;
+//                for (ScriptEntry s : scripts) {
+//                    s.setScriptIndex(i);
+//                    i++;
+//                }
+//                e.setScriptEntries(scripts);
+//            }
+//        }
     }
 
     private void runScriptEntry() {
@@ -720,6 +784,7 @@ public class PracticeActivity extends AppCompatActivity {
             TTS.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, params);
         }
     }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {

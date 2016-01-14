@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by karina on 2016-01-06.
  */
-public class BookXmlParser { // We don't use namespaces
+public class BooksXmlParser { // We don't use namespaces
     private static final String ns = null;
 
     public List parse( StringReader in) throws XmlPullParserException, IOException {

@@ -26,8 +26,6 @@ import java.util.ArrayList;
 public class TransitionActivity extends AppCompatActivity {
 
     private static final long TRANSITION_PAUSE = 1000;
-    private DBHandler db;
-    private ArrayList<Exercise> exercises;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
@@ -70,21 +68,10 @@ public class TransitionActivity extends AppCompatActivity {
 
     private Exercise loadExercise(int lessonId, Integer exerciseCount) {
         //retrieve sentences to practice from db for each exercise
-        ArrayList<Exercise> exercises = new ArrayList<>();
-        try {
-            InputStream is = getAssets()
-                    .open(DBHandler.DATABASE_NAME);
-            db = new DBHandler(TransitionActivity.this, is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (db != null) {
-            exercises = db.findExercises(lessonId);
 
-        }
-        if (exercises.size() > exerciseCount) {//is there other exercise
+        if (PracticeActivity.exercises.size() > exerciseCount) {//is there another exercise
             //yes
-            return exercises.get(exerciseCount);
+            return PracticeActivity.exercises.get(exerciseCount);
         } else {
             //no
             return null;

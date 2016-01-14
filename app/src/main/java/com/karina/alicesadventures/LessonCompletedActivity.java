@@ -84,7 +84,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
             String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
             String deviceId = md5(android_id).toUpperCase();
             b.addTestDevice(deviceId);
-        
+
         AdRequest adRequest = b.build();
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
         mAdView.loadAd(adRequest);

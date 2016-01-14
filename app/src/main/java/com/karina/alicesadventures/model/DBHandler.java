@@ -245,22 +245,22 @@ public class DBHandler {
         return lessons;
     }
 
-    public ArrayList<Exercise> findExercises(Integer lessonId) {
-        ArrayList<Exercise> exercises = new ArrayList<>();
-        open();
-        Cursor c = db.query(TABLE_EXERCISE,
-                new String[]{COLUMN_ID, COLUMN_NAME, COLUMN_TRANSITION_IMAGE, COLUMN_LESSON_ID},
-                COLUMN_LESSON_ID + "= ? ", new String[]{lessonId.toString()},
-                null, null, null, null);
-        if (c.moveToFirst()) {
-            do {
-                Lesson lesson = new Lesson();
-                lesson.set_id(lessonId);
-                exercises.add(new Exercise(c.getInt(0), c.getString(1), c.getString(2), lesson));
-            } while (c.moveToNext());
-        }
-        close();
-
-        return exercises;
-    }
+//    public ArrayList<Exercise> findExercises(Integer lessonId) {
+//        ArrayList<Exercise> exercises = new ArrayList<>();
+//        open();
+//        Cursor c = db.query(TABLE_EXERCISE,
+//                new String[]{COLUMN_ID, COLUMN_NAME, COLUMN_TRANSITION_IMAGE, COLUMN_LESSON_ID},
+//                COLUMN_LESSON_ID + "= ? ", new String[]{lessonId.toString()},
+//                null, null, null, null);
+//        if (c.moveToFirst()) {
+//            do {
+//                Lesson lesson = new Lesson();
+//                lesson.set_id(lessonId);
+//                exercises.add(new Exercise(c.getInt(0), c.getString(1), c.getString(2), lesson));
+//            } while (c.moveToNext());
+//        }
+//        close();
+//
+//        return exercises;
+//    }
 }

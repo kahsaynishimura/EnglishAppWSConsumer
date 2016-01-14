@@ -25,7 +25,7 @@ import com.karina.alicesadventures.Util.IntentResult;
 import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.Book;
 import com.karina.alicesadventures.model.GeneralResponse;
-import com.karina.alicesadventures.parsers.BookXmlParser;
+import com.karina.alicesadventures.parsers.BooksXmlParser;
 import com.karina.alicesadventures.parsers.GeneralResponseXmlParser;
 
 import java.io.StringReader;
@@ -53,11 +53,11 @@ public class BookActivity extends ActionBarActivity {
         protected List<Book> doInBackground(String... params) {
             List<Book> books = null;
             HTTPConnection httpConnection = new HTTPConnection();
-            BookXmlParser bookXmlParser = new BookXmlParser();
+            BooksXmlParser booksXmlParser = new BooksXmlParser();
 
             try {
                 String result = httpConnection.sendGet(params[0]);
-                books = bookXmlParser.parse(new StringReader(result));
+                books = booksXmlParser.parse(new StringReader(result));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -91,6 +91,12 @@ public class BookActivity extends ActionBarActivity {
                     }
                 });
             }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            mListBooksTask=null;
         }
     }
 

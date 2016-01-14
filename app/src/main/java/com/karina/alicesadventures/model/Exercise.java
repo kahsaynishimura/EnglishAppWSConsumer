@@ -9,14 +9,15 @@ public class Exercise {
     private Integer _id;
     private String name;
     private String transitionImage;
-    private Lesson Lesson; //belongs to one lesson
+    private Lesson lesson; //belongs to one lesson
     private ArrayList<ScriptEntry> scriptEntries;//has many script entries
 
-    public Exercise(Integer id, String name,String transitionImage, Lesson lesson) {
+    public Exercise(Integer id, String name,String transitionImage, Integer lessonId) {
         _id = id;
         this.name = name;
         this.transitionImage = transitionImage;
-        Lesson = lesson;
+        this.lesson = new Lesson();
+        lesson.set_id(lessonId);
     }
 
     public Exercise() {
@@ -40,11 +41,11 @@ public class Exercise {
     }
 
     public Lesson getLesson() {
-        return Lesson;
+        return lesson;
     }
 
     public void setLesson(Lesson lesson) {
-        Lesson = lesson;
+        this.lesson = lesson;
     }
 
     public ArrayList<ScriptEntry> getScriptEntries() {

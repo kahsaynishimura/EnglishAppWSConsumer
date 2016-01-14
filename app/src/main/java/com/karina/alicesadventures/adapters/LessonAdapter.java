@@ -15,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.karina.alicesadventures.PracticeActivity;
 import com.karina.alicesadventures.R;
 import com.karina.alicesadventures.TransitionActivity;
 import com.karina.alicesadventures.model.Lesson;
@@ -69,7 +70,7 @@ public class LessonAdapter extends ArrayAdapter<Lesson> {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent i = new Intent(context, TransitionActivity.class);
+                    Intent i = new Intent(context, PracticeActivity.class);
 
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
