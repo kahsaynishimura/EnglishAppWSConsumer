@@ -1,12 +1,9 @@
 package com.karina.alicesadventures;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -18,21 +15,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.SessionManager;
-import com.karina.alicesadventures.model.Book;
 import com.karina.alicesadventures.model.Trade;
-import com.karina.alicesadventures.parsers.BookXmlParser;
 import com.karina.alicesadventures.parsers.TradesXmlParser;
 
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -73,7 +69,7 @@ public class PrizesActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-             finish();
+                finish();
             }
         });
 
@@ -149,7 +145,11 @@ public class PrizesActivity extends AppCompatActivity {
          * The fragment argument representing the section number for this
          * fragment.
          */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+        private static final String ARG_PRODUCT_NAME = "product_name";
+        private static final String ARG_PARTNER_NAME = "partner_name";
+        private static final String ARG_PARTNER_ADDRESS = "partner_address";
+        private static final String ARG_PARTNER_PHONE = "partner_phone";
+        private static final String ARG_QR_CODE = "qr_code";
 
         public PlaceholderFragment() {
         }
@@ -158,10 +158,14 @@ public class PrizesActivity extends AppCompatActivity {
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
+        public static PlaceholderFragment newInstance(Trade trade) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            args.putString(ARG_PRODUCT_NAME, trade.getProduct().getName());
+            args.putString(ARG_PARTNER_NAME, trade.getProduct().getPartner().getCompanyName());
+            args.putString(ARG_PARTNER_ADDRESS, trade.getProduct().getPartner().getAddress());
+            args.putString(ARG_PARTNER_PHONE, trade.getProduct().getPartner().getPhone());
+            args.putString(ARG_QR_CODE, trade.getQr_code());
             fragment.setArguments(args);
             return fragment;
         }
@@ -170,11 +174,53 @@ public class PrizesActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_prizes, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            TextView productName = (TextView) rootView.findViewById(R.id.product_name);
+            productName.setText(getString(R.string.product_name, getArguments().getString(ARG_PRODUCT_NAME)));
+            TextView partnerName = (TextView) rootView.findViewById(R.id.partner_name);
+            partnerName.setText(getString(R.string.partner_name, getArguments().getString(ARG_PARTNER_NAME)));
+            TextView partnerAddress = (TextView) rootView.findViewById(R.id.partner_address);
+            partnerAddress.setText(getString(R.string.partner_address, getArguments().getString(ARG_PARTNER_ADDRESS)));
+            TextView partnerPhone = (TextView) rootView.findViewById(R.id.partner_phone);
+            partnerPhone.setText(getString(R.string.partner_phone, getArguments().getString(ARG_PARTNER_PHONE)));
+            try {
+                Bitmap bitmap = encodeAsBitmap(getArguments().getString(ARG_QR_CODE));
+                ((ImageView) rootView.findViewById(R.id.qr_code)).setImageBitmap(bitmap);
+            }catch (WriterException e) {
+                e.printStackTrace();
+            }
+
             return rootView;
         }
+
+        static Bitmap encodeAsBitmap(String str) throws WriterException {
+            BitMatrix result;
+
+            int WHITE = 0xFFFFFFFF;
+            int BLACK = 0xFF000000;
+            int WIDTH = 250;
+            int HEIGHT = 250;
+            try {
+                result = new MultiFormatWriter().encode(str,
+                        BarcodeFormat.QR_CODE, WIDTH, WIDTH, null);
+            } catch (IllegalArgumentException iae) {
+                // Unsupported format
+                return null;
+            }
+            int w = result.getWidth();
+            int h = result.getHeight();
+            int[] pixels = new int[w * h];
+            for (int y = 0; y < h; y++) {
+                int offset = y * w;
+                for (int x = 0; x < w; x++) {
+                    pixels[offset + x] = result.get(x, y) ? BLACK : WHITE;
+                }
+            }
+            Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, WIDTH, 0, 0, w, h);
+            return bitmap;
+        }
     }
+
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -192,7 +238,7 @@ public class PrizesActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            return PlaceholderFragment.newInstance((Trade) items.get(position));
         }
 
         @Override

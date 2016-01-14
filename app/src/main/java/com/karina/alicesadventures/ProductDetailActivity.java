@@ -245,8 +245,8 @@ public class ProductDetailActivity extends AppCompatActivity {
 
             int WHITE = 0xFFFFFFFF;
             int BLACK = 0xFF000000;
-            int WIDTH = 150;
-            int HEIGHT = 150;
+            int WIDTH = 250;
+            int HEIGHT = 250;
             try {
                 result = new MultiFormatWriter().encode(str,
                         BarcodeFormat.QR_CODE, WIDTH, WIDTH, null);

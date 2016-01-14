@@ -9,8 +9,35 @@
     tools:context="com.karina.alicesadventures.PrizesActivity$PlaceholderFragment">
 
     <TextView
-        android:id="@+id/section_label"
+        android:id="@+id/product_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/partner_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/product_name" />
+
+    <TextView
+        android:id="@+id/partner_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/partner_name" />
+
+    <TextView
+        android:id="@+id/partner_phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/partner_address" />
+
+    <ImageView
+        android:id="@+id/qr_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:src="@drawable/check"
+        android:layout_below="@+id/partner_phone"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
