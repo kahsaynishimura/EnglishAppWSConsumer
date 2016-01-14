@@ -134,8 +134,10 @@ public class BookActivity extends ActionBarActivity {
             String scanContent = scanningResult.getContents();
             String scanFormat = scanningResult.getFormatName();
             if (scanFormat.equals("QR_CODE")) {
+
                 HashMap<String, String> hashMap = new HashMap<>();
                 hashMap.put("data[Trade][qr_code]", scanContent);
+                hashMap.put("data[Partner][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
 
                 try {
                     mValidateCodeTask = new ValidateCodeTask("http://karinanishimura.com.br/cakephp/trades/validateQR.xml", hashMap);
