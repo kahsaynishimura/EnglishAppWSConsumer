@@ -69,22 +69,13 @@ public class PrizesActivity extends AppCompatActivity {
         mListTradesTask = new ListTradesTask("http://karinanishimura.com.br/cakephp/trades/index_api.xml", hashMap);
         mListTradesTask.execute();
 
-
-//        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), new ArrayList());
-//
-//        // Set up the ViewPager with the sections adapter.
-//        mViewPager = (ViewPager) findViewById(R.id.container);
-//        mViewPager.setAdapter(mSectionsPagerAdapter);
-//
-//
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+             finish();
+            }
+        });
 
     }
 
@@ -112,7 +103,6 @@ public class PrizesActivity extends AppCompatActivity {
             return trades;
         }
 
-
         @Override
         protected void onPostExecute(List<Trade> trades) {
             mListTradesTask = null;
@@ -120,8 +110,11 @@ public class PrizesActivity extends AppCompatActivity {
             if (trades == null) {
                 Toast.makeText(PrizesActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
             } else {
-                //TODO
+                mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), trades);
 
+                // Set up the ViewPager with the sections adapter.
+                mViewPager = (ViewPager) findViewById(R.id.container);
+                mViewPager.setAdapter(mSectionsPagerAdapter);
             }
         }
     }
