@@ -19,7 +19,7 @@ import java.util.List;
 public class BooksXmlParser { // We don't use namespaces
     private static final String ns = null;
 
-    public List parse( StringReader in) throws XmlPullParserException, IOException {
+    public List parse(StringReader in) throws XmlPullParserException, IOException {
         try {
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
@@ -30,6 +30,7 @@ public class BooksXmlParser { // We don't use namespaces
             in.close();
         }
     }
+
     private List<Book> readBooks(XmlPullParser parser) throws XmlPullParserException, IOException {
         List<Book> entries = new ArrayList<Book>();
 
@@ -48,6 +49,7 @@ public class BooksXmlParser { // We don't use namespaces
         }
         return entries;
     }
+
     // Parses the contents of a book. If it encounters a name and id, hands them off
     // to their respective &quot;read&quot; methods for processing. Otherwise, skips the tag.
     private Book readBooksParent(XmlPullParser parser) throws XmlPullParserException, IOException {
@@ -80,12 +82,13 @@ public class BooksXmlParser { // We don't use namespaces
                 bookName = readText(parser);
             } else if (name.equals("id")) {
                 id = Integer.parseInt(readText(parser));
-            }  else {
+            } else {
                 skip(parser);
             }
         }
         return new Book(id, bookName);
     }
+
     private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
         String result = "";
         if (parser.next() == XmlPullParser.TEXT) {

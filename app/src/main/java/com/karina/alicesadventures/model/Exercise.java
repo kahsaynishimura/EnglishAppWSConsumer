@@ -13,7 +13,7 @@ public class Exercise {
     private Lesson lesson; //belongs to one lesson
     private List<SpeechScript> scriptEntries;//has many script entries
 
-    public Exercise(Integer id, String name,String transitionImage, Integer lessonId) {
+    public Exercise(Integer id, String name, String transitionImage, Integer lessonId) {
         _id = id;
         this.name = name;
         this.transitionImage = transitionImage;

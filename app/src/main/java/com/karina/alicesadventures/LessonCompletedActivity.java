@@ -48,7 +48,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lesson_completed);
 
-        PracticeActivity.exercises=new ArrayList<>();
+        PracticeActivity.exercises = new ArrayList<>();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LessonCompletedActivity.this);
 
         saveLastLessonCompletedId(sharedPreferences);
@@ -81,11 +81,11 @@ public class LessonCompletedActivity extends ActionBarActivity {
         }
         AdView mAdView = (AdView) findViewById(R.id.ad_view);
 
-        AdRequest.Builder b=new AdRequest.Builder();
+        AdRequest.Builder b = new AdRequest.Builder();
 
-            String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-            String deviceId = md5(android_id).toUpperCase();
-            b.addTestDevice(deviceId);
+        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        String deviceId = md5(android_id).toUpperCase();
+        b.addTestDevice(deviceId);
 
         AdRequest adRequest = b.build();
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
@@ -98,6 +98,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
             }
         });
     }
+
     public static final String md5(final String s) {
         try {
             // Create MD5 Hash
@@ -117,10 +118,11 @@ public class LessonCompletedActivity extends ActionBarActivity {
             return hexString.toString();
 
         } catch (NoSuchAlgorithmException e) {
-          e.printStackTrace();
+            e.printStackTrace();
         }
         return "";
     }
+
     public void saveLastLessonCompletedId(SharedPreferences sharedPreferences) {
 
         DBHandler db = null;

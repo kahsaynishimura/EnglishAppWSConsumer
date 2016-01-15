@@ -59,13 +59,13 @@ public class LessonAdapter extends ArrayAdapter<Lesson> {
         if (obj.get_id() <= lastCompletedLesson + 1) {
             //the next lesson must be unlocked as well.
 
-            changeDrawable( ((ImageView) view.findViewById(R.id.imgPadLock)),"@drawable/padlock_unlock",context,R.drawable.padlock_unlock);
+            changeDrawable(((ImageView) view.findViewById(R.id.imgPadLock)), "@drawable/padlock_unlock", context, R.drawable.padlock_unlock);
 
 
             if (obj.get_id() <= lastCompletedLesson) {
                 //completed lessons display a check mark
 
-                changeDrawable( ((ImageView) view.findViewById(R.id.imgPadLock)),"@drawable/checkmark",context,R.drawable.checkmark);
+                changeDrawable(((ImageView) view.findViewById(R.id.imgPadLock)), "@drawable/checkmark", context, R.drawable.checkmark);
 
             }
             view.setOnClickListener(new View.OnClickListener() {
@@ -80,7 +80,7 @@ public class LessonAdapter extends ArrayAdapter<Lesson> {
 
                     //converting it back to a milliseconds representation:
                     long millis = date.getTime();
-                    PracticeActivity.exercises=new ArrayList<>();
+                    PracticeActivity.exercises = new ArrayList<>();
                     editor.putInt("exercise_count", 0);
                     editor.putInt("correct_sentence_count", 0);
                     editor.putInt("wrong_sentence_count", 0);
@@ -97,7 +97,7 @@ public class LessonAdapter extends ArrayAdapter<Lesson> {
         return view;
     }
 
-    private void changeDrawable( ImageView view, String uri, Context context, int id) {
+    private void changeDrawable(ImageView view, String uri, Context context, int id) {
         if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) { //versao api >21
             view.setImageDrawable(context.getDrawable(id));
         } else {

@@ -138,7 +138,7 @@ public class SelectUserActivity extends ActionBarActivity {
                 Snackbar.make(((Button) findViewById(R.id.btn_login)), getText(R.string.verify_internet_connection), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             } else if (user.get_id() == null) {
-                Snackbar.make(((Button) findViewById(R.id.btn_login)), getText(R.string.not_found), Snackbar.LENGTH_LONG)
+                Snackbar.make(((Button) findViewById(R.id.btn_login)), getText(R.string.user_pass_not_found), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             } else {
                 // save logged in user

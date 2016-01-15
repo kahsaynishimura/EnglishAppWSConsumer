@@ -86,10 +86,10 @@ public class PracticeActivity extends AppCompatActivity {
         current = new CurrentPracticeData();
         Integer lessonId = sharedPreferences.getInt("lesson_id", 0);
         updateTitleWithLessonName(lessonId);
-        if(exercises.size()==0) {//it is the first exercise
+        if (exercises.size() == 0) {//it is the first exercise
             loadExercises(lessonId);
-        }else{
-            if(hasMoreExercises()){
+        } else {
+            if (hasMoreExercises()) {
                 current.setCurrentExercise(exercises.get(sharedPreferences.getInt("exercise_count", 0)));
                 getScripts(current.getCurrentExercise().get_id());
             }
@@ -183,7 +183,7 @@ public class PracticeActivity extends AppCompatActivity {
                 Toast.makeText(PracticeActivity.this, getText(R.string.practices_not_found), Toast.LENGTH_LONG).show();
                 finish();
             } else {
-                if (scripts.get(0)==null) {
+                if (scripts.get(0) == null) {
                     finish();
                 } else {
 
@@ -794,29 +794,6 @@ public class PracticeActivity extends AppCompatActivity {
         }
         return l;
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_practice, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
 
     private void speak(String textToSpeak, String id, Bundle bundle) {
         if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {

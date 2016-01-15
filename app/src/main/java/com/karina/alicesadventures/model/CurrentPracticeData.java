@@ -21,6 +21,7 @@ public class CurrentPracticeData {
             setCurrentSpeechScript(getCurrentExercise().getScriptEntries().get(getCurrentScriptIndex()));
         }
     }
+
     public void setCurrentExercise(Exercise currentExercise) {
         this.currentExercise = currentExercise;
     }
@@ -36,6 +37,7 @@ public class CurrentPracticeData {
     public SpeechScript getCurrentSpeechScript() {
         return currentSpeechScript;
     }
+
     public Boolean getShouldRunScript() {
         return shouldRunScript;
     }
@@ -54,6 +56,6 @@ public class CurrentPracticeData {
     }
 
     public boolean hasMoreScripts() {
-       return getCurrentExercise().getScriptEntries().size() > getCurrentScriptIndex();
+        return getCurrentExercise().getScriptEntries().size() > getCurrentScriptIndex();
     }
 }

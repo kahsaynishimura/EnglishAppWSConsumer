@@ -105,10 +105,10 @@ public class PrizesActivity extends AppCompatActivity {
             super.onPostExecute(trades);
             if (trades == null) {
                 Toast.makeText(PrizesActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
-            } else if(trades.get(0)==null){
+            } else if (trades.get(0) == null) {
                 Toast.makeText(PrizesActivity.this, getText(R.string.no_prizes), Toast.LENGTH_LONG).show();
                 finish();
-            }else {
+            } else {
                 mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), trades);
 
                 // Set up the ViewPager with the sections adapter.
@@ -116,28 +116,6 @@ public class PrizesActivity extends AppCompatActivity {
                 mViewPager.setAdapter(mSectionsPagerAdapter);
             }
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_prizes, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -188,7 +166,7 @@ public class PrizesActivity extends AppCompatActivity {
             try {
                 Bitmap bitmap = encodeAsBitmap(getArguments().getString(ARG_QR_CODE));
                 ((ImageView) rootView.findViewById(R.id.qr_code)).setImageBitmap(bitmap);
-            }catch (WriterException e) {
+            } catch (WriterException e) {
                 e.printStackTrace();
             }
 
