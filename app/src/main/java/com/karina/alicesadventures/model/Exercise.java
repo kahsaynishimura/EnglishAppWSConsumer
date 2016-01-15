@@ -1,6 +1,7 @@
 package com.karina.alicesadventures.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Karina Nishimura on 15-09-30.
@@ -10,7 +11,7 @@ public class Exercise {
     private String name;
     private String transitionImage;
     private Lesson lesson; //belongs to one lesson
-    private ArrayList<ScriptEntry> scriptEntries;//has many script entries
+    private List<SpeechScript> scriptEntries;//has many script entries
 
     public Exercise(Integer id, String name,String transitionImage, Integer lessonId) {
         _id = id;
@@ -48,11 +49,11 @@ public class Exercise {
         this.lesson = lesson;
     }
 
-    public ArrayList<ScriptEntry> getScriptEntries() {
+    public List<SpeechScript> getScriptEntries() {
         return scriptEntries;
     }
 
-    public void setScriptEntries(ArrayList<ScriptEntry> scriptEntries) {
+    public void setScriptEntries(List<SpeechScript> scriptEntries) {
         this.scriptEntries = scriptEntries;
     }
 

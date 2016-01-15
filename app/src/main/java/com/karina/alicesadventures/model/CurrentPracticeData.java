@@ -8,17 +8,17 @@ public class CurrentPracticeData {
 
     private Exercise currentExercise = null;
     private Integer currentScriptIndex = 0;
-    private ScriptEntry currentScriptEntry = null;
+    private SpeechScript currentSpeechScript = null;
     private Boolean shouldRunScript = true;
 
     public CurrentPracticeData() {
     }
 
     public void selectNextScript() {
-        setCurrentScriptIndex(getCurrentScriptEntry().getScriptIndex() + 1);
+        setCurrentScriptIndex(getCurrentSpeechScript().getScriptIndex() + 1);
 
         if (hasMoreScripts()) {
-            setCurrentScriptEntry(getCurrentExercise().getScriptEntries().get(getCurrentScriptIndex()));
+            setCurrentSpeechScript(getCurrentExercise().getScriptEntries().get(getCurrentScriptIndex()));
         }
     }
     public void setCurrentExercise(Exercise currentExercise) {
@@ -29,12 +29,12 @@ public class CurrentPracticeData {
         return currentExercise;
     }
 
-    public void setCurrentScriptEntry(ScriptEntry currentScriptEntry) {
-        this.currentScriptEntry = currentScriptEntry;
+    public void setCurrentSpeechScript(SpeechScript currentSpeechScript) {
+        this.currentSpeechScript = currentSpeechScript;
     }
 
-    public ScriptEntry getCurrentScriptEntry() {
-        return currentScriptEntry;
+    public SpeechScript getCurrentSpeechScript() {
+        return currentSpeechScript;
     }
     public Boolean getShouldRunScript() {
         return shouldRunScript;

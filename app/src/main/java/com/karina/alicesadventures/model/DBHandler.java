@@ -190,43 +190,43 @@ public class DBHandler {
 
     }
 
-    public ArrayList<ScriptEntry> findScripts(Integer exerciseId) {
-        ArrayList<ScriptEntry> scriptEntries = new ArrayList<>();
-        open();
-        Cursor c = db.query(TABLE_SCRIPT_ENTRY,
-                new String[]{COLUMN_ID, COLUMN_TEXT_TO_SHOW,
-                        COLUMN_TEXT_TO_READ, COLUMN_TEXT_TO_CHECK, COLUMN_SCRIPT_INDEX, COLUMN_FUNCTION_ID},
-                COLUMN_EXERCISE_ID + "= ? ", new String[]{exerciseId.toString()},
-                null, null, null, null);
-        if (c.moveToFirst()) {
-            do {
-                Exercise e = new Exercise();
-                e.set_id(exerciseId);
-                scriptEntries.add(new ScriptEntry(c.getInt(0), c.getString(1), c.getString(2), c.getString(3), c.getInt(4), c.getInt(5), e));
-            } while (c.moveToNext());
-        }
-        close();
+//    public ArrayList<SpeechScript> findScripts(Integer exerciseId) {
+//        ArrayList<SpeechScript> scriptEntries = new ArrayList<>();
+//        open();
+//        Cursor c = db.query(TABLE_SCRIPT_ENTRY,
+//                new String[]{COLUMN_ID, COLUMN_TEXT_TO_SHOW,
+//                        COLUMN_TEXT_TO_READ, COLUMN_TEXT_TO_CHECK, COLUMN_SCRIPT_INDEX, COLUMN_FUNCTION_ID},
+//                COLUMN_EXERCISE_ID + "= ? ", new String[]{exerciseId.toString()},
+//                null, null, null, null);
+//        if (c.moveToFirst()) {
+//            do {
+//                Exercise e = new Exercise();
+//                e.set_id(exerciseId);
+//                scriptEntries.add(new SpeechScript(c.getInt(0), c.getString(1), c.getString(2), c.getString(3), c.getInt(4), c.getInt(5), e));
+//            } while (c.moveToNext());
+//        }
+//        close();
+//
+//        return scriptEntries;
+//    }
 
-        return scriptEntries;
-    }
-
-    public User findUser(String userCode) {
-        User user = null;
-        open();
-        Cursor c = db.query(TABLE_USER,
-                new String[]{COLUMN_ID, COLUMN_NAME,
-                        COLUMN_LAST_COMPLETED_LESSON_ID, COLUMN_CODE},
-                COLUMN_CODE + " LIKE ? ", new String[]{userCode.toString()},
-                null, null, null, null);
-        if (c.moveToFirst()) {
-            do {
-                user = new User(c.getInt(0), c.getString(1), userCode, c.getInt(2));
-            } while (c.moveToNext());
-        }
-        close();
-
-        return user;
-    }
+//    public User findUser(String userCode) {
+//        User user = null;
+//        open();
+//        Cursor c = db.query(TABLE_USER,
+//                new String[]{COLUMN_ID, COLUMN_NAME,
+//                        COLUMN_LAST_COMPLETED_LESSON_ID, COLUMN_CODE},
+//                COLUMN_CODE + " LIKE ? ", new String[]{userCode.toString()},
+//                null, null, null, null);
+//        if (c.moveToFirst()) {
+//            do {
+//                user = new User(c.getInt(0), c.getString(1), userCode, c.getInt(2));
+//            } while (c.moveToNext());
+//        }
+//        close();
+//
+//        return user;
+//    }
 
     public ArrayList<Lesson> findLessons(Integer bookId) {
         ArrayList<Lesson> lessons = new ArrayList<>();

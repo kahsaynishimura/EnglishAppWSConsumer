@@ -3,7 +3,7 @@ package com.karina.alicesadventures.model;
 /**
  * Created by Karina Nishimura on 15-09-30.
  */
-public class ScriptEntry implements Comparable {
+public class SpeechScript implements Comparable {
 
     private Integer _id;
     private String textToShow;
@@ -13,7 +13,7 @@ public class ScriptEntry implements Comparable {
     private Integer functionId;
     private Exercise exercise;//belongs to one exercise
 
-    public ScriptEntry(Integer id, String textToShow, String textToRead, String textToCheck, Integer scriptIndex, Integer functionId, Exercise exercise) {
+    public SpeechScript(Integer id, String textToShow, String textToRead, String textToCheck, Integer scriptIndex, Integer functionId, Exercise exercise) {
         _id = id;
         this.textToShow = textToShow;
         this.textToRead = textToRead;
@@ -73,7 +73,7 @@ public class ScriptEntry implements Comparable {
 
     @Override
     public int compareTo(Object another) {
-        int compareRunningOrder = ((ScriptEntry) another).getScriptIndex();
+        int compareRunningOrder = ((SpeechScript) another).getScriptIndex();
         return this.scriptIndex - compareRunningOrder;
     }
 

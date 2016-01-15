@@ -34,7 +34,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -44,8 +43,9 @@ import com.karina.alicesadventures.model.CurrentPracticeData;
 import com.karina.alicesadventures.model.DBHandler;
 import com.karina.alicesadventures.model.Exercise;
 import com.karina.alicesadventures.model.Lesson;
-import com.karina.alicesadventures.model.ScriptEntry;
+import com.karina.alicesadventures.model.SpeechScript;
 import com.karina.alicesadventures.parsers.ExercisesXmlParser;
+import com.karina.alicesadventures.parsers.ScriptsXmlParser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,6 +60,7 @@ import java.util.Locale;
 public class PracticeActivity extends AppCompatActivity {
 
     private ListExercisesTask mListExercisesTask;
+    private ListSpeechScriptsTask mListSpeechScriptsTask;
     private static final long TRANSITION_PAUSE = 1000;
     private static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 100;
     private SpeechRecognizer speech = null;
@@ -68,7 +69,7 @@ public class PracticeActivity extends AppCompatActivity {
     private String LOG_TAG = "PracticeActivity";
 
     CurrentPracticeData current;//stores current screen info - current screen state
-    public static List<Exercise> exercises;
+    public static List<Exercise> exercises = new ArrayList<Exercise>();
     private TextToSpeech TTS;
     private DBHandler db;
     public final long INSTRUCTION_PAUSE = 1000;
@@ -85,8 +86,15 @@ public class PracticeActivity extends AppCompatActivity {
         current = new CurrentPracticeData();
         Integer lessonId = sharedPreferences.getInt("lesson_id", 0);
         updateTitleWithLessonName(lessonId);
-        loadExercises(lessonId);
-
+        if(exercises.size()==0) {//it is the first exercise
+            loadExercises(lessonId);
+        }else{
+            if(hasMoreExercises()){
+                current.setCurrentExercise(exercises.get(sharedPreferences.getInt("exercise_count", 0)));
+                getScripts(current.getCurrentExercise().get_id());
+            }
+        }
+        setContentView(R.layout.activity_practice);
     }
 
     private class ListExercisesTask extends AsyncTask<Void, Void, List<Exercise>> {
@@ -124,20 +132,66 @@ public class PracticeActivity extends AppCompatActivity {
                 if (exercises.size() <= sharedPreferences.getInt("exercise_count", 0)) {
                     finish();
                 } else {
-                    for (Exercise e : exercises) {
-                        ArrayList<ScriptEntry> scripts = db.findScripts(e.get_id());
-                        Collections.sort(scripts);
-                        int i = 0;
-                        for (ScriptEntry s : scripts) {
-                            s.setScriptIndex(i);
-                            i++;
-                        }
-                        e.setScriptEntries(scripts);
+                    if (exercises.get(0) != null) {
+                        PracticeActivity.exercises = exercises;
+                        current.setCurrentExercise(exercises.get(sharedPreferences.getInt("exercise_count", 0)));
+
+                        getScripts(current.getCurrentExercise().get_id());
                     }
-                    PracticeActivity.exercises=exercises;
-                    Exercise e = exercises.get(sharedPreferences.getInt("exercise_count", 0));
-                    current.setCurrentExercise(e);
-                    setContentView(R.layout.activity_practice);
+                }
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            mListExercisesTask = null;
+        }
+    }
+
+    private class ListSpeechScriptsTask extends AsyncTask<Void, Void, List<SpeechScript>> {
+        private final String url;
+        HashMap hashMap;
+
+        public ListSpeechScriptsTask(String url, HashMap<String, String> hashMap) {
+            this.hashMap = hashMap;
+            this.url = url;
+        }
+
+        @Override
+        protected List<SpeechScript> doInBackground(Void... params) {
+            List<SpeechScript> speechScripts = null;
+            HTTPConnection httpConnection = new HTTPConnection();
+            ScriptsXmlParser scriptsXmlParser = new ScriptsXmlParser();
+
+            try {
+                String result = httpConnection.sendPost(url, hashMap);
+                speechScripts = scriptsXmlParser.parse(new StringReader(result));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return speechScripts;
+        }
+
+
+        @Override
+        protected void onPostExecute(List<SpeechScript> scripts) {
+            mListExercisesTask = null;
+            super.onPostExecute(scripts);
+            if (scripts == null) {
+                Toast.makeText(PracticeActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
+            } else {
+                if (scripts.get(0)==null) {
+                    finish();
+                } else {
+
+                    Collections.sort(scripts);
+                    int i = 0;
+                    for (SpeechScript s : scripts) {
+                        s.setScriptIndex(i);
+                        i++;
+                    }
+                    exercises.get(sharedPreferences.getInt("exercise_count", 0)).setScriptEntries(scripts);
 
                     speech = SpeechRecognizer.createSpeechRecognizer(PracticeActivity.this);
                     speech.setRecognitionListener(new CustomSpeechRecognition());
@@ -184,8 +238,16 @@ public class PracticeActivity extends AppCompatActivity {
         return exercises.size() > sharedPreferences.getInt("exercise_count", 0);
     }
 
+    private void getScripts(Integer exerciseId) {
+        HashMap<String, String> hashMap = new HashMap();
+        hashMap.put("data[SpeechScript][exercise_id]", exerciseId.toString());
+        mListSpeechScriptsTask = new ListSpeechScriptsTask("http://karinanishimura.com.br/cakephp/speech_scripts/index_api.xml", hashMap);
+        mListSpeechScriptsTask.execute();
+    }
+
     /*Selects the exercise to run*/
     public void selectNextExercise() {
+
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -198,7 +260,7 @@ public class PracticeActivity extends AppCompatActivity {
 
             if (current.getCurrentExercise().getScriptEntries().size() > 0) {
                 current.setCurrentScriptIndex(0);
-                current.setCurrentScriptEntry(current.getCurrentExercise().getScriptEntries().get(current.getCurrentScriptIndex()));
+                current.setCurrentSpeechScript(current.getCurrentExercise().getScriptEntries().get(current.getCurrentScriptIndex()));
             }
         }
 
@@ -223,10 +285,10 @@ public class PracticeActivity extends AppCompatActivity {
 //        if (db != null) {
 //            exercises = db.findExercises(lessonId);
 //            for (Exercise e : exercises) {
-//                ArrayList<ScriptEntry> scripts = db.findScripts(e.get_id());
+//                ArrayList<SpeechScript> scripts = db.findScripts(e.get_id());
 //                Collections.sort(scripts);
 //                int i = 0;
-//                for (ScriptEntry s : scripts) {
+//                for (SpeechScript s : scripts) {
 //                    s.setScriptIndex(i);
 //                    i++;
 //                }
@@ -244,7 +306,7 @@ public class PracticeActivity extends AppCompatActivity {
 
             if (current.getCurrentScriptIndex() < current.getCurrentExercise().getScriptEntries().size()) {
 
-                final ScriptEntry s = current.getCurrentScriptEntry();
+                final SpeechScript s = current.getCurrentSpeechScript();
                 if (s != null) {
                     runOnUiThread(new Runnable() {
 
@@ -287,7 +349,7 @@ public class PracticeActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onDone(String utteranceId) {
-                                    if (current.getCurrentScriptEntry().getFunctionId() == 1) {
+                                    if (current.getCurrentSpeechScript().getFunctionId() == 1) {
                                         current.setShouldRunScript(true);
                                         current.selectNextScript();
                                         runScriptEntry();
@@ -413,7 +475,6 @@ public class PracticeActivity extends AppCompatActivity {
                     Intent i = new Intent(PracticeActivity.this, TransitionActivity.class);
                     startActivity(i);
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-
                     current.setShouldRunScript(true);
                 } else {
                     Intent i = new Intent(PracticeActivity.this, LessonCompletedActivity.class);
@@ -615,7 +676,7 @@ public class PracticeActivity extends AppCompatActivity {
             String recognizedSentence = (matches.size() > 0) ? matches.get(0) : "";
             Boolean hit = false;
             for (String r : matches) {
-                hit = current.getCurrentScriptEntry().getTextToCheck().toLowerCase().replaceAll("[^a-zA-Z0-9]", "")
+                hit = current.getCurrentSpeechScript().getTextToCheck().toLowerCase().replaceAll("[^a-zA-Z0-9]", "")
                         .equals(r.toLowerCase().replaceAll("[^a-zA-Z0-9]", ""));
                 if (hit) {
                     recognizedSentence = r;
@@ -637,7 +698,7 @@ public class PracticeActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt("wrong_sentence_count", sharedPreferences.getInt("wrong_sentence_count", 0) + 1);
                 //TODO: update number_attemps to +1 on the current execution
-                // db.updateNumberAttempts  (current.getCurrentScriptEntry().get_id(),lessonId);
+                // db.updateNumberAttempts  (current.getCurrentSpeechScript().get_id(),lessonId);
                 editor.commit();
             }
             updateLastSentences(recognizedSentence);

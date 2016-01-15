@@ -37,7 +37,7 @@ public class TransitionActivity extends AppCompatActivity {
         //pegar imagem do exercicio dependendo do contador e da licao
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(TransitionActivity.this);
 
-        Exercise exercise = loadExercise(sharedPreferences.getInt("lesson_id", 1), sharedPreferences.getInt("exercise_count", 0));
+        Exercise exercise = loadExercise(sharedPreferences.getInt("exercise_count", 0));
         if(exercise!=null) {
             try {
                 int imageResource = getResources().getIdentifier("@drawable/" + exercise.getTransitionImage(), null, getPackageName());
@@ -66,7 +66,7 @@ public class TransitionActivity extends AppCompatActivity {
     }
 
 
-    private Exercise loadExercise(int lessonId, Integer exerciseCount) {
+    private Exercise loadExercise( Integer exerciseCount) {
         //retrieve sentences to practice from db for each exercise
 
         if (PracticeActivity.exercises.size() > exerciseCount) {//is there another exercise
