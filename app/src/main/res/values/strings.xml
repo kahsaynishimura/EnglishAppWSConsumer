@@ -31,7 +31,7 @@
     <string name="password">Password:</string>
     <string name="error_field_required">This information is required</string>
     <string name="error_invalid_email">A valid email is required</string>
-    <string name="not_found">Username or password did not check</string>
+    <string name="user_pass_not_found">Username or password did not check</string>
     <string name="action_logout">Log out</string>
     <string name="title_activity_add_user">Create an account</string>
     <string name="create_account">Create Account</string>
@@ -53,6 +53,8 @@
     <string name="no_prizes">You got no prizes so far. Keep practicing and trade your points.</string>
 
     <string name="banner_ad_unit_id">ca-app-pub-4511527372438796/7377519865</string>
+    <string name="exercise_not_found">No exercises found</string>
+    <string name="practices_not_found">Practices not found</string>
 
 
 </resources>

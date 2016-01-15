@@ -8,17 +8,18 @@ import java.util.List;
 public class Lesson {
     private Integer _id;
     private String name;
-    private Integer bookId;
+    private Book book;
     private List<Exercise> exerciseList;
 
 
-    public Lesson(){
+    public Lesson() {
     }
 
-    public Lesson(Integer _id, String name,Integer bookId ){
+    public Lesson(Integer _id, String name, Integer bookId) {
         this._id = _id;
         this.name = name;
-        this.bookId = bookId;
+        this.book = new Book();
+        this.book.set_id(bookId);
     }
 
     public Integer get_id() {
@@ -37,12 +38,12 @@ public class Lesson {
         this.name = name;
     }
 
-    public Integer getBookId() {
-        return bookId;
+    public Book getBook() {
+        return book;
     }
 
-    public void setBookId(Integer bookId) {
-        this.bookId = bookId;
+    public void setBook(Book book) {
+        this.book = book;
     }
 
     public List<Exercise> getExerciseList() {

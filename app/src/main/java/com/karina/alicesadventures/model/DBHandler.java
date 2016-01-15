@@ -125,27 +125,6 @@ public class DBHandler {
         return e;
     }
 
-    public Exercise findExercise(Integer exerciseId) {
-        Exercise e = new Exercise();
-        open();
-        Cursor c = db.query(TABLE_EXERCISE,
-                new String[]{COLUMN_NAME, COLUMN_TRANSITION_IMAGE
-                },
-                COLUMN_ID + "= ? ", new String[]{exerciseId.toString()},
-                null, null, null, null);
-        if (c.moveToFirst()) {
-            do {
-
-                e.setName(c.getString(0));
-                e.setTransitionImage(c.getString(1));
-            } while (c.moveToNext());
-        }
-        close();
-
-        return e;
-    }
-
-
     private static class DBHelper extends SQLiteOpenHelper {
         public DBHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -160,24 +139,6 @@ public class DBHandler {
         }
     }
 
-    public String addPracticeHistory(Integer userId, Integer lessonId, Integer totalHits, Integer percentageWrong, String startTime, String finishTime, Integer totalPoints) {
-        ContentValues insertValues = new ContentValues();
-        insertValues.put(COLUMN_USER_ID, userId);
-        insertValues.put(COLUMN_LESSON_ID, lessonId);
-        insertValues.put(COLUMN_START_TIME, startTime);//mili
-        insertValues.put(COLUMN_FINISH_TIME, finishTime);//mili
-        insertValues.put(COLUMN_TOTAL_HITS, totalHits);
-        insertValues.put(COLUMN_PERCENTAGE_WRONG, percentageWrong);
-        insertValues.put(COLUMN_TOTAL_POINTS, totalPoints);
-
-        open();
-        long rowId = db.insert(TABLE_PRACTICE_HISTORY, null, insertValues);
-
-        db.close();
-        return rowId + "";
-
-    }
-
     public Boolean saveLastLessonCompletedId(Integer userId, Integer lessonCompletedId) {
         ContentValues insertValues = new ContentValues();
         insertValues.put(COLUMN_LAST_COMPLETED_LESSON_ID, lessonCompletedId.toString());
@@ -190,77 +151,6 @@ public class DBHandler {
 
     }
 
-//    public ArrayList<SpeechScript> findScripts(Integer exerciseId) {
-//        ArrayList<SpeechScript> scriptEntries = new ArrayList<>();
-//        open();
-//        Cursor c = db.query(TABLE_SCRIPT_ENTRY,
-//                new String[]{COLUMN_ID, COLUMN_TEXT_TO_SHOW,
-//                        COLUMN_TEXT_TO_READ, COLUMN_TEXT_TO_CHECK, COLUMN_SCRIPT_INDEX, COLUMN_FUNCTION_ID},
-//                COLUMN_EXERCISE_ID + "= ? ", new String[]{exerciseId.toString()},
-//                null, null, null, null);
-//        if (c.moveToFirst()) {
-//            do {
-//                Exercise e = new Exercise();
-//                e.set_id(exerciseId);
-//                scriptEntries.add(new SpeechScript(c.getInt(0), c.getString(1), c.getString(2), c.getString(3), c.getInt(4), c.getInt(5), e));
-//            } while (c.moveToNext());
-//        }
-//        close();
-//
-//        return scriptEntries;
-//    }
 
-//    public User findUser(String userCode) {
-//        User user = null;
-//        open();
-//        Cursor c = db.query(TABLE_USER,
-//                new String[]{COLUMN_ID, COLUMN_NAME,
-//                        COLUMN_LAST_COMPLETED_LESSON_ID, COLUMN_CODE},
-//                COLUMN_CODE + " LIKE ? ", new String[]{userCode.toString()},
-//                null, null, null, null);
-//        if (c.moveToFirst()) {
-//            do {
-//                user = new User(c.getInt(0), c.getString(1), userCode, c.getInt(2));
-//            } while (c.moveToNext());
-//        }
-//        close();
-//
-//        return user;
-//    }
 
-    public ArrayList<Lesson> findLessons(Integer bookId) {
-        ArrayList<Lesson> lessons = new ArrayList<>();
-        open();
-        Cursor c = db.query(TABLE_LESSON,
-                new String[]{COLUMN_ID, COLUMN_NAME, COLUMN_BOOK_ID},
-                COLUMN_BOOK_ID + "= ? ", new String[]{bookId.toString()},
-                null, null, null, null);
-        if (c.moveToFirst()) {
-            do {
-                lessons.add(new Lesson(c.getInt(0), c.getString(1), bookId));
-            } while (c.moveToNext());
-        }
-        close();
-
-        return lessons;
-    }
-
-//    public ArrayList<Exercise> findExercises(Integer lessonId) {
-//        ArrayList<Exercise> exercises = new ArrayList<>();
-//        open();
-//        Cursor c = db.query(TABLE_EXERCISE,
-//                new String[]{COLUMN_ID, COLUMN_NAME, COLUMN_TRANSITION_IMAGE, COLUMN_LESSON_ID},
-//                COLUMN_LESSON_ID + "= ? ", new String[]{lessonId.toString()},
-//                null, null, null, null);
-//        if (c.moveToFirst()) {
-//            do {
-//                Lesson lesson = new Lesson();
-//                lesson.set_id(lessonId);
-//                exercises.add(new Exercise(c.getInt(0), c.getString(1), c.getString(2), lesson));
-//            } while (c.moveToNext());
-//        }
-//        close();
-//
-//        return exercises;
-//    }
 }

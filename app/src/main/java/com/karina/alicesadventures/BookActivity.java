@@ -85,7 +85,8 @@ public class BookActivity extends ActionBarActivity {
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(BookActivity.this);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-                        editor.putInt("book_id", ++position);//be careful with this fixed id for books. it presumes that in the database the book id is in orther
+                        editor.putString("book_id", (++position)+"");
+                        //be careful with this fixed id for books. it presumes that in the database the book id is sorted
                         editor.commit();
                         startActivity(i);
                     }

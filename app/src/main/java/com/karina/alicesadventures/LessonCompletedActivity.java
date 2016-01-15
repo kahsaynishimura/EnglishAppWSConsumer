@@ -47,6 +47,8 @@ public class LessonCompletedActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lesson_completed);
+
+        PracticeActivity.exercises=new ArrayList<>();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LessonCompletedActivity.this);
 
         saveLastLessonCompletedId(sharedPreferences);
@@ -140,46 +142,29 @@ public class LessonCompletedActivity extends ActionBarActivity {
         startActivity(i);
     }
 
-    public void nextLesson(View v) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LessonCompletedActivity.this);
-
-        ArrayList<Lesson> lessons = getLessons(sharedPreferences.getInt("book_id", 1));
-        Lesson lastLesson = lessons.get(lessons.size() - 1);
-        Integer lessonId = sharedPreferences.getInt("lesson_id", 0);
-
-        if (lessonId != lastLesson.get_id()) {//if that was not the last lesson, start the next one
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putInt("exercise_count", 0);
-            editor.putInt("lesson_id", (lessonId + 1));
-            editor.putInt("wrong_sentence_count", 0);
-            editor.putLong("start_time", 0);
-            editor.commit();
-
-            Intent i = new Intent(LessonCompletedActivity.this, TransitionActivity.class);
-            startActivity(i);
-        } else {
-            Intent i = new Intent(LessonCompletedActivity.this, BookCompletedActivity.class);
-            startActivity(i);
-        }
-        finish();
-    }
-
-    private ArrayList<Lesson> getLessons(Integer bookId) {
-
-        DBHandler db = null;
-
-        try {
-            InputStream is = getBaseContext().getAssets()
-                    .open(DBHandler.DATABASE_NAME);
-            db = new DBHandler(this, is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (db != null) {
-            return db.findLessons(bookId);
-        }
-        return null;
-    }
+//    public void nextLesson(View v) {
+//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LessonCompletedActivity.this);
+//
+//        ArrayList<Lesson> lessons = getLessons(sharedPreferences.getString("book_id", "1"));
+//        Lesson lastLesson = lessons.get(lessons.size() - 1);
+//        Integer lessonId = sharedPreferences.getInt("lesson_id", 0);
+//
+//        if (lessonId != lastLesson.get_id()) {//if that was not the last lesson, start the next one
+//            SharedPreferences.Editor editor = sharedPreferences.edit();
+//            editor.putInt("exercise_count", 0);
+//            editor.putInt("lesson_id", (lessonId + 1));
+//            editor.putInt("wrong_sentence_count", 0);
+//            editor.putLong("start_time", 0);
+//            editor.commit();
+//
+//            Intent i = new Intent(LessonCompletedActivity.this, TransitionActivity.class);
+//            startActivity(i);
+//        } else {
+//            Intent i = new Intent(LessonCompletedActivity.this, BookCompletedActivity.class);
+//            startActivity(i);
+//        }
+//        finish();
+//    }
 
 
     private class AddPracticeTask extends AsyncTask<Void, Void, String> {

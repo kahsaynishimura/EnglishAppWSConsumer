@@ -127,7 +127,8 @@ public class PracticeActivity extends AppCompatActivity {
             mListExercisesTask = null;
             super.onPostExecute(exercises);
             if (exercises == null) {
-                Toast.makeText(PracticeActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
+                Toast.makeText(PracticeActivity.this, getText(R.string.exercise_not_found), Toast.LENGTH_LONG).show();
+                finish();
             } else {
                 if (exercises.size() <= sharedPreferences.getInt("exercise_count", 0)) {
                     finish();
@@ -179,7 +180,8 @@ public class PracticeActivity extends AppCompatActivity {
             mListExercisesTask = null;
             super.onPostExecute(scripts);
             if (scripts == null) {
-                Toast.makeText(PracticeActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
+                Toast.makeText(PracticeActivity.this, getText(R.string.practices_not_found), Toast.LENGTH_LONG).show();
+                finish();
             } else {
                 if (scripts.get(0)==null) {
                     finish();
@@ -275,26 +277,6 @@ public class PracticeActivity extends AppCompatActivity {
 
         mListExercisesTask = new ListExercisesTask("http://www.karinanishimura.com.br/cakephp/exercises/index_api.xml", hashMap);
         mListExercisesTask.execute();
-//        try {
-//            InputStream is = getAssets()
-//                    .open(DBHandler.DATABASE_NAME);
-//            db = new DBHandler(PracticeActivity.this, is);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        if (db != null) {
-//            exercises = db.findExercises(lessonId);
-//            for (Exercise e : exercises) {
-//                ArrayList<SpeechScript> scripts = db.findScripts(e.get_id());
-//                Collections.sort(scripts);
-//                int i = 0;
-//                for (SpeechScript s : scripts) {
-//                    s.setScriptIndex(i);
-//                    i++;
-//                }
-//                e.setScriptEntries(scripts);
-//            }
-//        }
     }
 
     private void runScriptEntry() {

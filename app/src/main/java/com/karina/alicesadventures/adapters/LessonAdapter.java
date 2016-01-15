@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.karina.alicesadventures.PracticeActivity;
 import com.karina.alicesadventures.R;
 import com.karina.alicesadventures.TransitionActivity;
+import com.karina.alicesadventures.model.Exercise;
 import com.karina.alicesadventures.model.Lesson;
 
 import java.util.ArrayList;
@@ -79,13 +80,13 @@ public class LessonAdapter extends ArrayAdapter<Lesson> {
 
                     //converting it back to a milliseconds representation:
                     long millis = date.getTime();
-
+                    PracticeActivity.exercises=new ArrayList<>();
                     editor.putInt("exercise_count", 0);
                     editor.putInt("correct_sentence_count", 0);
                     editor.putInt("wrong_sentence_count", 0);
                     editor.putLong("start_time", date.getTime());
                     editor.putInt("lesson_id", l.get_id());
-                    editor.commit();
+                    editor.apply();
                     context.startActivity(i);
                 }
             });
