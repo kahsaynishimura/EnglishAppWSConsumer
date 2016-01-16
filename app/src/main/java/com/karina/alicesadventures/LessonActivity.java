@@ -5,8 +5,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -14,14 +12,9 @@ import android.widget.Toast;
 
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.adapters.LessonAdapter;
-import com.karina.alicesadventures.model.DBHandler;
-import com.karina.alicesadventures.model.Exercise;
 import com.karina.alicesadventures.model.Lesson;
-import com.karina.alicesadventures.parsers.ExercisesXmlParser;
 import com.karina.alicesadventures.parsers.LessonsXmlParser;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,7 +76,6 @@ public class LessonActivity extends ActionBarActivity {
                 ListView myLessons = (ListView) findViewById(R.id.lessons);
                 myLessons.setAdapter(a);
             }
-
         }
 
         @Override

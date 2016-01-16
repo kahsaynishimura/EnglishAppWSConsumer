@@ -11,23 +11,17 @@ import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.SessionManager;
-import com.karina.alicesadventures.model.DBHandler;
-import com.karina.alicesadventures.model.Lesson;
 import com.karina.alicesadventures.parsers.MessageXmlParser;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -36,7 +30,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 
 public class LessonCompletedActivity extends ActionBarActivity {
@@ -51,8 +44,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
         PracticeActivity.exercises = new ArrayList<>();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LessonCompletedActivity.this);
 
-        saveLastLessonCompletedId(sharedPreferences);
-
+     //save lesson completed
         long millis = sharedPreferences.getLong("start_time", 0L);
         Date startTime = new Date(millis);
         Integer totalHits = sharedPreferences.getInt("correct_sentence_count", 0);
@@ -90,13 +82,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
         AdRequest adRequest = b.build();
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
         mAdView.loadAd(adRequest);
-        mAdView.setAdListener(new AdListener() {
-            @Override
 
-            public void onAdLoaded() {
-                //Toast.makeText(LessonCompletedActivity.this, "entrou", Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
     public static final String md5(final String s) {
@@ -123,21 +109,6 @@ public class LessonCompletedActivity extends ActionBarActivity {
         return "";
     }
 
-    public void saveLastLessonCompletedId(SharedPreferences sharedPreferences) {
-
-        DBHandler db = null;
-
-        try {
-            InputStream is = getBaseContext().getAssets()
-                    .open(DBHandler.DATABASE_NAME);
-            db = new DBHandler(this, is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (db != null) {
-            db.saveLastLessonCompletedId(sharedPreferences.getInt("user_id", 0), sharedPreferences.getInt("lesson_id", 0));
-        }
-    }
 
     public void viewPrizes(View v) {
         Intent i = new Intent(LessonCompletedActivity.this, ProductListActivity.class);

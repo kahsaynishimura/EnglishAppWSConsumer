@@ -72,7 +72,7 @@ public class BookActivity extends ActionBarActivity {
             if (books == null) {
                 Toast.makeText(BookActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
             } else {
-                ArrayAdapter<Book> a =
+                final ArrayAdapter<Book> a =
                         new ArrayAdapter<Book>(BookActivity.this, android.R.layout.simple_list_item_1, books);
 
                 ListView myBooks = (ListView) findViewById(R.id.books);
@@ -84,9 +84,8 @@ public class BookActivity extends ActionBarActivity {
                         Intent i = new Intent(BookActivity.this, LessonActivity.class);
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(BookActivity.this);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
-
-                        editor.putString("book_id", (++position)+"");
-                        //be careful with this fixed id for books. it presumes that in the database the book id is sorted
+                        Book book = a.getItem(position);
+                        editor.putString("book_id", book.get_id() + "");
                         editor.commit();
                         startActivity(i);
                     }
@@ -97,7 +96,7 @@ public class BookActivity extends ActionBarActivity {
         @Override
         protected void onCancelled() {
             super.onCancelled();
-            mListBooksTask=null;
+            mListBooksTask = null;
         }
     }
 

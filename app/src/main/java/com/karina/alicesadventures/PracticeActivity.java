@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
@@ -19,7 +20,6 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
@@ -27,10 +27,8 @@ import android.speech.tts.UtteranceProgressListener;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -38,17 +36,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.model.CurrentPracticeData;
-import com.karina.alicesadventures.model.DBHandler;
 import com.karina.alicesadventures.model.Exercise;
-import com.karina.alicesadventures.model.Lesson;
 import com.karina.alicesadventures.model.SpeechScript;
 import com.karina.alicesadventures.parsers.ExercisesXmlParser;
 import com.karina.alicesadventures.parsers.ScriptsXmlParser;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,6 +55,7 @@ import java.util.Locale;
 
 public class PracticeActivity extends AppCompatActivity {
 
+    private static final int VOICE_RECOGNITION_REQUEST_CODE = 1;
     private ListExercisesTask mListExercisesTask;
     private ListSpeechScriptsTask mListSpeechScriptsTask;
     private static final long TRANSITION_PAUSE = 1000;
@@ -71,7 +68,6 @@ public class PracticeActivity extends AppCompatActivity {
     CurrentPracticeData current;//stores current screen info - current screen state
     public static List<Exercise> exercises = new ArrayList<Exercise>();
     private TextToSpeech TTS;
-    private DBHandler db;
     public final long INSTRUCTION_PAUSE = 1000;
 
     SharedPreferences sharedPreferences;
@@ -85,7 +81,6 @@ public class PracticeActivity extends AppCompatActivity {
         checkConnection();
         current = new CurrentPracticeData();
         Integer lessonId = sharedPreferences.getInt("lesson_id", 0);
-        updateTitleWithLessonName(lessonId);
         if (exercises.size() == 0) {//it is the first exercise
             loadExercises(lessonId);
         } else {
@@ -95,6 +90,18 @@ public class PracticeActivity extends AppCompatActivity {
             }
         }
         setContentView(R.layout.activity_practice);
+        AdView mAdView = (AdView) findViewById(R.id.ad_view);
+
+        AdRequest.Builder b = new AdRequest.Builder();
+
+        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
+        b.addTestDevice(deviceId);
+
+        AdRequest adRequest = b.build();
+        b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+        mAdView.loadAd(adRequest);
+
     }
 
     private class ListExercisesTask extends AsyncTask<Void, Void, List<Exercise>> {
@@ -150,6 +157,76 @@ public class PracticeActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == VOICE_RECOGNITION_REQUEST_CODE)
+
+            //If Voice recognition is successful then it returns RESULT_OK
+            if (resultCode == RESULT_OK) {
+
+                ArrayList<String> matches = data
+                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+
+                if (!matches.isEmpty()) {
+                    // If first Match contains the 'search' word
+                    // Then start web search.
+                    String recognizedSentence = (matches.size() > 0) ? matches.get(0) : "";
+                    Boolean hit = false;
+                    for (String r : matches) {
+                        hit = current.getCurrentSpeechScript().getTextToCheck().toLowerCase().replaceAll("[^a-zA-Z0-9]", "")
+                                .equals(r.toLowerCase().replaceAll("[^a-zA-Z0-9]", ""));
+                        if (hit) {
+                            recognizedSentence = r;
+                            break;
+                        }
+                    }
+
+                    if (hit) {
+                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(PracticeActivity.this);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putInt("correct_sentence_count", sharedPreferences.getInt("correct_sentence_count", 0) + 1);
+                        editor.commit();
+                        if (current.hasMoreScripts()) {
+                            current.selectNextScript();
+                        }
+
+                    } else {
+                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(PracticeActivity.this);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putInt("wrong_sentence_count", sharedPreferences.getInt("wrong_sentence_count", 0) + 1);
+                        //TODO: update number_attemps to +1 on the current execution
+                        // db.updateNumberAttempts  (current.getCurrentSpeechScript().get_id(),lessonId);
+                        editor.commit();
+                    }
+                    updateLastSentences(recognizedSentence);
+                    current.setShouldRunScript(true);
+                    runScriptEntry();//user should not stop in the middle of the lesson.
+
+                }
+                //Result code for various error.
+            }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void updateLastSentences(String sentence) {
+        TextView tv1 = ((TextView) findViewById(R.id.recognizedText1));
+        TextView tv2 = ((TextView) findViewById(R.id.recognizedText2));
+        TextView tv3 = ((TextView) findViewById(R.id.recognizedText3));
+        TextView tv4 = ((TextView) findViewById(R.id.recognizedText4));
+        TextView tv5 = ((TextView) findViewById(R.id.recognizedText5));
+        TextView tv6 = ((TextView) findViewById(R.id.recognizedText6));
+        TextView tv7 = ((TextView) findViewById(R.id.recognizedText7));
+        TextView tv8 = ((TextView) findViewById(R.id.recognizedText8));
+        tv8.setText(tv7.getText());
+        tv7.setText(tv6.getText());
+        tv6.setText(tv5.getText());
+        tv5.setText(tv4.getText());
+        tv4.setText(tv3.getText());
+        tv3.setText(tv2.getText());
+        tv2.setText(tv1.getText());
+        tv1.setText(sentence);
+    }
+
     private class ListSpeechScriptsTask extends AsyncTask<Void, Void, List<SpeechScript>> {
         private final String url;
         HashMap hashMap;
@@ -196,7 +273,6 @@ public class PracticeActivity extends AppCompatActivity {
                     exercises.get(sharedPreferences.getInt("exercise_count", 0)).setScriptEntries(scripts);
 
                     speech = SpeechRecognizer.createSpeechRecognizer(PracticeActivity.this);
-                    speech.setRecognitionListener(new CustomSpeechRecognition());
                     recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                     recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, (Locale.US).toString());
                     recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, PracticeActivity.this.getPackageName());
@@ -294,14 +370,15 @@ public class PracticeActivity extends AppCompatActivity {
 
                         @Override
                         public void run() {
-
                             TextView child = new TextView(PracticeActivity.this);
                             child.setTextSize(20f);
 
                             LinearLayout parent = (LinearLayout) findViewById(R.id.contentFrame);
                             child.setText(s.getTextToShow());
                             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
+                            params.setMargins(30, 20, 30, 20);
+                            params.gravity= Gravity.CENTER_HORIZONTAL;
+                            parent.setBackgroundColor(Color.parseColor("#AFE4E2"));
                             child.setLayoutParams(params);
                             ArrayList<TextView> items = new ArrayList<>();
 
@@ -318,6 +395,7 @@ public class PracticeActivity extends AppCompatActivity {
                     //speak
                     Bundle b = new Bundle();
                     b.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, s.get_id().toString());
+                    recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, s.getTextToShow());
 
                     switch (s.getFunctionId()) {
 
@@ -515,10 +593,10 @@ public class PracticeActivity extends AppCompatActivity {
                         }
 
                     } else {
-                        speech.startListening(recognizerIntent);
+                        startActivityForResult(recognizerIntent, VOICE_RECOGNITION_REQUEST_CODE);
                     }
                 } else {
-                    speech.startListening(recognizerIntent);
+                    startActivityForResult(recognizerIntent, VOICE_RECOGNITION_REQUEST_CODE);
                 }
             }
         });
@@ -536,7 +614,7 @@ public class PracticeActivity extends AppCompatActivity {
                     // permission was granted, yay! Do the
                     //  task you need to do.
 
-                    speech.startListening(recognizerIntent);
+                    startActivityForResult(recognizerIntent, VOICE_RECOGNITION_REQUEST_CODE);
 
                 } else {
                     finish();
@@ -557,184 +635,6 @@ public class PracticeActivity extends AppCompatActivity {
         if (TTS != null) {
             TTS.shutdown();
         }
-    }
-
-
-    class CustomSpeechRecognition implements RecognitionListener {
-        Boolean beganSpeech = false;
-
-        @Override
-        public void onReadyForSpeech(Bundle params) {
-
-            changeDrawable(((ImageButton) findViewById(R.id.mic)), "@drawable/mic_0_enabled", PracticeActivity.this, R.drawable.mic_0_enabled);
-            Log.i(LOG_TAG, "onReadyForSpeech");
-        }
-
-        @Override
-        public void onBeginningOfSpeech() {
-            Log.i(LOG_TAG, "onBeginningOfSpeech");
-            beganSpeech = true;
-        }
-
-        @Override
-        public void onRmsChanged(float rmsdB) {
-
-            // Log.i(LOG_TAG, "onRmsChanged");
-
-            if (beganSpeech == true) {
-                switch ((int) rmsdB) {
-                    case 1:
-                    case 2:
-                        changeDrawable(((ImageButton) findViewById(R.id.mic)), "@drawable/mic_1", PracticeActivity.this, R.drawable.mic_1);
-                        break;
-                    case 3:
-                    case 4:
-                        changeDrawable(((ImageButton) findViewById(R.id.mic)), "@drawable/mic_3", PracticeActivity.this, R.drawable.mic_3);
-                        break;
-                    case 5:
-                    case 6:
-                        changeDrawable(((ImageButton) findViewById(R.id.mic)), "@drawable/mic_5", PracticeActivity.this, R.drawable.mic_5);
-                        break;
-                    case 7:
-                    case 8:
-                        changeDrawable(((ImageButton) findViewById(R.id.mic)), "@drawable/mic_7", PracticeActivity.this, R.drawable.mic_7);
-                        break;
-                    case 9:
-                    case 10:
-                        changeDrawable(((ImageButton) findViewById(R.id.mic)), "@drawable/mic_10", PracticeActivity.this, R.drawable.mic_10);
-                        break;
-                    default:
-                        changeDrawable(((ImageButton) findViewById(R.id.mic)), "@drawable/mic_0_enabled", PracticeActivity.this, R.drawable.mic_0_enabled);
-                        break;
-                }
-                beganSpeech = false;
-            }
-        }
-
-        @Override
-        public void onBufferReceived(byte[] buffer) {
-
-            Log.i(LOG_TAG, "onBufferReceived");
-        }
-
-        @Override
-        public void onEndOfSpeech() {
-            changeDrawable(((ImageButton) findViewById(R.id.mic)), "@drawable/mic_disabled", PracticeActivity.this, R.drawable.mic_disabled);
-
-            Log.i(LOG_TAG, "onEndOfSpeech");
-            speech.stopListening();
-        }
-
-        @Override
-        public void onError(int error) {
-            Log.i(LOG_TAG, "onError: " + getErrorText(error));
-            changeDrawable(((ImageButton) findViewById(R.id.mic)), "@drawable/mic_disabled", PracticeActivity.this, R.drawable.mic_disabled);
-
-            speech.cancel();
-        }
-
-        public void updateLastSentences(String sentence) {
-            TextView tv1 = ((TextView) findViewById(R.id.recognizedText1));
-            TextView tv2 = ((TextView) findViewById(R.id.recognizedText2));
-            TextView tv3 = ((TextView) findViewById(R.id.recognizedText3));
-            TextView tv4 = ((TextView) findViewById(R.id.recognizedText4));
-            TextView tv5 = ((TextView) findViewById(R.id.recognizedText5));
-            tv5.setText(tv4.getText());
-            tv4.setText(tv3.getText());
-            tv3.setText(tv2.getText());
-            tv2.setText(tv1.getText());
-            tv1.setText(sentence);
-        }
-
-        @Override
-        public void onResults(Bundle results) {
-            changeDrawable(((ImageButton) findViewById(R.id.mic)), "@drawable/mic_disabled", PracticeActivity.this, R.drawable.mic_disabled);
-
-
-            Log.i(LOG_TAG, "onResults");
-            ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-
-            //just show the first result so that the user gets a sense of where he is wrong
-            String recognizedSentence = (matches.size() > 0) ? matches.get(0) : "";
-            Boolean hit = false;
-            for (String r : matches) {
-                hit = current.getCurrentSpeechScript().getTextToCheck().toLowerCase().replaceAll("[^a-zA-Z0-9]", "")
-                        .equals(r.toLowerCase().replaceAll("[^a-zA-Z0-9]", ""));
-                if (hit) {
-                    recognizedSentence = r;
-                    break;
-                }
-            }
-
-            if (hit) {
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(PracticeActivity.this);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putInt("correct_sentence_count", sharedPreferences.getInt("correct_sentence_count", 0) + 1);
-                editor.commit();
-                if (current.hasMoreScripts()) {
-                    current.selectNextScript();
-                }
-
-            } else {
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(PracticeActivity.this);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putInt("wrong_sentence_count", sharedPreferences.getInt("wrong_sentence_count", 0) + 1);
-                //TODO: update number_attemps to +1 on the current execution
-                // db.updateNumberAttempts  (current.getCurrentSpeechScript().get_id(),lessonId);
-                editor.commit();
-            }
-            updateLastSentences(recognizedSentence);
-            current.setShouldRunScript(true);
-            runScriptEntry();//user should not stop in the middle of the lesson.
-        }
-
-        @Override
-        public void onPartialResults(Bundle partialResults) {
-            Log.i(LOG_TAG, "onPartialResults");
-        }
-
-        @Override
-        public void onEvent(int eventType, Bundle params) {
-            Log.i(LOG_TAG, "onEvent");
-        }
-
-        public String getErrorText(int errorCode) {
-            String message = errorCode + "";
-            switch (errorCode) {
-                case SpeechRecognizer.ERROR_AUDIO:
-                    message += "Audio recording error";
-                    break;
-                case SpeechRecognizer.ERROR_CLIENT:
-                    message += "Client side error";
-                    break;
-                case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
-                    message += "Insufficient permissions";
-                    break;
-                case SpeechRecognizer.ERROR_NETWORK:
-                    message += "Network error";
-                    break;
-                case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
-                    message += "Network timeout";
-                    break;
-                case SpeechRecognizer.ERROR_NO_MATCH:
-                    message += "No match";
-                    break;
-                case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-                    message += "RecognitionService busy";
-                    break;
-                case SpeechRecognizer.ERROR_SERVER:
-                    message += "error from server";
-                    break;
-                case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                    message += "No speech input";
-                    break;
-                default:
-                    message += "Didn't understand, please try again.";
-                    break;
-            }
-            return message;
-        }
-
     }
 
     private void changeDrawable(ImageButton view, String uri, Context context, int id) {
@@ -779,21 +679,6 @@ public class PracticeActivity extends AppCompatActivity {
         }
     }
 
-    public Lesson updateTitleWithLessonName(Integer lessonId) {
-        Lesson l = null;
-        try {
-            InputStream is = getAssets()
-                    .open(DBHandler.DATABASE_NAME);
-            db = new DBHandler(PracticeActivity.this, is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (db != null) {
-            l = db.findLesson(lessonId);
-            setTitle(l.getName());
-        }
-        return l;
-    }
 
     private void speak(String textToSpeak, String id, Bundle bundle) {
         if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {

@@ -1,7 +1,6 @@
 package com.karina.alicesadventures;
 
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -11,16 +10,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.karina.alicesadventures.model.DBHandler;
 import com.karina.alicesadventures.model.Exercise;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 
 //keeps track of the current Exercise
 public class TransitionActivity extends AppCompatActivity {
