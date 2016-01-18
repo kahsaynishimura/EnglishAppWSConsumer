@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 public class AddUserActivity extends AppCompatActivity {
     private AddUserTask mAddUserTask;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,12 +34,12 @@ public class AddUserActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //make email edit text field the next field after name
-        EditText e = (EditText)findViewById(R.id.txtName);
+        EditText e = (EditText) findViewById(R.id.txtName);
         e.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_NEXT ) {
-                    ((EditText)findViewById(R.id.txtEmail)).requestFocus();
+                if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                    ((EditText) findViewById(R.id.txtEmail)).requestFocus();
                     return true;
                 }
                 return false;
@@ -56,44 +57,46 @@ public class AddUserActivity extends AppCompatActivity {
         EditText mNameView = (EditText) findViewById(R.id.txtName);
         EditText mEmailView = (EditText) findViewById(R.id.txtEmail);
         EditText mPasswordView = (EditText) findViewById(R.id.txtPassword);
+        EditText mPasswordCheckView = (EditText) findViewById(R.id.txtPasswordCheck);
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
         String mName = mNameView.getText().toString();
         String mEmail = mEmailView.getText().toString();
         String mPassword = mPasswordView.getText().toString();
+        String mPasswordCheck = mPasswordCheckView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
-
 
         if (TextUtils.isEmpty(mPassword)) {
             mPasswordView.setError(getString(R.string.error_field_required));
             focusView = mPasswordView;
             cancel = true;
-        }
-        /*TODO:else if (mPassword.length() < 4) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
+        } else if (mPassword.length() < 8) {
+            mPasswordView.setError(getString(R.string.error_field_length));
             focusView = mPasswordView;
             cancel = true;
-        }*/
-
+        } else if (!mPassword.equals(mPasswordCheck)) {
+            mPasswordCheckView.setError(getString(R.string.error_pass_mismatch));
+            focusView = mPasswordView;
+            cancel = true;
+        }
         if (TextUtils.isEmpty(mEmail)) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
+        } else if (!mEmail.contains("@")) {
+            mEmailView.setError(getString(R.string.error_invalid_email));
+            focusView = mEmailView;
+            cancel = true;
         }
+
         if (TextUtils.isEmpty(mName)) {
             mNameView.setError(getString(R.string.error_field_required));
             focusView = mNameView;
             cancel = true;
         }
-        /*else if (!mEmail.contains("@")) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
-        }
-*/
         if (cancel) {
             focusView.requestFocus();
         } else {
@@ -104,7 +107,7 @@ public class AddUserActivity extends AppCompatActivity {
             hashMap.put("data[User][username]", mEmail);
             hashMap.put("data[User][name]", mName);
             try {
-                mAddUserTask= new AddUserTask("http://karinanishimura.com.br/cakephp/users/add_api.xml", hashMap);
+                mAddUserTask = new AddUserTask("http://karinanishimura.com.br/cakephp/users/add_api.xml", hashMap);
                 mAddUserTask.execute();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -128,7 +131,7 @@ public class AddUserActivity extends AppCompatActivity {
         protected String doInBackground(Void... params) {
             String message = null;
             HTTPConnection httpConnection = new HTTPConnection();
-            MessageXmlParser messageXmlParser= new MessageXmlParser();
+            MessageXmlParser messageXmlParser = new MessageXmlParser();
             String result = "";
             try {
                 result = httpConnection.sendPost(url, hashMap);
@@ -145,7 +148,7 @@ public class AddUserActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String message) {
             super.onPostExecute(message);
-           mAddUserTask = null;
+            mAddUserTask = null;
             if (message == null) {
                 Snackbar.make(((FloatingActionButton) findViewById(R.id.fab)), getText(R.string.verify_internet_connection), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();

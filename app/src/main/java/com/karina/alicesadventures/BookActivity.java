@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +16,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -46,6 +49,17 @@ public class BookActivity extends ActionBarActivity {
         sessionManager.checkLogin();
         mListBooksTask = new ListBooksTask();
         mListBooksTask.execute("http://www.karinanishimura.com.br/cakephp/books/index_api.xml");
+        AdView mAdView = (AdView) findViewById(R.id.ad_view);
+
+        AdRequest.Builder b = new AdRequest.Builder();
+
+//        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+//        String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
+//        b.addTestDevice(deviceId);
+
+        AdRequest adRequest = b.build();
+        b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+        mAdView.loadAd(adRequest);
     }
 
     private class ListBooksTask extends AsyncTask<String, Void, List<Book>> {

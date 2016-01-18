@@ -66,24 +66,17 @@ public class SelectUserActivity extends ActionBarActivity {
             mPasswordView.setError(getString(R.string.error_field_required));
             focusView = mPasswordView;
             cancel = true;
-        }
-        /*TODO:else if (mPassword.length() < 4) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
+        } else if (mPassword.length() < 8) {
+            mPasswordView.setError(getString(R.string.error_field_length));
             focusView = mPasswordView;
             cancel = true;
-        }*/
+        }
 
         if (TextUtils.isEmpty(mEmail)) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
         }
-        /*else if (!mEmail.contains("@")) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
-        }
-*/
         if (cancel) {
             focusView.requestFocus();
         } else {

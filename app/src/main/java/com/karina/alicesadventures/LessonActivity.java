@@ -4,12 +4,15 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.adapters.LessonAdapter;
 import com.karina.alicesadventures.model.Lesson;
@@ -36,7 +39,17 @@ public class LessonActivity extends ActionBarActivity {
         hashMap.put("data[Lesson][book_id]", sharedPreferences.getString("book_id", "1"));
         mListLessonsTask = new ListLessonsTask("http://karinanishimura.com.br/cakephp/lessons/index_api.xml", hashMap);
         mListLessonsTask.execute();
+        AdView mAdView = (AdView) findViewById(R.id.ad_view);
 
+        AdRequest.Builder b = new AdRequest.Builder();
+
+//        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+//        String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
+//        b.addTestDevice(deviceId);
+
+        AdRequest adRequest = b.build();
+        b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+        mAdView.loadAd(adRequest);
     }
 
 

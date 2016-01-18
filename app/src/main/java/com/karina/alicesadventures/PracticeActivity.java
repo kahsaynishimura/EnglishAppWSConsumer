@@ -94,9 +94,9 @@ public class PracticeActivity extends AppCompatActivity {
 
         AdRequest.Builder b = new AdRequest.Builder();
 
-        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
-        b.addTestDevice(deviceId);
+//        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+//        String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
+//        b.addTestDevice(deviceId);
 
         AdRequest adRequest = b.build();
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);

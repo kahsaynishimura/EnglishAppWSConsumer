@@ -20,7 +20,7 @@
     <string name="finish_time">Finish</string>
     <string name="correct"># correct sentences</string>
     <string name="errors_percentage">Errors</string>
-    <string name="title_activity_select_user">Log in</string>
+    <string name="title_activity_select_user">Echo Practice</string>
     <string name="log_in">Log in</string>
     <string name="quit_confirm">Confirmation</string>
     <string name="quit_text">Are you sure you want to go back and lose all the progress you have made?</string>
@@ -29,6 +29,7 @@
     <string name="verify_internet_connection">Please, check your connection.</string>
     <string name="email">Email:</string>
     <string name="password">Password:</string>
+    <string name="password_check">Password again:</string>
     <string name="error_field_required">This information is required</string>
     <string name="error_invalid_email">A valid email is required</string>
     <string name="user_pass_not_found">Username or password did not check</string>
@@ -55,6 +56,8 @@
     <string name="banner_ad_unit_id">ca-app-pub-4511527372438796/7377519865</string>
     <string name="exercise_not_found">No exercises found</string>
     <string name="practices_not_found">Practices not found</string>
+    <string name="error_pass_mismatch">The passwords did not match</string>
+    <string name="error_field_length">this field should contain at least 8 characteres</string>
 
 
 </resources>
