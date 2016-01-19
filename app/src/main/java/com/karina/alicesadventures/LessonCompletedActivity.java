@@ -11,6 +11,7 @@ import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +19,9 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.karina.alicesadventures.Util.AnalyticsApplication;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.parsers.MessageXmlParser;
@@ -34,6 +38,8 @@ import java.util.HashMap;
 
 public class LessonCompletedActivity extends ActionBarActivity {
     private AddPracticeTask mAddPracticeTask;
+    private Tracker mTracker;
+    private static final String TAG = "LessonCompletedActivity";
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -41,10 +47,15 @@ public class LessonCompletedActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lesson_completed);
 
+
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
+
         PracticeActivity.exercises = new ArrayList<>();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LessonCompletedActivity.this);
 
-     //save lesson completed
+        //save lesson completed
         long millis = sharedPreferences.getLong("start_time", 0L);
         Date startTime = new Date(millis);
         Integer totalHits = sharedPreferences.getInt("correct_sentence_count", 0);
@@ -83,6 +94,15 @@ public class LessonCompletedActivity extends ActionBarActivity {
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
         mAdView.loadAd(adRequest);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String name = "Lesson Completed";
+        Log.i(TAG, "Setting screen name: " + name);
+        mTracker.setScreenName("Screen~" + name);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     public static final String md5(final String s) {

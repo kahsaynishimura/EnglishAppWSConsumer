@@ -11,16 +11,20 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
+import com.karina.alicesadventures.Util.AnalyticsApplication;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.GeneralResponse;
@@ -45,6 +49,8 @@ public class ProductDetailActivity extends AppCompatActivity {
     private ViewProductTask mViewProductTask;
 
     private Product product = null;
+    private Tracker mTracker;
+    private static final String TAG = "ProductDetailActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +58,11 @@ public class ProductDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_product_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
+
+
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -96,6 +107,15 @@ public class ProductDetailActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String name = "Product Detail";
+        Log.i(TAG, "Setting screen name: " + name);
+        mTracker.setScreenName("Screen~" + name);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     public void trade(View v) {
@@ -146,7 +166,7 @@ public class ProductDetailActivity extends AppCompatActivity {
             super.onPostExecute(product);
             mViewProductTask = null;
             if (product != null) {
-               // ProductsXmlParser.ITEM_MAP.put(product.getId().toString(), product);
+                // ProductsXmlParser.ITEM_MAP.put(product.getId().toString(), product);
                 Bundle arguments = new Bundle();
                 arguments.putString(ProductDetailFragment.ARG_ITEM_ID, product.getId().toString());
                 ProductDetailFragment fragment = new ProductDetailFragment();

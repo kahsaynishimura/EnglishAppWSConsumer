@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +20,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.karina.alicesadventures.Util.AnalyticsApplication;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.model.Product;
 import com.karina.alicesadventures.parsers.ProductsXmlParser;
@@ -38,6 +42,8 @@ import java.util.List;
 public class ProductListActivity extends AppCompatActivity {
     private ListProductsTask mListProductsTask;
     private List<Product> ITEMS = new ArrayList<Product>();
+    private Tracker mTracker;
+    private static final String TAG = "ProductListActivity";
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
@@ -48,6 +54,11 @@ public class ProductListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_list);
+
+
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -96,8 +107,17 @@ public class ProductListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String name = "List of products";
+        Log.i(TAG, "Setting screen name: " + name);
+        mTracker.setScreenName("Screen~" + name);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    }
+
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter( ITEMS));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(ITEMS));
     }
 
     public class SimpleItemRecyclerViewAdapter
@@ -130,7 +150,7 @@ public class ProductListActivity extends AppCompatActivity {
                         arguments.putInt(ProductDetailFragment.ARG_ITEM_ID, holder.product.getId());
                         ProductDetailFragment fragment = new ProductDetailFragment();
                         fragment.setArguments(arguments);
-                       getSupportFragmentManager().beginTransaction()
+                        getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.product_detail_container, fragment)
                                 .commit();
                     } else {
@@ -204,7 +224,7 @@ public class ProductListActivity extends AppCompatActivity {
         @Override
         protected void onCancelled() {
             super.onCancelled();
-            mListProductsTask=null;
+            mListProductsTask = null;
         }
     }
 

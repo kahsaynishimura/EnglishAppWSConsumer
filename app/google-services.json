@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_id": "echo-practice",
+    "project_number": "23769891053",
+    "name": "Echo Practice"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:23769891053:android:6d6bc953771bdd69",
+        "client_id": "android:com.karina.alicesadventures",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.karina.alicesadventures"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-46090209-3"
+          }
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 2,
+          "test_banner_ad_unit_id": "ca-app-pub-3940256099942544/6300978111",
+          "test_interstitial_ad_unit_id": "ca-app-pub-3940256099942544/1033173712"
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}

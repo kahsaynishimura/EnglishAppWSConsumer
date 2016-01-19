@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,10 +19,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
+import com.karina.alicesadventures.Util.AnalyticsApplication;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.IntentIntegrator;
 import com.karina.alicesadventures.Util.IntentResult;
@@ -37,16 +41,25 @@ import java.util.List;
 
 public class BookActivity extends ActionBarActivity {
 
+    private static final String TAG = "BookActivity";
     private ListBooksTask mListBooksTask;
     private ValidateCodeTask mValidateCodeTask;
     private SessionManager sessionManager;
+    private Tracker mTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book);
+
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
+
+        //ensure there is a logged in user
         sessionManager = new SessionManager(BookActivity.this);
         sessionManager.checkLogin();
+
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[User][id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
         mListBooksTask = new ListBooksTask("http://www.karinanishimura.com.br/cakephp/books/index_api.xml", hashMap);
@@ -62,6 +75,15 @@ public class BookActivity extends ActionBarActivity {
         AdRequest adRequest = b.build();
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
         mAdView.loadAd(adRequest);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String name = "List of books";
+        Log.i(TAG, "Setting screen name: " + name);
+        mTracker.setScreenName("Screen~" + name);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     private class ListBooksTask extends AsyncTask<String, Void, List<Book>> {

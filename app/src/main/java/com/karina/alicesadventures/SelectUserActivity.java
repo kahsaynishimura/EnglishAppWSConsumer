@@ -6,10 +6,14 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.karina.alicesadventures.Util.AnalyticsApplication;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.User;
@@ -22,6 +26,8 @@ public class SelectUserActivity extends ActionBarActivity {
     private LoginTask mLoginTask;
     private SessionManager sessionManager;
     private static int SPLASH_TIME_OUT = 2000;
+    private Tracker mTracker;
+    private static final String TAG = "SelectUserActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +43,21 @@ public class SelectUserActivity extends ActionBarActivity {
 
         } else {
             setContentView(R.layout.activity_select_user);
+
         }
 
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String name = "Login";
+        Log.i(TAG, "Setting screen name: " + name);
+        mTracker.setScreenName("Screen~" + name);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     public void createAccount(View v) {

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -13,6 +14,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.karina.alicesadventures.Util.AnalyticsApplication;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.adapters.LessonAdapter;
 import com.karina.alicesadventures.model.Lesson;
@@ -25,6 +29,8 @@ import java.util.List;
 
 public class LessonActivity extends ActionBarActivity {
     private ListLessonsTask mListLessonsTask;
+    private Tracker mTracker;
+    private static final String TAG = "LessonActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,11 @@ public class LessonActivity extends ActionBarActivity {
     }
 
     private void loadComponents() {
+
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LessonActivity.this);
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Lesson][book_id]", sharedPreferences.getString("book_id", "1"));
@@ -50,8 +61,18 @@ public class LessonActivity extends ActionBarActivity {
         AdRequest adRequest = b.build();
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
         mAdView.loadAd(adRequest);
+
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String name = "List of lessons";
+        Log.i(TAG, "Setting screen name: " + name);
+        mTracker.setScreenName("Screen~" + name);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    }
 
     private class ListLessonsTask extends AsyncTask<Void, Void, List<Lesson>> {
         private final String url;

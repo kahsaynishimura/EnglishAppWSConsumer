@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -15,6 +16,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.karina.alicesadventures.Util.AnalyticsApplication;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.parsers.MessageXmlParser;
 
@@ -23,6 +27,8 @@ import java.util.HashMap;
 
 public class AddUserActivity extends AppCompatActivity {
     private AddUserTask mAddUserTask;
+    private Tracker mTracker;
+    private static final String TAG = "AddUserActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +51,21 @@ public class AddUserActivity extends AppCompatActivity {
                 return false;
             }
         });
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
+
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String name = "Create account";
+        Log.i(TAG, "Setting screen name: " + name);
+        mTracker.setScreenName("Screen~" + name);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    }
 
     public void createAccount(View v) {
 

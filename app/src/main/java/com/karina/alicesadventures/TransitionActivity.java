@@ -10,15 +10,21 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.karina.alicesadventures.Util.AnalyticsApplication;
 import com.karina.alicesadventures.model.Exercise;
 
 //keeps track of the current Exercise
 public class TransitionActivity extends AppCompatActivity {
 
     private static final long TRANSITION_PAUSE = 1000;
+    private Tracker mTracker;
+    private static final String TAG = "TransitionActivity";
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
@@ -31,12 +37,12 @@ public class TransitionActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(TransitionActivity.this);
 
         Exercise exercise = loadExercise(sharedPreferences.getInt("exercise_count", 0));
-        if(exercise!=null) {
+        if (exercise != null) {
             try {
                 int imageResource = getResources().getIdentifier("@drawable/" + exercise.getTransitionImage(), null, getPackageName());
                 if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) { //versao api >=21
                     container.setBackground(getDrawable(imageResource));
-                }else{
+                } else {
 
                     Drawable res = getResources().getDrawable(imageResource);
                     container.setBackgroundResource(imageResource);
@@ -46,6 +52,9 @@ public class TransitionActivity extends AppCompatActivity {
             }
         }
 
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -58,8 +67,16 @@ public class TransitionActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String name = "Transition";
+        Log.i(TAG, "Setting screen name: " + name);
+        mTracker.setScreenName("Screen~" + name);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    }
 
-    private Exercise loadExercise( Integer exerciseCount) {
+    private Exercise loadExercise(Integer exerciseCount) {
         //retrieve sentences to practice from db for each exercise
 
         if (PracticeActivity.exercises.size() > exerciseCount) {//is there another exercise

@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,10 +20,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
+import com.karina.alicesadventures.Util.AnalyticsApplication;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.Trade;
@@ -44,6 +48,8 @@ public class PrizesActivity extends AppCompatActivity {
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ListTradesTask mListTradesTask;
+    private Tracker mTracker;
+    private static final String TAG = "PrizesActivity";
     /**
      * The {@link ViewPager} that will host the section contents.
      */
@@ -73,6 +79,9 @@ public class PrizesActivity extends AppCompatActivity {
             }
         });
 
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
     }
 
     private class ListTradesTask extends AsyncTask<String, Void, List<Trade>> {
@@ -116,6 +125,15 @@ public class PrizesActivity extends AppCompatActivity {
                 mViewPager.setAdapter(mSectionsPagerAdapter);
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String name = "Prizes";
+        Log.i(TAG, "Setting screen name: " + name);
+        mTracker.setScreenName("Screen~" + name);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     /**

@@ -27,6 +27,7 @@ import android.speech.tts.UtteranceProgressListener;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -38,6 +39,9 @@ import android.widget.VideoView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.karina.alicesadventures.Util.AnalyticsApplication;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.model.CurrentPracticeData;
 import com.karina.alicesadventures.model.Exercise;
@@ -62,6 +66,9 @@ public class PracticeActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 100;
     private SpeechRecognizer speech = null;
     private Intent recognizerIntent;
+    private Tracker mTracker;
+    private static final String TAG = "PracticeActivity";
+
 
     private String LOG_TAG = "PracticeActivity";
 
@@ -102,6 +109,10 @@ public class PracticeActivity extends AppCompatActivity {
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
         mAdView.loadAd(adRequest);
 
+
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
     }
 
     private class ListExercisesTask extends AsyncTask<Void, Void, List<Exercise>> {
@@ -377,7 +388,7 @@ public class PracticeActivity extends AppCompatActivity {
                             child.setText(s.getTextToShow());
                             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                             params.setMargins(30, 20, 30, 20);
-                            params.gravity= Gravity.CENTER_HORIZONTAL;
+                            params.gravity = Gravity.CENTER_HORIZONTAL;
                             parent.setBackgroundColor(Color.parseColor("#AFE4E2"));
                             child.setLayoutParams(params);
                             ArrayList<TextView> items = new ArrayList<>();
@@ -601,6 +612,15 @@ public class PracticeActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String name = "Practice";
+        Log.i(TAG, "Setting screen name: " + name);
+        mTracker.setScreenName("Screen~" + name);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     @Override
