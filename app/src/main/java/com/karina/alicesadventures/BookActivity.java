@@ -47,8 +47,10 @@ public class BookActivity extends ActionBarActivity {
         setContentView(R.layout.activity_book);
         sessionManager = new SessionManager(BookActivity.this);
         sessionManager.checkLogin();
-        mListBooksTask = new ListBooksTask();
-        mListBooksTask.execute("http://www.karinanishimura.com.br/cakephp/books/index_api.xml");
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("data[User][id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
+        mListBooksTask = new ListBooksTask("http://www.karinanishimura.com.br/cakephp/books/index_api.xml", hashMap);
+        mListBooksTask.execute();
         AdView mAdView = (AdView) findViewById(R.id.ad_view);
 
         AdRequest.Builder b = new AdRequest.Builder();
@@ -63,6 +65,14 @@ public class BookActivity extends ActionBarActivity {
     }
 
     private class ListBooksTask extends AsyncTask<String, Void, List<Book>> {
+        private final String url;
+        HashMap hashMap;
+
+        public ListBooksTask(String url, HashMap<String, String> hashMap) {
+            this.hashMap = hashMap;
+            this.url = url;
+        }
+
         @Override
         protected List<Book> doInBackground(String... params) {
             List<Book> books = null;
@@ -70,7 +80,7 @@ public class BookActivity extends ActionBarActivity {
             BooksXmlParser booksXmlParser = new BooksXmlParser();
 
             try {
-                String result = httpConnection.sendGet(params[0]);
+                String result = httpConnection.sendPost(url, hashMap);
                 books = booksXmlParser.parse(new StringReader(result));
             } catch (Exception e) {
                 e.printStackTrace();
