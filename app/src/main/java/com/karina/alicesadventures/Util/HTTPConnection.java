@@ -1,4 +1,4 @@
-package com.karina.alicesadventures.Util;
+package com.karina.alicesadventures.util;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -6,9 +6,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Map;
-
-import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Created by karina on 2016-01-06.

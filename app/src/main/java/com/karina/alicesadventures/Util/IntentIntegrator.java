@@ -1,4 +1,4 @@
-package com.karina.alicesadventures.Util;
+package com.karina.alicesadventures.util;
 
 /*
  * Copyright 2009 ZXing authors

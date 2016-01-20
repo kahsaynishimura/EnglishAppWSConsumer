@@ -1,4 +1,4 @@
-package com.karina.alicesadventures.Util;
+package com.karina.alicesadventures.util;
 
 import java.util.HashMap;
 

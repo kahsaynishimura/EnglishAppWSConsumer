@@ -18,12 +18,11 @@ import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-import com.karina.alicesadventures.Util.HTTPConnection;
-import com.karina.alicesadventures.Util.SessionManager;
+import com.karina.alicesadventures.util.HTTPConnection;
+import com.karina.alicesadventures.util.SessionManager;
 import com.karina.alicesadventures.model.User;
 import com.karina.alicesadventures.parsers.UserXmlParser;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.StringReader;

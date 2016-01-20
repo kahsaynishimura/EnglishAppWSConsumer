@@ -1,4 +1,4 @@
-package com.karina.alicesadventures.Util;
+package com.karina.alicesadventures.util;
 /*
  * Copyright Google Inc. All Rights Reserved.
  *
@@ -19,7 +19,6 @@ package com.karina.alicesadventures.Util;
 import android.app.Application;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
 import com.karina.alicesadventures.R;
 

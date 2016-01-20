@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.karina.alicesadventures.Util.SessionManager;
+import com.karina.alicesadventures.util.SessionManager;
 import com.karina.alicesadventures.model.Product;
 import com.karina.alicesadventures.parsers.ProductsXmlParser;
 

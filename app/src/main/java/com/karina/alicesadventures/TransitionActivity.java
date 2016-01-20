@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.karina.alicesadventures.Util.AnalyticsApplication;
+import com.karina.alicesadventures.util.AnalyticsApplication;
 import com.karina.alicesadventures.model.Exercise;
 
 //keeps track of the current Exercise

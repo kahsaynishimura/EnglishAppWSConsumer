@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
@@ -16,14 +15,13 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.karina.alicesadventures.Util.AnalyticsApplication;
-import com.karina.alicesadventures.Util.HTTPConnection;
-import com.karina.alicesadventures.Util.SessionManager;
+import com.karina.alicesadventures.util.AnalyticsApplication;
+import com.karina.alicesadventures.util.HTTPConnection;
+import com.karina.alicesadventures.util.SessionManager;
 import com.karina.alicesadventures.parsers.MessageXmlParser;
 
 import java.io.StringReader;
