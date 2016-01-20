@@ -3,15 +3,11 @@ package com.karina.alicesadventures;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -25,7 +21,6 @@ import com.facebook.login.widget.LoginButton;
 import com.karina.alicesadventures.Util.HTTPConnection;
 import com.karina.alicesadventures.Util.SessionManager;
 import com.karina.alicesadventures.model.User;
-import com.karina.alicesadventures.parsers.MessageXmlParser;
 import com.karina.alicesadventures.parsers.UserXmlParser;
 
 import org.json.JSONException;
@@ -86,13 +81,12 @@ public class FacebookFragment extends Fragment {
                                     HashMap<String, String> hashMap = new HashMap<>();
                                     hashMap.put("data[User][username]", object.get("email").toString());
                                     hashMap.put("data[User][name]", object.get("name").toString());
-                                    try {
+
+                                        mAddUserTask=null;
                                         mAddUserTask = new AddUserTask("http://karinanishimura.com.br/cakephp/users/add_fb_api.xml", hashMap);
                                         mAddUserTask.execute();
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                } catch (JSONException e) {
+
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 }
 

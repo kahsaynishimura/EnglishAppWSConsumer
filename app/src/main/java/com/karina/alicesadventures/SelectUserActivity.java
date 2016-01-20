@@ -71,9 +71,10 @@ public class SelectUserActivity extends FragmentActivity{
         super.onResume();
         String name = "Login";
         Log.i(TAG, "Setting screen name: " + name);
-        mTracker.setScreenName("Screen~" + name);
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
-
+        if(mTracker!=null) {
+            mTracker.setScreenName("Screen~" + name);
+            mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+        }
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
     }

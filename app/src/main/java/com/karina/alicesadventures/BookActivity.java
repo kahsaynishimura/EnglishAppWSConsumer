@@ -17,6 +17,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.analytics.HitBuilders;
@@ -51,7 +53,7 @@ public class BookActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book);
-
+        FacebookSdk.sdkInitialize(getApplicationContext());
         // Obtain the shared Tracker instance.
         AnalyticsApplication application = (AnalyticsApplication) getApplication();
         mTracker = application.getDefaultTracker();
@@ -62,7 +64,7 @@ public class BookActivity extends ActionBarActivity {
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[User][id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
-        mListBooksTask = new ListBooksTask("http://www.karinanishimura.com.br/cakephp/books/index_api.xml", hashMap);
+        mListBooksTask = new ListBooksTask("https://www.karinanishimura.com.br/cakephp/books/index_api.xml", hashMap);
         mListBooksTask.execute();
         AdView mAdView = (AdView) findViewById(R.id.ad_view);
 
@@ -168,6 +170,7 @@ public class BookActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
             sessionManager.logoutUser();
+            LoginManager.getInstance().logOut();
         } else if (id == R.id.action_validate_code) {
             IntentIntegrator scanIntegrator = new IntentIntegrator(BookActivity.this);
             scanIntegrator.initiateScan();
