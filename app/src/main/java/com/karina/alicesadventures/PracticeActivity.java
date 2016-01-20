@@ -27,6 +27,7 @@ import android.speech.tts.UtteranceProgressListener;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -41,13 +42,13 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.karina.alicesadventures.util.AnalyticsApplication;
-import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.model.CurrentPracticeData;
 import com.karina.alicesadventures.model.Exercise;
 import com.karina.alicesadventures.model.SpeechScript;
 import com.karina.alicesadventures.parsers.ExercisesXmlParser;
 import com.karina.alicesadventures.parsers.ScriptsXmlParser;
+import com.karina.alicesadventures.util.AnalyticsApplication;
+import com.karina.alicesadventures.util.HTTPConnection;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -208,18 +209,37 @@ public class PracticeActivity extends AppCompatActivity {
                         //TODO: update number_attemps to +1 on the current execution
                         // db.updateNumberAttempts  (current.getCurrentSpeechScript().get_id(),lessonId);
                         editor.commit();
+                        recognizedSentence=formatWrongSentence(recognizedSentence,current.getCurrentSpeechScript().getTextToCheck());
                     }
+
                     updateLastSentences(recognizedSentence);
                     current.setShouldRunScript(true);
                     runScriptEntry();//user should not stop in the middle of the lesson.
 
                 }
-                //Result code for various error.
             }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void updateLastSentences(String sentence) {
+    private String formatWrongSentence(String recognizedSentence, String strCheck) {
+
+        String []arSpeech=recognizedSentence.split("[ ]");
+        String []arCheck=strCheck.split("[ ]");
+
+        String result="";
+        for(int i = 0; i < arCheck.length &&  i <arSpeech.length; i++) {
+            if(arSpeech[i].toLowerCase().replaceAll("[^a-zA-Z0-9]", "")
+                    .equals(arCheck[i].toLowerCase().replaceAll("[^a-zA-Z0-9]", ""))){
+                result+=arSpeech[i]+" ";
+            }else{
+                result+="<b><font color='red'>"+arSpeech[i]+" </font></b>";
+            }
+        }
+
+        return result;
+    }
+
+    public void updateLastSentences(String htmlSentence) {
         TextView tv1 = ((TextView) findViewById(R.id.recognizedText1));
         TextView tv2 = ((TextView) findViewById(R.id.recognizedText2));
         TextView tv3 = ((TextView) findViewById(R.id.recognizedText3));
@@ -235,7 +255,7 @@ public class PracticeActivity extends AppCompatActivity {
         tv4.setText(tv3.getText());
         tv3.setText(tv2.getText());
         tv2.setText(tv1.getText());
-        tv1.setText(sentence);
+        tv1.setText(Html.fromHtml(htmlSentence));
     }
 
     private class ListSpeechScriptsTask extends AsyncTask<Void, Void, List<SpeechScript>> {
