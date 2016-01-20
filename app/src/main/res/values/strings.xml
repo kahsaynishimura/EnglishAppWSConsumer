@@ -53,6 +53,7 @@
     <string name="partner_phone">Phone: %1$s</string>
     <string name="no_prizes">You got no prizes so far. Keep practicing and trade your points.</string>
 
+    <string name="facebook_app_id">542192119273493</string>
     <string name="banner_ad_unit_id">ca-app-pub-4511527372438796/7377519865</string>
     <string name="exercise_not_found">No exercises found</string>
     <string name="practices_not_found">Practices not found</string>

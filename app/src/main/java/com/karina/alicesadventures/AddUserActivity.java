@@ -136,7 +136,7 @@ public class AddUserActivity extends AppCompatActivity {
 
     }
 
-    private class AddUserTask extends AsyncTask<Void, Void, String> {
+    public class AddUserTask extends AsyncTask<Void, Void, String> {
 
         private final String url;
         HashMap hashMap;

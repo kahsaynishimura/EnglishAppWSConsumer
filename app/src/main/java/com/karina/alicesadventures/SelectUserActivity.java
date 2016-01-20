@@ -1,16 +1,26 @@
 package com.karina.alicesadventures;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.karina.alicesadventures.Util.AnalyticsApplication;
@@ -22,12 +32,12 @@ import com.karina.alicesadventures.parsers.UserXmlParser;
 import java.io.StringReader;
 import java.util.HashMap;
 
-public class SelectUserActivity extends ActionBarActivity {
+public class SelectUserActivity extends FragmentActivity{
     private LoginTask mLoginTask;
     private SessionManager sessionManager;
-    private static int SPLASH_TIME_OUT = 2000;
     private Tracker mTracker;
     private static final String TAG = "SelectUserActivity";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +53,18 @@ public class SelectUserActivity extends ActionBarActivity {
 
         } else {
             setContentView(R.layout.activity_select_user);
+            FacebookFragment fragment = new FacebookFragment();
+            //fragment.setArguments(arguments);
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.facebook_container, fragment)
+                    .commit();
 
+            // Obtain the shared Tracker instance.
+            AnalyticsApplication application = (AnalyticsApplication) getApplication();
+            mTracker = application.getDefaultTracker();
         }
-
-        // Obtain the shared Tracker instance.
-        AnalyticsApplication application = (AnalyticsApplication) getApplication();
-        mTracker = application.getDefaultTracker();
     }
+
 
     @Override
     protected void onResume() {
@@ -58,6 +73,17 @@ public class SelectUserActivity extends ActionBarActivity {
         Log.i(TAG, "Setting screen name: " + name);
         mTracker.setScreenName("Screen~" + name);
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+
+        // Logs 'install' and 'app activate' App Events.
+        AppEventsLogger.activateApp(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Logs 'app deactivate' App Event.
+        AppEventsLogger.deactivateApp(this);
     }
 
     public void createAccount(View v) {

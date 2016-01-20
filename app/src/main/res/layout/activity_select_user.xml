@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#AFE4E2"
     android:fillViewport="false">
 
@@ -88,5 +89,10 @@
             android:onClick="login"
             android:text="@string/log_in" />
 
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/facebook_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
     </LinearLayout>
 </ScrollView>
