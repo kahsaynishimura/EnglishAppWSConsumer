@@ -75,7 +75,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
         hashMap.put("data[Practice][finish_time]", df.format(finishTime));
         hashMap.put("data[Practice][points]", totalHits.toString());
         try {
-            mAddPracticeTask = new AddPracticeTask("http://karinanishimura.com.br/cakephp/practices/add_api.xml", hashMap);
+            mAddPracticeTask = new AddPracticeTask(HTTPConnection.SERVER_BASE_URL+"practices/add_api.xml", hashMap);
             mAddPracticeTask.execute();
         } catch (Exception e) {
             e.printStackTrace();

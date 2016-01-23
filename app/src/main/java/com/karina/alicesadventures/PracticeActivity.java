@@ -350,7 +350,7 @@ public class PracticeActivity extends AppCompatActivity {
     private void getScripts(Integer exerciseId) {
         HashMap<String, String> hashMap = new HashMap();
         hashMap.put("data[SpeechScript][exercise_id]", exerciseId.toString());
-        mListSpeechScriptsTask = new ListSpeechScriptsTask("http://karinanishimura.com.br/cakephp/speech_scripts/index_api.xml", hashMap);
+        mListSpeechScriptsTask = new ListSpeechScriptsTask(HTTPConnection.SERVER_BASE_URL+"speech_scripts/index_api.xml", hashMap);
         mListSpeechScriptsTask.execute();
     }
 
@@ -382,7 +382,7 @@ public class PracticeActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Exercise][lesson_id]", lessonId.toString());
 
-        mListExercisesTask = new ListExercisesTask("http://www.karinanishimura.com.br/cakephp/exercises/index_api.xml", hashMap);
+        mListExercisesTask = new ListExercisesTask(HTTPConnection.SERVER_BASE_URL+"exercises/index_api.xml", hashMap);
         mListExercisesTask.execute();
     }
 

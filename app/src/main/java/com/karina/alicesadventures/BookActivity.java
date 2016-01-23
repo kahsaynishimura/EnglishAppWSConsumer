@@ -63,7 +63,7 @@ public class BookActivity extends ActionBarActivity {
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[User][id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
-        mListBooksTask = new ListBooksTask("https://www.karinanishimura.com.br/cakephp/books/index_api.xml", hashMap);
+        mListBooksTask = new ListBooksTask(HTTPConnection.SERVER_BASE_URL+"books/index_api.xml", hashMap);
         mListBooksTask.execute();
         AdView mAdView = (AdView) findViewById(R.id.ad_view);
 
@@ -194,7 +194,7 @@ public class BookActivity extends ActionBarActivity {
                 hashMap.put("data[Partner][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
 
                 try {
-                    mValidateCodeTask = new ValidateCodeTask("http://karinanishimura.com.br/cakephp/trades/validateQR.xml", hashMap);
+                    mValidateCodeTask = new ValidateCodeTask(HTTPConnection.SERVER_BASE_URL+"trades/validateQR.xml", hashMap);
                     mValidateCodeTask.execute();
                 } catch (Exception e) {
                     e.printStackTrace();

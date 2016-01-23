@@ -66,7 +66,7 @@ public class PrizesActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Trade][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
 
-        mListTradesTask = new ListTradesTask("http://karinanishimura.com.br/cakephp/trades/index_api.xml", hashMap);
+        mListTradesTask = new ListTradesTask(HTTPConnection.SERVER_BASE_URL+"trades/index_api.xml", hashMap);
         mListTradesTask.execute();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

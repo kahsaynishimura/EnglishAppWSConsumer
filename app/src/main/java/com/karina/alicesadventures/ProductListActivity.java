@@ -86,7 +86,7 @@ public class ProductListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
         mListProductsTask = new ListProductsTask();
-        mListProductsTask.execute("http://karinanishimura.com.br/cakephp/products/index_api.xml");
+        mListProductsTask.execute(HTTPConnection.SERVER_BASE_URL+"products/index_api.xml");
 
     }
 

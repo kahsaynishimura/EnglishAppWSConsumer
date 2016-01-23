@@ -126,7 +126,7 @@ public class AddUserActivity extends AppCompatActivity {
             hashMap.put("data[User][username]", mEmail);
             hashMap.put("data[User][name]", mName);
             try {
-                mAddUserTask = new AddUserTask("http://karinanishimura.com.br/cakephp/users/add_api.xml", hashMap);
+                mAddUserTask = new AddUserTask(HTTPConnection.SERVER_BASE_URL+"users/add_api.xml", hashMap);
                 mAddUserTask.execute();
             } catch (Exception e) {
                 e.printStackTrace();

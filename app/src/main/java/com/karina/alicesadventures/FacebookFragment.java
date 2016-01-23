@@ -82,7 +82,7 @@ public class FacebookFragment extends Fragment {
                                     hashMap.put("data[User][name]", object.get("name").toString());
 
                                         mAddUserTask=null;
-                                        mAddUserTask = new AddUserTask("http://karinanishimura.com.br/cakephp/users/add_fb_api.xml", hashMap);
+                                        mAddUserTask = new AddUserTask(HTTPConnection.SERVER_BASE_URL+"users/add_fb_api.xml", hashMap);
                                         mAddUserTask.execute();
 
                                 } catch (Exception e) {

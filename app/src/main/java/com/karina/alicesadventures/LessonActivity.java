@@ -47,7 +47,7 @@ public class LessonActivity extends ActionBarActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LessonActivity.this);
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Lesson][book_id]", sharedPreferences.getString("book_id", "1"));
-        mListLessonsTask = new ListLessonsTask("http://karinanishimura.com.br/cakephp/lessons/index_api.xml", hashMap);
+        mListLessonsTask = new ListLessonsTask(HTTPConnection.SERVER_BASE_URL+"lessons/index_api.xml", hashMap);
         mListLessonsTask.execute();
         AdView mAdView = (AdView) findViewById(R.id.ad_view);
 

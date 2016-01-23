@@ -11,7 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.karina.alicesadventures.util.AnalyticsApplication;
@@ -44,12 +46,14 @@ public class SelectUserActivity extends FragmentActivity{
 
         } else {
             setContentView(R.layout.activity_select_user);
+            FacebookSdk.sdkInitialize(getApplicationContext());
             FacebookFragment fragment = new FacebookFragment();
             //fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.facebook_container, fragment)
                     .commit();
 
+            LoginManager.getInstance().logOut();
             // Obtain the shared Tracker instance.
             AnalyticsApplication application = (AnalyticsApplication) getApplication();
             mTracker = application.getDefaultTracker();
@@ -123,7 +127,7 @@ public class SelectUserActivity extends FragmentActivity{
             hashMap.put("data[User][password]", mPassword);
             hashMap.put("data[User][username]", mEmail);
             try {
-                mLoginTask = new LoginTask("http://karinanishimura.com.br/cakephp/users/login_api.xml", hashMap);
+                mLoginTask = new LoginTask(HTTPConnection.SERVER_BASE_URL+"users/login_api.xml", hashMap);
                 mLoginTask.execute();
             } catch (Exception e) {
                 e.printStackTrace();
