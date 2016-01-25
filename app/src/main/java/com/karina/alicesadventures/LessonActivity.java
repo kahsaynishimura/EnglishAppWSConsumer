@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -53,9 +54,9 @@ public class LessonActivity extends ActionBarActivity {
 
         AdRequest.Builder b = new AdRequest.Builder();
 
-//        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-//        String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
-//        b.addTestDevice(deviceId);
+        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
+        b.addTestDevice(deviceId);
 
         AdRequest adRequest = b.build();
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);

@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -63,15 +64,15 @@ public class BookActivity extends ActionBarActivity {
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[User][id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
-        mListBooksTask = new ListBooksTask(HTTPConnection.SERVER_BASE_URL+"books/index_api.xml", hashMap);
+        mListBooksTask = new ListBooksTask(HTTPConnection.SERVER_BASE_URL + "books/index_api.xml", hashMap);
         mListBooksTask.execute();
         AdView mAdView = (AdView) findViewById(R.id.ad_view);
 
         AdRequest.Builder b = new AdRequest.Builder();
 
-//        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-//        String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
-//        b.addTestDevice(deviceId);
+        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
+        b.addTestDevice(deviceId);
 
         AdRequest adRequest = b.build();
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
@@ -194,7 +195,7 @@ public class BookActivity extends ActionBarActivity {
                 hashMap.put("data[Partner][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
 
                 try {
-                    mValidateCodeTask = new ValidateCodeTask(HTTPConnection.SERVER_BASE_URL+"trades/validateQR.xml", hashMap);
+                    mValidateCodeTask = new ValidateCodeTask(HTTPConnection.SERVER_BASE_URL + "trades/validateQR.xml", hashMap);
                     mValidateCodeTask.execute();
                 } catch (Exception e) {
                     e.printStackTrace();

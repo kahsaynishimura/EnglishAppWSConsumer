@@ -7,7 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.LightingColorFilter;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
@@ -34,6 +36,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -80,6 +83,18 @@ public class PracticeActivity extends AppCompatActivity {
 
     SharedPreferences sharedPreferences;
 
+
+
+    //Progress Bar
+    private static final int PROGRESS = 0x1;
+    private ProgressBar mProgress;
+    private int mProgressStatus = 0;
+    private Handler mHandler = new Handler();
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,9 +117,9 @@ public class PracticeActivity extends AppCompatActivity {
 
         AdRequest.Builder b = new AdRequest.Builder();
 
-//        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-//        String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
-//        b.addTestDevice(deviceId);
+        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
+        b.addTestDevice(deviceId);
 
         AdRequest adRequest = b.build();
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
@@ -114,6 +129,9 @@ public class PracticeActivity extends AppCompatActivity {
         // Obtain the shared Tracker instance.
         AnalyticsApplication application = (AnalyticsApplication) getApplication();
         mTracker = application.getDefaultTracker();
+
+        //Progress Bar
+        mProgress = (ProgressBar) findViewById(R.id.progressBar);
     }
 
     private class ListExercisesTask extends AsyncTask<Void, Void, List<Exercise>> {
@@ -194,6 +212,8 @@ public class PracticeActivity extends AppCompatActivity {
                     }
 
                     if (hit) {
+                        mProgress.setProgress(mProgressStatus++);
+
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(PracticeActivity.this);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putInt("correct_sentence_count", sharedPreferences.getInt("correct_sentence_count", 0) + 1);
@@ -311,6 +331,10 @@ public class PracticeActivity extends AppCompatActivity {
                     recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
 
 
+                    //Progress Bar
+                    mProgress.setMax(scripts.size());
+                    mProgress.setProgress(0);
+
                     if (hasMoreExercises()) {
                         selectNextExercise();
                         TTS = new TextToSpeech(PracticeActivity.this, new TextToSpeech.OnInitListener() {
@@ -320,6 +344,9 @@ public class PracticeActivity extends AppCompatActivity {
                             }
                         });
                     }
+
+
+
                 }
             }
         }
@@ -350,6 +377,8 @@ public class PracticeActivity extends AppCompatActivity {
     private void getScripts(Integer exerciseId) {
         HashMap<String, String> hashMap = new HashMap();
         hashMap.put("data[SpeechScript][exercise_id]", exerciseId.toString());
+
+
         mListSpeechScriptsTask = new ListSpeechScriptsTask(HTTPConnection.SERVER_BASE_URL+"speech_scripts/index_api.xml", hashMap);
         mListSpeechScriptsTask.execute();
     }
@@ -394,7 +423,6 @@ public class PracticeActivity extends AppCompatActivity {
             current.setShouldRunScript(false);//prove to me again that I can execute everything ->go to the next exercise.
 
             if (current.getCurrentScriptIndex() < current.getCurrentExercise().getScriptEntries().size()) {
-
                 final SpeechScript s = current.getCurrentSpeechScript();
                 if (s != null) {
                     runOnUiThread(new Runnable() {

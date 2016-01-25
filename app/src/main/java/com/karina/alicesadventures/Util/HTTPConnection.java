@@ -12,7 +12,7 @@ import java.util.HashMap;
  */
 public class HTTPConnection {
     // private final String USER_AGENT = "Mozilla/5.0";
-    public static final String SERVER_BASE_URL ="https://karinanishimura.com.br/echo_practice/";
+    public static final String SERVER_BASE_URL ="http://echopractice.com/ep/";
     public static void main(String[] args) throws Exception {
 
         HTTPConnection http = new HTTPConnection();
