@@ -25,7 +25,7 @@ import com.karina.alicesadventures.parsers.UserXmlParser;
 import java.io.StringReader;
 import java.util.HashMap;
 
-public class SelectUserActivity extends FragmentActivity{
+public class SelectUserActivity extends FragmentActivity {
     private LoginTask mLoginTask;
     private SessionManager sessionManager;
     private Tracker mTracker;
@@ -37,7 +37,6 @@ public class SelectUserActivity extends FragmentActivity{
         super.onCreate(savedInstanceState);
         sessionManager = new SessionManager(SelectUserActivity.this);
         if (sessionManager.isLoggedIn()) {
-            //Intent i = new Intent(SelectUserActivity.this, ProductListActivity.class);
 
             Intent i = new Intent(SelectUserActivity.this, BookActivity.class);
 
@@ -48,7 +47,6 @@ public class SelectUserActivity extends FragmentActivity{
             setContentView(R.layout.activity_select_user);
             FacebookSdk.sdkInitialize(getApplicationContext());
             FacebookFragment fragment = new FacebookFragment();
-            //fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.facebook_container, fragment)
                     .commit();
@@ -66,7 +64,7 @@ public class SelectUserActivity extends FragmentActivity{
         super.onResume();
         String name = "Login";
         Log.i(TAG, "Setting screen name: " + name);
-        if(mTracker!=null) {
+        if (mTracker != null) {
             mTracker.setScreenName("Screen~" + name);
             mTracker.send(new HitBuilders.ScreenViewBuilder().build());
         }
@@ -127,7 +125,7 @@ public class SelectUserActivity extends FragmentActivity{
             hashMap.put("data[User][password]", mPassword);
             hashMap.put("data[User][username]", mEmail);
             try {
-                mLoginTask = new LoginTask(HTTPConnection.SERVER_BASE_URL+"users/login_api.xml", hashMap);
+                mLoginTask = new LoginTask(HTTPConnection.SERVER_BASE_URL + "users/login_api.xml", hashMap);
                 mLoginTask.execute();
             } catch (Exception e) {
                 e.printStackTrace();
