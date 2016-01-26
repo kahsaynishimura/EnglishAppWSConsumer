@@ -7,9 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.LightingColorFilter;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
@@ -49,11 +47,15 @@ import com.karina.alicesadventures.model.CurrentPracticeData;
 import com.karina.alicesadventures.model.Exercise;
 import com.karina.alicesadventures.model.SpeechScript;
 import com.karina.alicesadventures.parsers.ExercisesXmlParser;
+import com.karina.alicesadventures.parsers.MessageXmlParser;
 import com.karina.alicesadventures.parsers.ScriptsXmlParser;
 import com.karina.alicesadventures.util.AnalyticsApplication;
 import com.karina.alicesadventures.util.HTTPConnection;
+import com.karina.alicesadventures.util.SessionManager;
 
 import java.io.StringReader;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -62,7 +64,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class PracticeActivity extends AppCompatActivity {
-
+    private AddPracticeTask mAddPracticeTask;
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 1;
     private ListExercisesTask mListExercisesTask;
     private ListSpeechScriptsTask mListSpeechScriptsTask;
@@ -72,27 +74,20 @@ public class PracticeActivity extends AppCompatActivity {
     private Intent recognizerIntent;
     private Tracker mTracker;
     private static final String TAG = "PracticeActivity";
-
+    private Integer lessonId;
 
     private String LOG_TAG = "PracticeActivity";
 
     CurrentPracticeData current;//stores current screen info - current screen state
     public static List<Exercise> exercises = new ArrayList<Exercise>();
     private TextToSpeech TTS;
-    public final long INSTRUCTION_PAUSE = 1000;
 
     SharedPreferences sharedPreferences;
 
 
-
     //Progress Bar
-    private static final int PROGRESS = 0x1;
     private ProgressBar mProgress;
     private int mProgressStatus = 0;
-    private Handler mHandler = new Handler();
-
-
-
 
 
     @Override
@@ -103,7 +98,7 @@ public class PracticeActivity extends AppCompatActivity {
 
         checkConnection();
         current = new CurrentPracticeData();
-        Integer lessonId = sharedPreferences.getInt("lesson_id", 0);
+        lessonId = sharedPreferences.getInt("lesson_id", 0);
         if (exercises.size() == 0) {//it is the first exercise
             loadExercises(lessonId);
         } else {
@@ -229,7 +224,7 @@ public class PracticeActivity extends AppCompatActivity {
                         //TODO: update number_attemps to +1 on the current execution
                         // db.updateNumberAttempts  (current.getCurrentSpeechScript().get_id(),lessonId);
                         editor.commit();
-                        recognizedSentence=formatWrongSentence(recognizedSentence,current.getCurrentSpeechScript().getTextToCheck());
+                        recognizedSentence = formatWrongSentence(recognizedSentence, current.getCurrentSpeechScript().getTextToCheck());
                     }
 
                     updateLastSentences(recognizedSentence);
@@ -243,16 +238,16 @@ public class PracticeActivity extends AppCompatActivity {
 
     private String formatWrongSentence(String recognizedSentence, String strCheck) {
 
-        String []arSpeech=recognizedSentence.split("[ ]");
-        String []arCheck=strCheck.split("[ ]");
+        String[] arSpeech = recognizedSentence.split("[ ]");
+        String[] arCheck = strCheck.split("[ ]");
 
-        String result="";
-        for(int i = 0; i < arCheck.length &&  i <arSpeech.length; i++) {
-            if(arSpeech[i].toLowerCase().replaceAll("[^a-zA-Z0-9]", "")
-                    .equals(arCheck[i].toLowerCase().replaceAll("[^a-zA-Z0-9]", ""))){
-                result+=arSpeech[i]+" ";
-            }else{
-                result+="<b><font color='red'>"+arSpeech[i]+" </font></b>";
+        String result = "";
+        for (int i = 0; i < arCheck.length && i < arSpeech.length; i++) {
+            if (arSpeech[i].toLowerCase().replaceAll("[^a-zA-Z0-9]", "")
+                    .equals(arCheck[i].toLowerCase().replaceAll("[^a-zA-Z0-9]", ""))) {
+                result += arSpeech[i] + " ";
+            } else {
+                result += "<b><font color='red'>" + arSpeech[i] + " </font></b>";
             }
         }
 
@@ -346,7 +341,6 @@ public class PracticeActivity extends AppCompatActivity {
                     }
 
 
-
                 }
             }
         }
@@ -379,7 +373,7 @@ public class PracticeActivity extends AppCompatActivity {
         hashMap.put("data[SpeechScript][exercise_id]", exerciseId.toString());
 
 
-        mListSpeechScriptsTask = new ListSpeechScriptsTask(HTTPConnection.SERVER_BASE_URL+"speech_scripts/index_api.xml", hashMap);
+        mListSpeechScriptsTask = new ListSpeechScriptsTask(HTTPConnection.SERVER_BASE_URL + "speech_scripts/index_api.xml", hashMap);
         mListSpeechScriptsTask.execute();
     }
 
@@ -411,13 +405,11 @@ public class PracticeActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Exercise][lesson_id]", lessonId.toString());
 
-        mListExercisesTask = new ListExercisesTask(HTTPConnection.SERVER_BASE_URL+"exercises/index_api.xml", hashMap);
+        mListExercisesTask = new ListExercisesTask(HTTPConnection.SERVER_BASE_URL + "exercises/index_api.xml", hashMap);
         mListExercisesTask.execute();
     }
 
     private void runScriptEntry() {
-        //gravar - start_time na tabela de user_script
-        //
         if (current.getShouldRunScript()) {
 
             current.setShouldRunScript(false);//prove to me again that I can execute everything ->go to the next exercise.
@@ -589,6 +581,7 @@ public class PracticeActivity extends AppCompatActivity {
             } else { //exercise completed
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+                savePractice();
 
                 if (exercises.size() > sharedPreferences.getInt("exercise_count", 0)) {
                     Intent i = new Intent(PracticeActivity.this, TransitionActivity.class);
@@ -597,7 +590,7 @@ public class PracticeActivity extends AppCompatActivity {
                     current.setShouldRunScript(true);
                 } else {
                     Intent i = new Intent(PracticeActivity.this, LessonCompletedActivity.class);
-
+                    i.putExtra("lesson_id", lessonId.toString());
                     //getting the current time in milliseconds, and creating a Date object from it:
                     Date date = new Date(System.currentTimeMillis()); //or simply new Date();
 
@@ -613,6 +606,36 @@ public class PracticeActivity extends AppCompatActivity {
                 finish();
             }
         }
+    }
+
+    private void savePractice() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(PracticeActivity.this);
+
+        //save lesson completed
+        long millis = sharedPreferences.getLong("start_time", 0L);
+        Date startTime = new Date(millis);
+        Integer totalHits = current.getCurrentExercise().getScriptEntries().size();
+
+        //no matter what happens, if the student gets here, he is rewarded.
+
+        DateFormat df = DateFormat.getTimeInstance();
+        Date finishTime = new Date();
+
+        df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        SessionManager sessionManager = new SessionManager(PracticeActivity.this);
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("data[Practice][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
+        hashMap.put("data[Practice][start_time]", df.format(startTime));
+        hashMap.put("data[Practice][finish_time]", df.format(finishTime));
+        hashMap.put("data[Practice][points]", totalHits.toString());
+        hashMap.put("data[Practice][exercise_id]", current.getCurrentExercise().get_id().toString());
+        try {
+            mAddPracticeTask = new AddPracticeTask(HTTPConnection.SERVER_BASE_URL + "practices/add_api.xml", hashMap);
+            mAddPracticeTask.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -783,4 +806,55 @@ public class PracticeActivity extends AppCompatActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
+
+
+    private class AddPracticeTask extends AsyncTask<Void, Void, String> {
+
+        private final String url;
+        HashMap hashMap;
+
+        public AddPracticeTask(String url, HashMap<String, String> hashMap) {
+            this.hashMap = hashMap;
+            this.url = url;
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String message = null;
+            HTTPConnection httpConnection = new HTTPConnection();
+            MessageXmlParser messageXmlParser = new MessageXmlParser();
+            String result = "";
+            try {
+                result = httpConnection.sendPost(url, hashMap);
+                message = messageXmlParser.parse(new StringReader(result));
+            } catch (Exception e) {
+                e.printStackTrace();
+                mAddPracticeTask = null;
+
+            }
+            System.out.println(result);
+            return message;
+        }
+
+
+        @Override
+        protected void onPostExecute(String message) {
+            super.onPostExecute(message);
+            mAddPracticeTask = null;
+            if (message == null) {
+                Toast.makeText(PracticeActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(PracticeActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+
+            mAddPracticeTask = null;
+
+        }
+    }
+
 }

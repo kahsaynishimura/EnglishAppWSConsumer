@@ -171,6 +171,7 @@ public class AddUserActivity extends AppCompatActivity {
             if (message == null) {
                 Snackbar.make(((FloatingActionButton) findViewById(R.id.fab)), getText(R.string.verify_internet_connection), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                finish();
             } else {
                 Toast.makeText(AddUserActivity.this, message, Toast.LENGTH_LONG).show();
                 //confirm email

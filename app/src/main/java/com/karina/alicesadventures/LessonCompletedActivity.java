@@ -36,7 +36,7 @@ import java.util.HashMap;
 
 
 public class LessonCompletedActivity extends ActionBarActivity {
-    private AddPracticeTask mAddPracticeTask;
+    private SaveLastLessonTask mSaveLastLessonTask;
     private Tracker mTracker;
     private static final String TAG = "LessonCompletedActivity";
 
@@ -52,32 +52,13 @@ public class LessonCompletedActivity extends ActionBarActivity {
         mTracker = application.getDefaultTracker();
 
         PracticeActivity.exercises = new ArrayList<>();
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LessonCompletedActivity.this);
-
-        //save lesson completed
-        long millis = sharedPreferences.getLong("start_time", 0L);
-        Date startTime = new Date(millis);
-        Integer totalHits = sharedPreferences.getInt("correct_sentence_count", 0);
-        Integer wrongSentenceCount = sharedPreferences.getInt("wrong_sentence_count", 0);
-
-        //no matter what happens, if the student gets here, he is rewarded.
-
-        DateFormat df = DateFormat.getTimeInstance();
-        Date finishTime = new Date();
-        ((TextView) findViewById(R.id.txt_start_time)).setText(getString(R.string.start_time) + ": " + df.format(startTime));
-        ((TextView) findViewById(R.id.txt_finish_time)).setText(getString(R.string.finish_time) + ": " + df.format(finishTime));
-        ((TextView) findViewById(R.id.txt_correct)).setText(getString(R.string.correct) + ": " + totalHits);
-
-        df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SessionManager sessionManager = new SessionManager(LessonCompletedActivity.this);
         HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put("data[Practice][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
-        hashMap.put("data[Practice][start_time]", df.format(startTime));
-        hashMap.put("data[Practice][finish_time]", df.format(finishTime));
-        hashMap.put("data[Practice][points]", totalHits.toString());
+        hashMap.put("data[User][id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
+        hashMap.put("data[User][last_completed_lesson]", getIntent().getExtras().getString("lesson_id"));
         try {
-            mAddPracticeTask = new AddPracticeTask(HTTPConnection.SERVER_BASE_URL+"practices/add_api.xml", hashMap);
-            mAddPracticeTask.execute();
+            mSaveLastLessonTask = new SaveLastLessonTask(HTTPConnection.SERVER_BASE_URL + "users/save_last_lesson_api.xml", hashMap);
+            mSaveLastLessonTask.execute();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -145,7 +126,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
 //            SharedPreferences.Editor editor = sharedPreferences.edit();
 //            editor.putInt("exercise_count", 0);
 //            editor.putInt("lesson_id", (lessonId + 1));
-//            editor.putInt("wrong_sentence_count", 0);
+//
 //            editor.putLong("start_time", 0);
 //            editor.commit();
 //
@@ -159,12 +140,12 @@ public class LessonCompletedActivity extends ActionBarActivity {
 //    }
 
 
-    private class AddPracticeTask extends AsyncTask<Void, Void, String> {
+    private class SaveLastLessonTask extends AsyncTask<Void, Void, String> {
 
         private final String url;
         HashMap hashMap;
 
-        public AddPracticeTask(String url, HashMap<String, String> hashMap) {
+        public SaveLastLessonTask(String url, HashMap<String, String> hashMap) {
             this.hashMap = hashMap;
             this.url = url;
         }
@@ -180,7 +161,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
                 message = messageXmlParser.parse(new StringReader(result));
             } catch (Exception e) {
                 e.printStackTrace();
-                mAddPracticeTask = null;
+                mSaveLastLessonTask = null;
 
             }
             System.out.println(result);
@@ -191,7 +172,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(String message) {
             super.onPostExecute(message);
-            mAddPracticeTask = null;
+            mSaveLastLessonTask = null;
             if (message == null) {
                 Snackbar.make(((FloatingActionButton) findViewById(R.id.fab)), getText(R.string.verify_internet_connection), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
@@ -206,7 +187,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
         protected void onCancelled() {
             super.onCancelled();
 
-            mAddPracticeTask = null;
+            mSaveLastLessonTask = null;
 
         }
     }

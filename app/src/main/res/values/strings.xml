@@ -59,6 +59,7 @@
     <string name="practices_not_found">Practices not found</string>
     <string name="error_pass_mismatch">The passwords did not match</string>
     <string name="error_field_length">this field should contain at least 8 characteres</string>
+    <string name="lesson_completed">Lesson Completed</string>
 
 
 </resources>
