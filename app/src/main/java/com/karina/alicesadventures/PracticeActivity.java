@@ -1,6 +1,7 @@
 package com.karina.alicesadventures;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -52,6 +53,9 @@ import com.karina.alicesadventures.parsers.ScriptsXmlParser;
 import com.karina.alicesadventures.util.AnalyticsApplication;
 import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.util.SessionManager;
+import com.purplebrain.adbuddiz.sdk.AdBuddiz;
+import com.purplebrain.adbuddiz.sdk.AdBuddizDelegate;
+import com.purplebrain.adbuddiz.sdk.AdBuddizError;
 
 import java.io.StringReader;
 import java.text.DateFormat;
@@ -76,7 +80,6 @@ public class PracticeActivity extends AppCompatActivity {
     private static final String TAG = "PracticeActivity";
     private Integer lessonId;
 
-    private String LOG_TAG = "PracticeActivity";
 
     CurrentPracticeData current;//stores current screen info - current screen state
     public static List<Exercise> exercises = new ArrayList<Exercise>();
@@ -99,6 +102,7 @@ public class PracticeActivity extends AppCompatActivity {
         checkConnection();
         current = new CurrentPracticeData();
         lessonId = sharedPreferences.getInt("lesson_id", 0);
+
         if (exercises.size() == 0) {//it is the first exercise
             loadExercises(lessonId);
         } else {
@@ -127,59 +131,6 @@ public class PracticeActivity extends AppCompatActivity {
 
         //Progress Bar
         mProgress = (ProgressBar) findViewById(R.id.progressBar);
-    }
-
-    private class ListExercisesTask extends AsyncTask<Void, Void, List<Exercise>> {
-        private final String url;
-        HashMap hashMap;
-
-        public ListExercisesTask(String url, HashMap<String, String> hashMap) {
-            this.hashMap = hashMap;
-            this.url = url;
-        }
-
-        @Override
-        protected List<Exercise> doInBackground(Void... params) {
-            List<Exercise> exercises = null;
-            HTTPConnection httpConnection = new HTTPConnection();
-            ExercisesXmlParser exercisesXmlParser = new ExercisesXmlParser();
-
-            try {
-                String result = httpConnection.sendPost(url, hashMap);
-                exercises = exercisesXmlParser.parse(new StringReader(result));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return exercises;
-        }
-
-
-        @Override
-        protected void onPostExecute(List<Exercise> exercises) {
-            mListExercisesTask = null;
-            super.onPostExecute(exercises);
-            if (exercises == null) {
-                Toast.makeText(PracticeActivity.this, getText(R.string.exercise_not_found), Toast.LENGTH_LONG).show();
-                finish();
-            } else {
-                if (exercises.size() <= sharedPreferences.getInt("exercise_count", 0)) {
-                    finish();
-                } else {
-                    if (exercises.get(0) != null) {
-                        PracticeActivity.exercises = exercises;
-                        current.setCurrentExercise(exercises.get(sharedPreferences.getInt("exercise_count", 0)));
-
-                        getScripts(current.getCurrentExercise().get_id());
-                    }
-                }
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-            mListExercisesTask = null;
-        }
     }
 
     @Override
@@ -341,6 +292,59 @@ public class PracticeActivity extends AppCompatActivity {
                     }
 
 
+                }
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            mListExercisesTask = null;
+        }
+    }
+
+    private class ListExercisesTask extends AsyncTask<Void, Void, List<Exercise>> {
+        private final String url;
+        HashMap hashMap;
+
+        public ListExercisesTask(String url, HashMap<String, String> hashMap) {
+            this.hashMap = hashMap;
+            this.url = url;
+        }
+
+        @Override
+        protected List<Exercise> doInBackground(Void... params) {
+            List<Exercise> exercises = null;
+            HTTPConnection httpConnection = new HTTPConnection();
+            ExercisesXmlParser exercisesXmlParser = new ExercisesXmlParser();
+
+            try {
+                String result = httpConnection.sendPost(url, hashMap);
+                exercises = exercisesXmlParser.parse(new StringReader(result));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return exercises;
+        }
+
+
+        @Override
+        protected void onPostExecute(List<Exercise> exercises) {
+            mListExercisesTask = null;
+            super.onPostExecute(exercises);
+            if (exercises == null) {
+                Toast.makeText(PracticeActivity.this, getText(R.string.exercise_not_found), Toast.LENGTH_LONG).show();
+                finish();
+            } else {
+                if (exercises.size() <= sharedPreferences.getInt("exercise_count", 0)) {
+                    finish();
+                } else {
+                    if (exercises.get(0) != null) {
+                        PracticeActivity.exercises = exercises;
+                        current.setCurrentExercise(exercises.get(sharedPreferences.getInt("exercise_count", 0)));
+
+                        getScripts(current.getCurrentExercise().get_id());
+                    }
                 }
             }
         }
@@ -580,30 +584,70 @@ public class PracticeActivity extends AppCompatActivity {
 
             } else { //exercise completed
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                Intent i;
+                //start advertisement before final delivery (the awaited points)
+                //adertisements
+                // AdBuddiz.setLogLevel(AdBuddizLogLevel.Info);
+                // AdBuddiz.setTestModeActive();
+                AdBuddiz.setPublisherKey("cdb7b7f2-0359-4ea3-a6b3-52664ec70e07");
 
-                savePractice();
 
-                if (exercises.size() > sharedPreferences.getInt("exercise_count", 0)) {
-                    Intent i = new Intent(PracticeActivity.this, TransitionActivity.class);
-                    startActivity(i);
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                    current.setShouldRunScript(true);
-                } else {
-                    Intent i = new Intent(PracticeActivity.this, LessonCompletedActivity.class);
-                    i.putExtra("lesson_id", lessonId.toString());
-                    //getting the current time in milliseconds, and creating a Date object from it:
-                    Date date = new Date(System.currentTimeMillis()); //or simply new Date();
+                AdBuddiz.cacheAds(SelectUserActivity.this);
+                final Activity activity = SelectUserActivity.this;
+                AdBuddiz.setDelegate(new AdBuddizDelegate() {
+                    @Override
+                    public void didCacheAd() {
+                        AdBuddiz.showAd(activity);
+                        Toast.makeText(activity, "didCacheAd", Toast.LENGTH_SHORT).show();
+                    }
 
-                    //converting it back to a milliseconds representation:
-                    long millis = date.getTime();
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putLong("finish_time", date.getTime());
-                    editor.commit();
+                    @Override
+                    public void didShowAd() {
+                        Toast.makeText(activity, "didShowAd", Toast.LENGTH_SHORT).show();
+                    }
 
-                    startActivity(i);
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                }
-                finish();
+                    @Override
+                    public void didFailToShowAd(AdBuddizError error) {
+                        Toast.makeText(activity, error.name(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void didClick() {
+
+                        Toast.makeText(activity, "didClick", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void didHideAd() {
+                        savePractice();
+
+
+                        if (exercises.size() > sharedPreferences.getInt("exercise_count", 0)) {
+                            i = new Intent(PracticeActivity.this, TransitionActivity.class);
+                            startActivity(i);
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                            current.setShouldRunScript(true);
+                        } else {
+                            i = new Intent(PracticeActivity.this, LessonCompletedActivity.class);
+                            i.putExtra("lesson_id", lessonId.toString());
+                            //getting the current time in milliseconds, and creating a Date object from it:
+                            Date date = new Date(System.currentTimeMillis()); //or simply new Date();
+
+                            //converting it back to a milliseconds representation:
+                            long millis = date.getTime();
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putLong("finish_time", date.getTime());
+                            editor.commit();
+
+                            startActivity(i);
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        }
+                        PracticeActivity.this.finish();
+                        Toast.makeText(activity, "didHideAd", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
             }
         }
     }

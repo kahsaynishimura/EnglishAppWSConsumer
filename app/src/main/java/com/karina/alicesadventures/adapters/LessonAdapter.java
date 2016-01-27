@@ -71,6 +71,7 @@ public class LessonAdapter extends ArrayAdapter<Lesson> {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    //it's very important redirecting directly to the practice screen
                     Intent i = new Intent(context, PracticeActivity.class);
 
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
