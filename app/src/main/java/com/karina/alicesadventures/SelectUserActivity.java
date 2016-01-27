@@ -1,6 +1,5 @@
 package com.karina.alicesadventures;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,7 +10,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
@@ -23,11 +21,6 @@ import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.util.SessionManager;
 import com.karina.alicesadventures.model.User;
 import com.karina.alicesadventures.parsers.UserXmlParser;
-import com.purplebrain.adbuddiz.sdk.AdBuddiz;
-import com.purplebrain.adbuddiz.sdk.AdBuddizDelegate;
-import com.purplebrain.adbuddiz.sdk.AdBuddizError;
-import com.purplebrain.adbuddiz.sdk.AdBuddizRewardedVideoDelegate;
-import com.purplebrain.adbuddiz.sdk.AdBuddizRewardedVideoError;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -42,10 +35,7 @@ public class SelectUserActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         sessionManager = new SessionManager(SelectUserActivity.this);
-
         if (sessionManager.isLoggedIn()) {
 
             Intent i = new Intent(SelectUserActivity.this, BookActivity.class);
@@ -55,8 +45,6 @@ public class SelectUserActivity extends FragmentActivity {
 
         } else {
             setContentView(R.layout.activity_select_user);
-
-            //Facebook login
             FacebookSdk.sdkInitialize(getApplicationContext());
             FacebookFragment fragment = new FacebookFragment();
             getSupportFragmentManager().beginTransaction()
@@ -70,11 +58,6 @@ public class SelectUserActivity extends FragmentActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        AdBuddiz.onDestroy(); // to minimize memory footprint
-    }
 
     @Override
     protected void onResume() {

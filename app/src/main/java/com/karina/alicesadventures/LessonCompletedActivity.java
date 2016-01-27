@@ -1,33 +1,37 @@
 package com.karina.alicesadventures;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.karina.alicesadventures.parsers.MessageXmlParser;
 import com.karina.alicesadventures.util.AnalyticsApplication;
 import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.util.SessionManager;
-import com.purplebrain.adbuddiz.sdk.AdBuddiz;
-import com.purplebrain.adbuddiz.sdk.AdBuddizRewardedVideoDelegate;
-import com.purplebrain.adbuddiz.sdk.AdBuddizRewardedVideoError;
+import com.karina.alicesadventures.parsers.MessageXmlParser;
 
 import java.io.StringReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 
@@ -41,38 +45,6 @@ public class LessonCompletedActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lesson_completed);
-        final Activity activity = LessonCompletedActivity.this;
-        AdBuddiz.RewardedVideo.setDelegate(new AdBuddizRewardedVideoDelegate() {
-            @Override
-            public void didFetch() { // Next rewarded video is ready to be displayed
-
-                Toast.makeText(activity, "didFetch", Toast.LENGTH_SHORT).show();
-                AdBuddiz.RewardedVideo.show(activity);
-                //  AdBuddiz.RewardedVideo.show(activity);
-                //  btnShowVideoAd.setEnabled(true); // enable the button since the video can be displayed
-            }
-
-            @Override
-            public void didComplete() { // User closed the ad after having fully watched the video
-                Toast.makeText(activity, "didComplete", Toast.LENGTH_SHORT).show();
-
-                // giveRewardToUser(); // reward the user since he watched the video
-
-                // fetching manually next rewarded video
-                // btnShowVideoAd.setEnabled(false); // disable the button while fetching
-                AdBuddiz.RewardedVideo.fetch(activity);
-            }
-
-            @Override
-            public void didFail(AdBuddizRewardedVideoError error) { // Something went wrong when fetching or showing a video
-                Toast.makeText(activity, error.name(), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void didNotComplete() { // Media player encountered an error
-                Toast.makeText(activity, "didNotComplete", Toast.LENGTH_SHORT).show();
-            }
-        });
 
 
         // Obtain the shared Tracker instance.
@@ -202,8 +174,8 @@ public class LessonCompletedActivity extends ActionBarActivity {
             super.onPostExecute(message);
             mSaveLastLessonTask = null;
             if (message == null) {
-                Toast.makeText(LessonCompletedActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
-
+                Snackbar.make(((FloatingActionButton) findViewById(R.id.fab)), getText(R.string.verify_internet_connection), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             } else {
                 Toast.makeText(LessonCompletedActivity.this, message, Toast.LENGTH_LONG).show();
 
