@@ -1,6 +1,7 @@
 package com.karina.alicesadventures;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -8,12 +9,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
@@ -21,17 +19,18 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.karina.alicesadventures.util.AnalyticsApplication;
+import com.karina.alicesadventures.util.EchoPractice;
 import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.util.SessionManager;
 import com.karina.alicesadventures.parsers.MessageXmlParser;
+import com.purplebrain.adbuddiz.sdk.AdBuddiz;
+import com.purplebrain.adbuddiz.sdk.AdBuddizDelegate;
+import com.purplebrain.adbuddiz.sdk.AdBuddizError;
 
 import java.io.StringReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 
@@ -53,27 +52,77 @@ public class LessonCompletedActivity extends ActionBarActivity {
 
         PracticeActivity.exercises = new ArrayList<>();
         SessionManager sessionManager = new SessionManager(LessonCompletedActivity.this);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        Integer lessonId=sharedPreferences.getInt("lesson_id", 0);
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[User][id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
-        hashMap.put("data[User][last_completed_lesson]", getIntent().getExtras().getString("lesson_id"));
+        hashMap.put("data[User][last_completed_lesson]", lessonId.toString());
         try {
-            mSaveLastLessonTask = new SaveLastLessonTask(HTTPConnection.SERVER_BASE_URL + "users/save_last_lesson_api.xml", hashMap);
+            mSaveLastLessonTask = new SaveLastLessonTask(EchoPractice.SERVER_BASE_URL + "users/save_last_lesson_api.xml", hashMap);
             mSaveLastLessonTask.execute();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        AdView mAdView = (AdView) findViewById(R.id.ad_view);
 
+        //Admob
+        AdView mAdView = (AdView) findViewById(R.id.ad_view);
         AdRequest.Builder b = new AdRequest.Builder();
 
-        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        String deviceId = md5(android_id).toUpperCase();
-        b.addTestDevice(deviceId);
-
+        if(EchoPractice.DEBUG_MODE) {
+            String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+            String deviceId = md5(android_id).toUpperCase();
+            b.addTestDevice(deviceId);
+        }
         AdRequest adRequest = b.build();
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
         mAdView.loadAd(adRequest);
 
+        //AdBuddiz
+        showAd(LessonCompletedActivity.this);
+
+    }
+
+    public static void showAd(final Activity activity) {
+        AdBuddiz.cacheAds(activity);                    // start caching ads
+
+        AdBuddiz.showAd(activity);
+        // OPTIONAL, to get more info about the SDK behavior for AdBuddiz methods.
+        // All callbacks in the delegate will be called in UI thread.
+        AdBuddiz.setDelegate(new AdBuddizDelegate() {
+            @Override
+            public void didCacheAd() {
+                //Toast.makeText(activity, "didCacheAd", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void didShowAd() {
+                // Toast.makeText(activity, "didShowAd", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void didFailToShowAd(AdBuddizError error) {
+                // Toast.makeText(activity, error.name(), Toast.LENGTH_SHORT).show();
+                AdBuddiz.onDestroy();
+            }
+
+            @Override
+            public void didClick() {
+                //  Toast.makeText(activity, "didClick", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void didHideAd() {
+                //  Toast.makeText(activity, "didHideAd", Toast.LENGTH_SHORT).show();
+                AdBuddiz.onDestroy();
+            }
+
+
+        });
     }
 
     @Override
@@ -174,12 +223,9 @@ public class LessonCompletedActivity extends ActionBarActivity {
             super.onPostExecute(message);
             mSaveLastLessonTask = null;
             if (message == null) {
-                Snackbar.make(((FloatingActionButton) findViewById(R.id.fab)), getText(R.string.verify_internet_connection), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Toast.makeText(LessonCompletedActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(LessonCompletedActivity.this, message, Toast.LENGTH_LONG).show();
-
-
             }
         }
 
@@ -192,4 +238,9 @@ public class LessonCompletedActivity extends ActionBarActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AdBuddiz.onDestroy(); // to minimize memory footprint
+    }
 }

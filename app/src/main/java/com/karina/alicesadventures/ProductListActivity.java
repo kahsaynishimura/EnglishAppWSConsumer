@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.karina.alicesadventures.util.AnalyticsApplication;
+import com.karina.alicesadventures.util.EchoPractice;
 import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.model.Product;
 import com.karina.alicesadventures.parsers.ProductsXmlParser;
@@ -78,7 +79,7 @@ public class ProductListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
         mListProductsTask = new ListProductsTask();
-        mListProductsTask.execute(HTTPConnection.SERVER_BASE_URL+"products/index_api.xml");
+        mListProductsTask.execute(EchoPractice.SERVER_BASE_URL+"products/index_api.xml");
 
     }
 

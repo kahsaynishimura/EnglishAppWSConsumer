@@ -1,6 +1,7 @@
 package com.karina.alicesadventures;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -18,6 +19,10 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.karina.alicesadventures.util.AnalyticsApplication;
 import com.karina.alicesadventures.model.Exercise;
+import com.karina.alicesadventures.util.EchoPractice;
+import com.purplebrain.adbuddiz.sdk.AdBuddiz;
+import com.purplebrain.adbuddiz.sdk.AdBuddizDelegate;
+import com.purplebrain.adbuddiz.sdk.AdBuddizError;
 
 //keeps track of the current Exercise
 public class TransitionActivity extends AppCompatActivity {
@@ -55,16 +60,66 @@ public class TransitionActivity extends AppCompatActivity {
         // Obtain the shared Tracker instance.
         AnalyticsApplication application = (AnalyticsApplication) getApplication();
         mTracker = application.getDefaultTracker();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent i = new Intent(TransitionActivity.this, PracticeActivity.class);
-                startActivity(i);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                TransitionActivity.this.finish();
-            }
-        }, TRANSITION_PAUSE);
 
+        //AdBuddiz
+        showAd(TransitionActivity.this);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AdBuddiz.onDestroy(); // to minimize memory footprint
+    }
+
+
+    public static void showAd(final Activity activity) {
+        AdBuddiz.cacheAds(activity);                    // start caching ads
+
+        AdBuddiz.showAd(activity);
+        // OPTIONAL, to get more info about the SDK behavior for AdBuddiz methods.
+        // All callbacks in the delegate will be called in UI thread.
+        AdBuddiz.setDelegate(new AdBuddizDelegate() {
+
+            @Override
+            public void didCacheAd() {
+                //Toast.makeText(activity, "didCacheAd", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void didShowAd() {
+                // Toast.makeText(activity, "didShowAd", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void didFailToShowAd(AdBuddizError error) {
+                // Toast.makeText(activity, error.name(), Toast.LENGTH_SHORT).show();
+                continueToPractice();
+            }
+
+            @Override
+            public void didClick() {
+                //  Toast.makeText(activity, "didClick", Toast.LENGTH_SHORT).show();
+                continueToPractice();
+            }
+
+            @Override
+            public void didHideAd() {
+                //  Toast.makeText(activity, "didHideAd", Toast.LENGTH_SHORT).show();
+                continueToPractice();
+            }
+
+            public void continueToPractice() {
+                Intent i = new Intent(activity, PracticeActivity.class);
+                activity.startActivity(i);
+                activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                activity.finish();
+                AdBuddiz.onDestroy();
+            }
+
+        });
     }
 
     @Override

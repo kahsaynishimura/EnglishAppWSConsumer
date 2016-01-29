@@ -25,6 +25,7 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.karina.alicesadventures.util.AnalyticsApplication;
+import com.karina.alicesadventures.util.EchoPractice;
 import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.util.SessionManager;
 import com.karina.alicesadventures.model.Trade;
@@ -66,7 +67,7 @@ public class PrizesActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Trade][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
 
-        mListTradesTask = new ListTradesTask(HTTPConnection.SERVER_BASE_URL+"trades/index_api.xml", hashMap);
+        mListTradesTask = new ListTradesTask(EchoPractice.SERVER_BASE_URL+"trades/index_api.xml", hashMap);
         mListTradesTask.execute();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

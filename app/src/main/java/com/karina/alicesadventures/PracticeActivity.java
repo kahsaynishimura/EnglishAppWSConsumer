@@ -1,6 +1,7 @@
 package com.karina.alicesadventures;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -45,13 +46,20 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.karina.alicesadventures.model.CurrentPracticeData;
 import com.karina.alicesadventures.model.Exercise;
+import com.karina.alicesadventures.model.Practice;
 import com.karina.alicesadventures.model.SpeechScript;
 import com.karina.alicesadventures.parsers.ExercisesXmlParser;
 import com.karina.alicesadventures.parsers.MessageXmlParser;
 import com.karina.alicesadventures.parsers.ScriptsXmlParser;
 import com.karina.alicesadventures.util.AnalyticsApplication;
+import com.karina.alicesadventures.util.EchoPractice;
 import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.util.SessionManager;
+import com.purplebrain.adbuddiz.sdk.AdBuddiz;
+import com.purplebrain.adbuddiz.sdk.AdBuddizDelegate;
+import com.purplebrain.adbuddiz.sdk.AdBuddizError;
+import com.purplebrain.adbuddiz.sdk.AdBuddizRewardedVideoDelegate;
+import com.purplebrain.adbuddiz.sdk.AdBuddizRewardedVideoError;
 
 import java.io.StringReader;
 import java.text.DateFormat;
@@ -74,7 +82,6 @@ public class PracticeActivity extends AppCompatActivity {
     private Intent recognizerIntent;
     private Tracker mTracker;
     private static final String TAG = "PracticeActivity";
-    private Integer lessonId;
 
     private String LOG_TAG = "PracticeActivity";
 
@@ -98,7 +105,7 @@ public class PracticeActivity extends AppCompatActivity {
 
         checkConnection();
         current = new CurrentPracticeData();
-        lessonId = sharedPreferences.getInt("lesson_id", 0);
+        Integer lessonId = sharedPreferences.getInt("lesson_id", 0);
         if (exercises.size() == 0) {//it is the first exercise
             loadExercises(lessonId);
         } else {
@@ -111,11 +118,11 @@ public class PracticeActivity extends AppCompatActivity {
         AdView mAdView = (AdView) findViewById(R.id.ad_view);
 
         AdRequest.Builder b = new AdRequest.Builder();
-
-        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
-        b.addTestDevice(deviceId);
-
+        if (EchoPractice.DEBUG_MODE) {
+            String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+            String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
+            b.addTestDevice(deviceId);
+        }
         AdRequest adRequest = b.build();
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
         mAdView.loadAd(adRequest);
@@ -155,7 +162,7 @@ public class PracticeActivity extends AppCompatActivity {
 
 
         @Override
-        protected void onPostExecute(List<Exercise> exercises) {
+        protected void onPostExecute(final List<Exercise> exercises) {
             mListExercisesTask = null;
             super.onPostExecute(exercises);
             if (exercises == null) {
@@ -165,11 +172,60 @@ public class PracticeActivity extends AppCompatActivity {
                 if (exercises.size() <= sharedPreferences.getInt("exercise_count", 0)) {
                     finish();
                 } else {
-                    if (exercises.get(0) != null) {
-                        PracticeActivity.exercises = exercises;
-                        current.setCurrentExercise(exercises.get(sharedPreferences.getInt("exercise_count", 0)));
+                    Exercise firstExercise = exercises.get(0);
+                    if (firstExercise != null) {//if there is a fulfilled exercise
+                        if (firstExercise.getPractices().get(0) != null) {//has the user practiced this lesson already? so, its first exercise should have practices
+                            //ask if they want to jump to the last exercise
+                            new AlertDialog.Builder(PracticeActivity.this)
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .setTitle(R.string.continue_from_last_exercise)
+                                    .setMessage(R.string.continue_from_last_exercise_message)
+                                    .setCancelable(false)
+                                    .setNegativeButton(getText(R.string.no), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
 
-                        getScripts(current.getCurrentExercise().get_id());
+                                            PracticeActivity.exercises = exercises;
+                                            current.setCurrentExercise(exercises.get(sharedPreferences.getInt("exercise_count", 0)));
+
+                                            getScripts(current.getCurrentExercise().get_id());
+
+                                        }
+                                    })
+                                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            //remove exercises that contain practices
+                                            List<Exercise>   exercisesTemp=exercises;
+                                            for (
+                                                    int i = 0;
+                                                    exercisesTemp.size() > 0 &&
+                                                            exercisesTemp.get(0).getPractices().size() > 0 &&
+                                                            exercisesTemp.get(0).getPractices().get(0).get_id() != null;
+                                                    i++) {
+
+                                                exercisesTemp.remove(0);
+
+                                            }
+                                            if (exercisesTemp.size() > 0) {
+                                                PracticeActivity.exercises = exercisesTemp;
+                                                current.setCurrentExercise(exercises.get(sharedPreferences.getInt("exercise_count", 0)));
+
+                                                getScripts(current.getCurrentExercise().get_id());
+                                            }else{
+                                                PracticeActivity.exercises =null;
+                                                finish();
+                                                Toast.makeText(PracticeActivity.this,getString(R.string.you_completed_this_lesson),Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+
+                                    })
+                                    .show();
+
+                        }
+
+
                     }
                 }
             }
@@ -179,6 +235,15 @@ public class PracticeActivity extends AppCompatActivity {
         protected void onCancelled() {
             super.onCancelled();
             mListExercisesTask = null;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (TTS != null) {
+            TTS.shutdown();
         }
     }
 
@@ -316,21 +381,21 @@ public class PracticeActivity extends AppCompatActivity {
                         s.setScriptIndex(i);
                         i++;
                     }
-                    exercises.get(sharedPreferences.getInt("exercise_count", 0)).setScriptEntries(scripts);
-
-                    speech = SpeechRecognizer.createSpeechRecognizer(PracticeActivity.this);
-                    recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                    recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, (Locale.US).toString());
-                    recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, PracticeActivity.this.getPackageName());
-                    recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-                    recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
-
-
-                    //Progress Bar
-                    mProgress.setMax(scripts.size());
-                    mProgress.setProgress(0);
-
                     if (hasMoreExercises()) {
+                        exercises.get(sharedPreferences.getInt("exercise_count", 0)).setScriptEntries(scripts);
+
+                        speech = SpeechRecognizer.createSpeechRecognizer(PracticeActivity.this);
+                        recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, (Locale.US).toString());
+                        recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, PracticeActivity.this.getPackageName());
+                        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                        recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
+
+
+                        //Progress Bar
+                        mProgress.setMax(scripts.size());
+                        mProgress.setProgress(0);
+
                         selectNextExercise();
                         TTS = new TextToSpeech(PracticeActivity.this, new TextToSpeech.OnInitListener() {
                             @Override
@@ -373,7 +438,7 @@ public class PracticeActivity extends AppCompatActivity {
         hashMap.put("data[SpeechScript][exercise_id]", exerciseId.toString());
 
 
-        mListSpeechScriptsTask = new ListSpeechScriptsTask(HTTPConnection.SERVER_BASE_URL + "speech_scripts/index_api.xml", hashMap);
+        mListSpeechScriptsTask = new ListSpeechScriptsTask(EchoPractice.SERVER_BASE_URL + "speech_scripts/index_api.xml", hashMap);
         mListSpeechScriptsTask.execute();
     }
 
@@ -402,10 +467,13 @@ public class PracticeActivity extends AppCompatActivity {
 
     private void loadExercises(Integer lessonId) {
         //retrieve sentences to practice from db for each exercise
+        SessionManager sessionManager=new SessionManager(PracticeActivity.this);
+
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Exercise][lesson_id]", lessonId.toString());
+        hashMap.put("data[Exercise][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
 
-        mListExercisesTask = new ListExercisesTask(HTTPConnection.SERVER_BASE_URL + "exercises/index_api.xml", hashMap);
+        mListExercisesTask = new ListExercisesTask(EchoPractice.SERVER_BASE_URL + "exercises/index_api.xml", hashMap);
         mListExercisesTask.execute();
     }
 
@@ -590,7 +658,6 @@ public class PracticeActivity extends AppCompatActivity {
                     current.setShouldRunScript(true);
                 } else {
                     Intent i = new Intent(PracticeActivity.this, LessonCompletedActivity.class);
-                    i.putExtra("lesson_id", lessonId.toString());
                     //getting the current time in milliseconds, and creating a Date object from it:
                     Date date = new Date(System.currentTimeMillis()); //or simply new Date();
 
@@ -630,7 +697,7 @@ public class PracticeActivity extends AppCompatActivity {
         hashMap.put("data[Practice][points]", totalHits.toString());
         hashMap.put("data[Practice][exercise_id]", current.getCurrentExercise().get_id().toString());
         try {
-            mAddPracticeTask = new AddPracticeTask(HTTPConnection.SERVER_BASE_URL + "practices/add_api.xml", hashMap);
+            mAddPracticeTask = new AddPracticeTask(EchoPractice.SERVER_BASE_URL + "practices/add_api.xml", hashMap);
             mAddPracticeTask.execute();
         } catch (Exception e) {
             e.printStackTrace();
@@ -717,14 +784,6 @@ public class PracticeActivity extends AppCompatActivity {
 
             // other 'case' lines to check for other
             // permissions this app might request
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (TTS != null) {
-            TTS.shutdown();
         }
     }
 

@@ -18,6 +18,7 @@ import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.karina.alicesadventures.util.EchoPractice;
 import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.util.SessionManager;
 import com.karina.alicesadventures.model.User;
@@ -82,7 +83,7 @@ public class FacebookFragment extends Fragment {
                                     hashMap.put("data[User][name]", object.get("name").toString());
 
                                         mAddUserTask=null;
-                                        mAddUserTask = new AddUserTask(HTTPConnection.SERVER_BASE_URL+"users/add_fb_api.xml", hashMap);
+                                        mAddUserTask = new AddUserTask(EchoPractice.SERVER_BASE_URL+"users/add_fb_api.xml", hashMap);
                                         mAddUserTask.execute();
 
                                 } catch (Exception e) {

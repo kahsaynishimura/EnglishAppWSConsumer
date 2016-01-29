@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.karina.alicesadventures.util.AnalyticsApplication;
+import com.karina.alicesadventures.util.EchoPractice;
 import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.parsers.MessageXmlParser;
 
@@ -126,7 +127,7 @@ public class AddUserActivity extends AppCompatActivity {
             hashMap.put("data[User][username]", mEmail);
             hashMap.put("data[User][name]", mName);
             try {
-                mAddUserTask = new AddUserTask(HTTPConnection.SERVER_BASE_URL+"users/add_api.xml", hashMap);
+                mAddUserTask = new AddUserTask(EchoPractice.SERVER_BASE_URL + "users/add_api.xml", hashMap);
                 mAddUserTask.execute();
             } catch (Exception e) {
                 e.printStackTrace();

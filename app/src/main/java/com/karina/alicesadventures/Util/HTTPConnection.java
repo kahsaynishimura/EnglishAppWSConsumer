@@ -12,7 +12,6 @@ import java.util.HashMap;
  */
 public class HTTPConnection {
     // private final String USER_AGENT = "Mozilla/5.0";
-    public static final String SERVER_BASE_URL ="https://echopractice.com/ep/";
     public static void main(String[] args) throws Exception {
 
         HTTPConnection http = new HTTPConnection();
@@ -24,7 +23,7 @@ public class HTTPConnection {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[User][password]", "t");
         hashMap.put("data[User][username]", "t");
-        http.sendPost(HTTPConnection.SERVER_BASE_URL+"users/login_api.xml", hashMap);
+        http.sendPost(EchoPractice.SERVER_BASE_URL+"users/login_api.xml", hashMap);
 
     }
 

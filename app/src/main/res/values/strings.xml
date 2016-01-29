@@ -60,6 +60,9 @@
     <string name="error_pass_mismatch">The passwords did not match</string>
     <string name="error_field_length">this field should contain at least 8 characteres</string>
     <string name="lesson_completed">Lesson Completed</string>
+    <string name="continue_from_last_exercise">Continue from last exercise</string>
+    <string name="continue_from_last_exercise_message">Do you want to continue from the exercise you stopped the last time you practiced this lesson?</string>
+    <string name="you_completed_this_lesson">You have completed this lesson already</string>
 
 
 </resources>

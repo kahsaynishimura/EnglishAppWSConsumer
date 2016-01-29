@@ -17,6 +17,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.karina.alicesadventures.util.AnalyticsApplication;
+import com.karina.alicesadventures.util.EchoPractice;
 import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.adapters.LessonAdapter;
 import com.karina.alicesadventures.model.Lesson;
@@ -48,16 +49,16 @@ public class LessonActivity extends ActionBarActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LessonActivity.this);
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Lesson][book_id]", sharedPreferences.getString("book_id", "1"));
-        mListLessonsTask = new ListLessonsTask(HTTPConnection.SERVER_BASE_URL+"lessons/index_api.xml", hashMap);
+        mListLessonsTask = new ListLessonsTask(EchoPractice.SERVER_BASE_URL+"lessons/index_api.xml", hashMap);
         mListLessonsTask.execute();
         AdView mAdView = (AdView) findViewById(R.id.ad_view);
 
         AdRequest.Builder b = new AdRequest.Builder();
-
-        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
-        b.addTestDevice(deviceId);
-
+        if(EchoPractice.DEBUG_MODE) {
+            String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+            String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
+            b.addTestDevice(deviceId);
+        }
         AdRequest adRequest = b.build();
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
         mAdView.loadAd(adRequest);

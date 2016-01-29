@@ -17,10 +17,12 @@ import com.facebook.login.LoginManager;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.karina.alicesadventures.util.AnalyticsApplication;
+import com.karina.alicesadventures.util.EchoPractice;
 import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.util.SessionManager;
 import com.karina.alicesadventures.model.User;
 import com.karina.alicesadventures.parsers.UserXmlParser;
+import com.purplebrain.adbuddiz.sdk.AdBuddiz;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -36,6 +38,12 @@ public class SelectUserActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sessionManager = new SessionManager(SelectUserActivity.this);
+        if (EchoPractice.DEBUG_MODE) {
+            AdBuddiz.setTestModeActive();
+        }
+        AdBuddiz.setPublisherKey("cdb7b7f2-0359-4ea3-a6b3-52664ec70e07"); // replace with your app publisher key
+
+
         if (sessionManager.isLoggedIn()) {
 
             Intent i = new Intent(SelectUserActivity.this, BookActivity.class);
@@ -125,7 +133,7 @@ public class SelectUserActivity extends FragmentActivity {
             hashMap.put("data[User][password]", mPassword);
             hashMap.put("data[User][username]", mEmail);
             try {
-                mLoginTask = new LoginTask(HTTPConnection.SERVER_BASE_URL + "users/login_api.xml", hashMap);
+                mLoginTask = new LoginTask(EchoPractice.SERVER_BASE_URL + "users/login_api.xml", hashMap);
                 mLoginTask.execute();
             } catch (Exception e) {
                 e.printStackTrace();

@@ -28,6 +28,7 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.karina.alicesadventures.util.AnalyticsApplication;
+import com.karina.alicesadventures.util.EchoPractice;
 import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.util.IntentIntegrator;
 import com.karina.alicesadventures.util.IntentResult;
@@ -64,16 +65,17 @@ public class BookActivity extends ActionBarActivity {
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[User][id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
-        mListBooksTask = new ListBooksTask(HTTPConnection.SERVER_BASE_URL + "books/index_api.xml", hashMap);
+        mListBooksTask = new ListBooksTask(EchoPractice.SERVER_BASE_URL + "books/index_api.xml", hashMap);
         mListBooksTask.execute();
         AdView mAdView = (AdView) findViewById(R.id.ad_view);
 
         AdRequest.Builder b = new AdRequest.Builder();
 
-        String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
-        b.addTestDevice(deviceId);
-
+        if(EchoPractice.DEBUG_MODE) {
+            String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+            String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
+            b.addTestDevice(deviceId);
+        }
         AdRequest adRequest = b.build();
         b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
         mAdView.loadAd(adRequest);
@@ -195,7 +197,7 @@ public class BookActivity extends ActionBarActivity {
                 hashMap.put("data[Partner][user_id]", sessionManager.getUserDetails().get(SessionManager.KEY_ID));
 
                 try {
-                    mValidateCodeTask = new ValidateCodeTask(HTTPConnection.SERVER_BASE_URL + "trades/validateQR.xml", hashMap);
+                    mValidateCodeTask = new ValidateCodeTask(EchoPractice.SERVER_BASE_URL + "trades/validateQR.xml", hashMap);
                     mValidateCodeTask.execute();
                 } catch (Exception e) {
                     e.printStackTrace();

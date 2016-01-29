@@ -1,5 +1,7 @@
 package com.karina.alicesadventures.model;
 
+import org.xmlpull.v1.XmlPullParser;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,7 @@ public class Exercise {
     private String transitionImage;
     private Lesson lesson; //belongs to one lesson
     private List<SpeechScript> scriptEntries;//has many script entries
+    private ArrayList<Practice> practices;
 
     public Exercise(Integer id, String name, String transitionImage, Integer lessonId) {
         _id = id;
@@ -19,6 +22,7 @@ public class Exercise {
         this.transitionImage = transitionImage;
         this.lesson = new Lesson();
         lesson.set_id(lessonId);
+        practices=new ArrayList<>();
     }
 
     public Exercise() {
@@ -63,5 +67,14 @@ public class Exercise {
 
     public void setTransitionImage(String transitionImage) {
         this.transitionImage = transitionImage;
+    }
+
+    public ArrayList<Practice> getPractices() {
+        return practices;
+    }
+
+    public void setPractices(
+            ArrayList<Practice> practices) {
+        this.practices = practices;
     }
 }

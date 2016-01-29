@@ -4,6 +4,7 @@ import android.util.Xml;
 
 import com.karina.alicesadventures.model.Book;
 import com.karina.alicesadventures.model.Exercise;
+import com.karina.alicesadventures.model.Practice;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -62,11 +63,30 @@ public class ExercisesXmlParser { // We don't use namespaces
             String name = parser.getName();
             if (name.equals("Exercise")) {
                 exercise = readExercise(parser);
+            } else if (name.equals("Practice")) {
+                exercise.getPractices().add(readPractice(parser));
             } else {
                 skip(parser);
             }
         }
         return exercise;
+    }
+
+    private Practice readPractice(XmlPullParser parser) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, "Practice");
+        Integer id = null;
+        while (parser.next() != XmlPullParser.END_TAG) {
+            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                continue;
+            }
+            String name = parser.getName();
+            if (name.equals("id")) {
+                id = Integer.parseInt(readText(parser));
+            } else {
+                skip(parser);
+            }
+        }
+        return new Practice(id);
     }
 
     private Exercise readExercise(XmlPullParser parser) throws XmlPullParserException, IOException {
