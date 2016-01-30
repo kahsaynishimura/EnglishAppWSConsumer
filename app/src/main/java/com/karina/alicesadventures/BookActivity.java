@@ -179,6 +179,9 @@ public class BookActivity extends ActionBarActivity {
         } else if (id == R.id.action_view_prizes) {
             Intent i = new Intent(BookActivity.this, PrizesActivity.class);
             startActivity(i);
+        } else if (id == R.id.action_view_products) {
+            Intent i = new Intent(BookActivity.this, ProductListActivity.class);
+            startActivity(i);
         }
         return super.onOptionsItemSelected(item);
     }

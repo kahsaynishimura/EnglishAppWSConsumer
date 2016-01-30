@@ -25,6 +25,7 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.karina.alicesadventures.util.AnalyticsApplication;
+import com.karina.alicesadventures.util.EchoPractice;
 import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.util.SessionManager;
 import com.karina.alicesadventures.model.GeneralResponse;
@@ -89,7 +90,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
                 if (ProductsXmlParser.ITEM_MAP.get(id) == null) {
                     try {
-                        mViewProductTask = new ViewProductTask("http://karinanishimura.com.br/cakephp/products/view_api/" + id + ".xml", null);
+                        mViewProductTask = new ViewProductTask(EchoPractice.SERVER_BASE_URL + "products/view_api/" + id + ".xml", null);
                         mViewProductTask.execute();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -123,7 +124,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         hashMap.put("data[Trade][product_id]", product.getId().toString());
 
         try {
-            mAddTradeTask = new AddTradeTask("http://karinanishimura.com.br/cakephp/trades/add_api.xml", hashMap);
+            mAddTradeTask = new AddTradeTask(EchoPractice.SERVER_BASE_URL + "trades/add_api.xml", hashMap);
             mAddTradeTask.execute();
         } catch (Exception e) {
             e.printStackTrace();
