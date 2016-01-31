@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.karina.alicesadventures">
+    package="com.karina.alicesadventures"
+    xmlns:tools="http://schemas.android.com/tools">
+    <uses-sdk android:targetSdkVersion="9" android:minSdkVersion="9"
+        tools:overrideLibrary="com.facebook"/>
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -87,6 +90,11 @@
             android:name=".PrizesActivity"
             android:label="@string/title_activity_prizes"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+             App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>

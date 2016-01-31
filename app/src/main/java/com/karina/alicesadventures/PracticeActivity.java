@@ -1,6 +1,7 @@
 package com.karina.alicesadventures;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -44,6 +45,9 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.karina.alicesadventures.model.CurrentPracticeData;
 import com.karina.alicesadventures.model.Exercise;
 import com.karina.alicesadventures.model.Practice;
@@ -71,7 +75,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class PracticeActivity extends AppCompatActivity {
+public class PracticeActivity extends Activity {
     private AddPracticeTask mAddPracticeTask;
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 1;
     private ListExercisesTask mListExercisesTask;
@@ -95,6 +99,11 @@ public class PracticeActivity extends AppCompatActivity {
     //Progress Bar
     private ProgressBar mProgress;
     private int mProgressStatus = 0;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
 
     @Override
@@ -134,6 +143,49 @@ public class PracticeActivity extends AppCompatActivity {
 
         //Progress Bar
         mProgress = (ProgressBar) findViewById(R.id.progressBar);
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Practice Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.karina.alicesadventures/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Practice Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.karina.alicesadventures/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
     }
 
     private class ListExercisesTask extends AsyncTask<Void, Void, List<Exercise>> {
@@ -174,7 +226,7 @@ public class PracticeActivity extends AppCompatActivity {
                 } else {
                     Exercise firstExercise = exercises.get(0);
                     if (firstExercise != null) {//if there is a fulfilled exercise
-                        if (firstExercise.getPractices().get(0) != null) {//has the user practiced this lesson already? so, its first exercise should have practices
+                        if (firstExercise.getPractices().get(0) != null && firstExercise.getPractices().get(0).get_id() != null) {//has the user practiced this lesson already? so, its first exercise should have practices
                             //ask if they want to jump to the last exercise
                             new AlertDialog.Builder(PracticeActivity.this)
                                     .setIcon(android.R.drawable.ic_dialog_alert)
@@ -185,10 +237,7 @@ public class PracticeActivity extends AppCompatActivity {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
 
-                                            PracticeActivity.exercises = exercises;
-                                            current.setCurrentExercise(exercises.get(sharedPreferences.getInt("exercise_count", 0)));
-
-                                            getScripts(current.getCurrentExercise().get_id());
+                                            loadPracticeSentences(exercises);
 
                                         }
                                     })
@@ -197,7 +246,7 @@ public class PracticeActivity extends AppCompatActivity {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             //remove exercises that contain practices
-                                            List<Exercise>   exercisesTemp=exercises;
+                                            List<Exercise> exercisesTemp = exercises;
                                             for (
                                                     int i = 0;
                                                     exercisesTemp.size() > 0 &&
@@ -209,23 +258,21 @@ public class PracticeActivity extends AppCompatActivity {
 
                                             }
                                             if (exercisesTemp.size() > 0) {
-                                                PracticeActivity.exercises = exercisesTemp;
-                                                current.setCurrentExercise(exercises.get(sharedPreferences.getInt("exercise_count", 0)));
 
-                                                getScripts(current.getCurrentExercise().get_id());
-                                            }else{
-                                                PracticeActivity.exercises =null;
+                                                loadPracticeSentences(exercisesTemp);
+                                            } else {
+                                                PracticeActivity.exercises = null;
                                                 finish();
-                                                Toast.makeText(PracticeActivity.this,getString(R.string.you_completed_this_lesson),Toast.LENGTH_LONG).show();
+                                                Toast.makeText(PracticeActivity.this, getString(R.string.you_completed_this_lesson), Toast.LENGTH_LONG).show();
                                             }
                                         }
 
                                     })
                                     .show();
 
+                        } else {
+                            loadPracticeSentences(exercises);
                         }
-
-
                     }
                 }
             }
@@ -235,6 +282,14 @@ public class PracticeActivity extends AppCompatActivity {
         protected void onCancelled() {
             super.onCancelled();
             mListExercisesTask = null;
+        }
+
+        private void loadPracticeSentences(List<Exercise> exercises) {
+
+            PracticeActivity.exercises = exercises;
+            current.setCurrentExercise(exercises.get(sharedPreferences.getInt("exercise_count", 0)));
+
+            getScripts(current.getCurrentExercise().get_id());
         }
     }
 
@@ -467,7 +522,7 @@ public class PracticeActivity extends AppCompatActivity {
 
     private void loadExercises(Integer lessonId) {
         //retrieve sentences to practice from db for each exercise
-        SessionManager sessionManager=new SessionManager(PracticeActivity.this);
+        SessionManager sessionManager = new SessionManager(PracticeActivity.this);
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("data[Exercise][lesson_id]", lessonId.toString());
@@ -519,52 +574,56 @@ public class PracticeActivity extends AppCompatActivity {
                     switch (s.getFunctionId()) {
 
                         case 1://The device is to speak (tts) the text_to_read (used to give instructions about the exercises)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) { //versao api >
 
-                            TTS.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-                                @Override
-                                public void onStart(String utteranceId) {
-
-                                }
-
-                                @Override
-                                public void onDone(String utteranceId) {
-                                    if (current.getCurrentSpeechScript().getFunctionId() == 1) {
-                                        current.setShouldRunScript(true);
-                                        current.selectNextScript();
-                                        runScriptEntry();
+                                TTS.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                                    @Override
+                                    public void onStart(String utteranceId) {
 
                                     }
-                                }
 
-                                @Override
-                                public void onError(String utteranceId) {
+                                    @Override
+                                    public void onDone(String utteranceId) {
+                                        if (current.getCurrentSpeechScript().getFunctionId() == 1) {
+                                            current.setShouldRunScript(true);
+                                            current.selectNextScript();
+                                            runScriptEntry();
 
-                                }
-                            });
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onError(String utteranceId) {
+
+                                    }
+                                });
+                            }
                             speak(s.getTextToRead(), s.get_id().toString(), b);
 
                             break;
 
                         case 2:
                             //The device is to Read text(tts), Show sentence- tts, Listen to speech, Check against database info= stt. Listen and compare.
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) { //versao api >
 
-                            TTS.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-                                @Override
-                                public void onStart(String utteranceId) {
-                                    ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(10);
-                                }
+                                TTS.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                                    @Override
+                                    public void onStart(String utteranceId) {
+                                        ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(10);
+                                    }
 
-                                @Override
-                                public void onDone(String utteranceId) {
-                                    promptSpeechInput();//shows mic screen
-                                    //if voice recognition fails, ask again. no touching button
-                                }
+                                    @Override
+                                    public void onDone(String utteranceId) {
+                                        promptSpeechInput();//shows mic screen
+                                        //if voice recognition fails, ask again. no touching button
+                                    }
 
-                                @Override
-                                public void onError(String utteranceId) {
+                                    @Override
+                                    public void onError(String utteranceId) {
 
-                                }
-                            });
+                                    }
+                                });
+                            }
                             speak(s.getTextToRead(), s.get_id().toString(), b);
                             break;
 
@@ -715,7 +774,7 @@ public class PracticeActivity extends AppCompatActivity {
             @Override
             public void run() {
 
-                if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) { //versao api >21
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { //versao api >21
                     // verify if user has granted this dangerous permission
                     int permissionCheck = ContextCompat.checkSelfPermission(PracticeActivity.this,
                             Manifest.permission.RECORD_AUDIO);
@@ -761,6 +820,7 @@ public class PracticeActivity extends AppCompatActivity {
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -788,7 +848,7 @@ public class PracticeActivity extends AppCompatActivity {
     }
 
     private void changeDrawable(ImageButton view, String uri, Context context, int id) {
-        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) { //versao api >21
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { //versao api >21
             view.setImageDrawable(context.getDrawable(id));
         } else {
             int imageResource = context.getResources().getIdentifier(uri, null, context.getPackageName());
@@ -831,7 +891,7 @@ public class PracticeActivity extends AppCompatActivity {
 
 
     private void speak(String textToSpeak, String id, Bundle bundle) {
-        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             TTS.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, bundle, id);
         } else {
             HashMap<String, String> params = new HashMap<>();
