@@ -473,8 +473,10 @@ public class PracticeActivity extends Activity {
     }
 
     public void startExercise() {
-        TTS.setLanguage(Locale.US);
-        runScriptEntry();
+        if (TTS != null) {
+            TTS.setLanguage(Locale.US);
+            runScriptEntry();
+        }
     }
 
     /*Whenever tryAgain is called, the function runscriptentry is allowed because the variable shouldRunScript was changed to true*/
