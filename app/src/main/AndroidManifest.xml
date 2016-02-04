@@ -20,7 +20,8 @@
         android:name=".util.AnalyticsApplication">
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <activity android:name="com.purplebrain.adbuddiz.sdk.AdBuddizActivity"
-            android:theme="@android:style/Theme.Translucent" />
+            android:theme="@android:style/Theme.Translucent"
+            />
         <activity android:name="com.facebook.FacebookActivity"
             android:configChanges=
                 "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -28,6 +29,7 @@
             android:label="@string/app_name" />
         <activity
             android:name=".SelectUserActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_select_user">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,24 +47,29 @@
             android:name=".PracticeActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".TransitionActivity"
             android:label="@string/title_activity_transition" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".LessonCompletedActivity"
             android:label="@string/title_activity_lesson_completed" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".BookCompletedActivity"
             android:label="@string/title_activity_lesson_completed" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".BookActivity"
             android:label="@string/app_name" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".LessonActivity"
             android:label="@string/title_activity_lesson" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".AddUserActivity"
             android:label="@string/title_activity_add_user"
-            android:parentActivityName=".SelectUserActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -71,7 +78,7 @@
         <activity
             android:name=".ProductListActivity"
             android:label="@string/title_product_list"
-            android:parentActivityName=".LessonCompletedActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -80,7 +87,7 @@
         <activity
             android:name=".ProductDetailActivity"
             android:label="@string/title_product_detail"
-            android:parentActivityName=".ProductListActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -88,8 +95,9 @@
         </activity>
         <activity
             android:name=".PrizesActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_prizes"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
              App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
         <meta-data
