@@ -9,8 +9,8 @@ android {
         applicationId "com.karina.alicesadventures"
         minSdkVersion 9
         targetSdkVersion 23
-        versionCode 16
-        versionName "1.7"
+        versionCode 18
+        versionName "1.0"
     }
     buildTypes {
         release {
@@ -20,9 +20,7 @@ android {
     }
 }
 repositories {
-    maven {
-        url 'http://repository.adbuddiz.com/maven'
-    }
+    mavenCentral()
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -34,7 +32,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:8.3.0'
     compile 'com.google.android.gms:play-services-analytics:8.3.0'
     compile 'com.facebook.android:facebook-android-sdk:4.6.0'
-    compile files('AdBuddiz-3.1.10.jar')
-
     compile 'com.google.android.gms:play-services-appindexing:8.3.0'
 }
