@@ -60,7 +60,7 @@ public class LessonActivity extends ActionBarActivity {
             b.addTestDevice(deviceId);
         }
         AdRequest adRequest = b.build();
-        b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+
         mAdView.loadAd(adRequest);
 
     }
