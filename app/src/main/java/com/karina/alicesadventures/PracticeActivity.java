@@ -1,7 +1,6 @@
 package com.karina.alicesadventures;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -28,7 +27,6 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
@@ -41,8 +39,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.appindexing.Action;
@@ -50,7 +50,6 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.karina.alicesadventures.model.CurrentPracticeData;
 import com.karina.alicesadventures.model.Exercise;
-import com.karina.alicesadventures.model.Practice;
 import com.karina.alicesadventures.model.SpeechScript;
 import com.karina.alicesadventures.parsers.ExercisesXmlParser;
 import com.karina.alicesadventures.parsers.MessageXmlParser;
@@ -59,11 +58,6 @@ import com.karina.alicesadventures.util.AnalyticsApplication;
 import com.karina.alicesadventures.util.EchoPractice;
 import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.util.SessionManager;
-import com.purplebrain.adbuddiz.sdk.AdBuddiz;
-import com.purplebrain.adbuddiz.sdk.AdBuddizDelegate;
-import com.purplebrain.adbuddiz.sdk.AdBuddizError;
-import com.purplebrain.adbuddiz.sdk.AdBuddizRewardedVideoDelegate;
-import com.purplebrain.adbuddiz.sdk.AdBuddizRewardedVideoError;
 
 import java.io.StringReader;
 import java.text.DateFormat;
@@ -88,6 +82,7 @@ public class PracticeActivity extends Activity {
     private static final String TAG = "PracticeActivity";
 
     private String LOG_TAG = "PracticeActivity";
+    InterstitialAd mInterstitialAd;
 
     CurrentPracticeData current;//stores current screen info - current screen state
     public static List<Exercise> exercises = new ArrayList<Exercise>();
@@ -133,7 +128,6 @@ public class PracticeActivity extends Activity {
             b.addTestDevice(deviceId);
         }
         AdRequest adRequest = b.build();
-        b.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
         mAdView.loadAd(adRequest);
 
 
@@ -146,6 +140,15 @@ public class PracticeActivity extends Activity {
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
+
+
+
+        requestNewInterstitial();
+
     }
 
     @Override
@@ -713,27 +716,61 @@ public class PracticeActivity extends Activity {
                 savePractice();
 
                 if (exercises.size() > sharedPreferences.getInt("exercise_count", 0)) {
-                    Intent i = new Intent(PracticeActivity.this, TransitionActivity.class);
-                    startActivity(i);
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                    current.setShouldRunScript(true);
+                    mInterstitialAd.setAdListener(new AdListener() {
+                        @Override
+                        public void onAdClosed() {
+                            requestNewInterstitial();
+                            makeTransition();
+                        }
+
+                    });
+                    if (mInterstitialAd.isLoaded()) {
+                        mInterstitialAd.show();
+                    } else {
+
+                        makeTransition();
+                    }
                 } else {
-                    Intent i = new Intent(PracticeActivity.this, LessonCompletedActivity.class);
-                    //getting the current time in milliseconds, and creating a Date object from it:
-                    Date date = new Date(System.currentTimeMillis()); //or simply new Date();
+                    mInterstitialAd.setAdListener(new AdListener() {
+                        @Override
+                        public void onAdClosed() {
+                            requestNewInterstitial();
+                            finishLesson();
+                        }
 
-                    //converting it back to a milliseconds representation:
-                    long millis = date.getTime();
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putLong("finish_time", date.getTime());
-                    editor.commit();
-
-                    startActivity(i);
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    });
+                    if (mInterstitialAd.isLoaded()) {
+                        mInterstitialAd.show();
+                    } else {
+                       finishLesson();
+                    }
                 }
                 finish();
             }
         }
+    }
+
+    private void makeTransition() {
+
+        Intent i = new Intent(PracticeActivity.this, TransitionActivity.class);
+        startActivity(i);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        current.setShouldRunScript(true);
+    }
+    private void finishLesson() {
+
+        Intent i = new Intent(PracticeActivity.this, LessonCompletedActivity.class);
+        //getting the current time in milliseconds, and creating a Date object from it:
+        Date date = new Date(System.currentTimeMillis()); //or simply new Date();
+
+        //converting it back to a milliseconds representation:
+        long millis = date.getTime();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong("finish_time", date.getTime());
+        editor.commit();
+
+        startActivity(i);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
     private void savePractice() {
@@ -976,6 +1013,24 @@ public class PracticeActivity extends Activity {
             mAddPracticeTask = null;
 
         }
+    }
+
+    private void requestNewInterstitial() {
+
+        AdRequest adRequest;
+        if (EchoPractice.DEBUG_MODE) {
+            String android_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+            String deviceId = LessonCompletedActivity.md5(android_id).toUpperCase();
+            adRequest = new AdRequest.Builder()
+                    .addTestDevice(deviceId)
+                    .build();
+
+        } else {
+            adRequest = new AdRequest.Builder().build();
+        }
+
+
+        mInterstitialAd.loadAd(adRequest);
     }
 
 }

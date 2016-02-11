@@ -65,6 +65,7 @@
     <string name="continue_from_last_exercise_message">Do you want to continue from the exercise you stopped the last time you practiced this lesson?</string>
     <string name="you_completed_this_lesson">You have already completed this lesson</string>
     <string name="action_view_products">View products to trade</string>
+    <string name="title_activity_account_instructions">AccountInstructionsActivity</string>
 
 
 </resources>
