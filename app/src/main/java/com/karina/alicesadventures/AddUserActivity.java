@@ -177,10 +177,14 @@ public class AddUserActivity extends AppCompatActivity {
                 Toast.makeText(AddUserActivity.this, message, Toast.LENGTH_LONG).show();
                 //confirm email
 
-                Intent i = new Intent(AddUserActivity.this, SelectUserActivity.class);
-                startActivity(i);
-                finish();
+              showInstructions();
             }
+        }
+
+        private void showInstructions() {
+            Intent i = new Intent(AddUserActivity.this, AccountInstructionsActivity.class);
+            startActivity(i);
+            finish();
         }
 
         @Override

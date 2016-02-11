@@ -66,6 +66,7 @@
     <string name="you_completed_this_lesson">You have already completed this lesson</string>
     <string name="action_view_products">View products to trade</string>
     <string name="title_activity_account_instructions">AccountInstructionsActivity</string>
+    <string name="create_account_instructions">We sent you an activation email. Please, open your email and click on Activate Account. Welcome to Echo Practice!</string>
 
 
 </resources>

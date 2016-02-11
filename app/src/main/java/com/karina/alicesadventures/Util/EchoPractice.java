@@ -5,5 +5,5 @@ package com.karina.alicesadventures.util;
  */
 public class EchoPractice {
     public static final String SERVER_BASE_URL = "https://echopractice.com/ep/";
-    public static Boolean DEBUG_MODE = true;
+    public static Boolean DEBUG_MODE = false;
 }
