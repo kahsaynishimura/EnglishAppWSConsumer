@@ -9,7 +9,7 @@ android {
         applicationId "com.karina.alicesadventures"
         minSdkVersion 9
         targetSdkVersion 23
-        versionCode 18
+        versionCode 19
         versionName "1.0"
     }
     buildTypes {

@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -132,7 +130,6 @@ public class ProductListActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.product = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).getName());
             holder.mNameView.setText(mValues.get(position).getName());
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -164,14 +161,12 @@ public class ProductListActivity extends AppCompatActivity {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             public final View mView;
-            public final TextView mIdView;
             public final TextView mNameView;
             public Product product;
 
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
-                mIdView = (TextView) view.findViewById(R.id.id);
                 mNameView = (TextView) view.findViewById(R.id.name);
             }
 

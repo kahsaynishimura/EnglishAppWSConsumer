@@ -50,6 +50,7 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.karina.alicesadventures.model.CurrentPracticeData;
 import com.karina.alicesadventures.model.Exercise;
+import com.karina.alicesadventures.model.Practice;
 import com.karina.alicesadventures.model.SpeechScript;
 import com.karina.alicesadventures.parsers.ExercisesXmlParser;
 import com.karina.alicesadventures.parsers.MessageXmlParser;
@@ -92,8 +93,12 @@ public class PracticeActivity extends Activity {
 
 
     //Progress Bar
-    private ProgressBar mProgress;
-    private int mProgressStatus = 0;
+    private ProgressBar mProgressScripts;
+    private int mProgressScriptsStatus = 1;
+    //Progress Bar
+    private ProgressBar mProgressExercises;
+    private int mProgressExercisesStatus = 0;
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -110,15 +115,24 @@ public class PracticeActivity extends Activity {
         checkConnection();
         current = new CurrentPracticeData();
         Integer lessonId = sharedPreferences.getInt("lesson_id", 0);
+        setContentView(R.layout.activity_practice);
+
+        //Progress Bar
+        mProgressScripts = (ProgressBar) findViewById(R.id.scriptsProgressBar);
+        mProgressExercises = (ProgressBar) findViewById(R.id.exercisesProgressBar);
+
         if (exercises.size() == 0) {//it is the first exercise
             loadExercises(lessonId);
         } else {
             if (hasMoreExercises()) {
-                current.setCurrentExercise(exercises.get(sharedPreferences.getInt("exercise_count", 0)));
+
+                mProgressExercises.setMax(sharedPreferences.getInt("total_exercises", 0));
+                changeCurrentExercise(sharedPreferences.getInt("exercise_count", 0));
                 getScripts(current.getCurrentExercise().get_id());
             }
         }
-        setContentView(R.layout.activity_practice);
+
+        //Ads
         AdView mAdView = (AdView) findViewById(R.id.ad_view);
 
         AdRequest.Builder b = new AdRequest.Builder();
@@ -135,8 +149,6 @@ public class PracticeActivity extends Activity {
         AnalyticsApplication application = (AnalyticsApplication) getApplication();
         mTracker = application.getDefaultTracker();
 
-        //Progress Bar
-        mProgress = (ProgressBar) findViewById(R.id.progressBar);
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
@@ -144,7 +156,6 @@ public class PracticeActivity extends Activity {
 
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
-
 
 
         requestNewInterstitial();
@@ -228,8 +239,11 @@ public class PracticeActivity extends Activity {
                     finish();
                 } else {
                     Exercise firstExercise = exercises.get(0);
-                    if (firstExercise != null) {//if there is a fulfilled exercise
+                    if (firstExercise != null) {//if there is at least one fulfilled exercise
+                        PracticeActivity.exercises = exercises;
+                        setTotalExercisesCount();
                         if (firstExercise.getPractices().get(0) != null && firstExercise.getPractices().get(0).get_id() != null) {//has the user practiced this lesson already? so, its first exercise should have practices
+
                             //ask if they want to jump to the last exercise
                             new AlertDialog.Builder(PracticeActivity.this)
                                     .setIcon(android.R.drawable.ic_dialog_alert)
@@ -240,7 +254,11 @@ public class PracticeActivity extends Activity {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
 
-                                            loadPracticeSentences(exercises);
+                                            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                                            editor.putInt("exercise_count", 0);
+                                            editor.commit();
+                                            loadPracticeSentences();
 
                                         }
                                     })
@@ -250,19 +268,20 @@ public class PracticeActivity extends Activity {
                                         public void onClick(DialogInterface dialog, int which) {
                                             //remove exercises that contain practices
                                             List<Exercise> exercisesTemp = exercises;
-                                            for (
-                                                    int i = 0;
-                                                    exercisesTemp.size() > 0 &&
-                                                            exercisesTemp.get(0).getPractices().size() > 0 &&
-                                                            exercisesTemp.get(0).getPractices().get(0).get_id() != null;
-                                                    i++) {
-
-                                                exercisesTemp.remove(0);
-
+                                            int i = 0;
+                                            while (i < exercises.size() &&
+                                                    exercises.size() > 0 &&
+                                                    exercises.get(i).getPractices().size() > 0 &&
+                                                    exercises.get(i).getPractices().get(0).get_id() != null) {
+                                                i++;
                                             }
-                                            if (exercisesTemp.size() > 0) {
 
-                                                loadPracticeSentences(exercisesTemp);
+                                            if (exercises.size() > i) {
+                                                //if its not the last exercise
+                                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                editor.putInt("exercise_count", i);
+                                                editor.commit();
+                                                loadPracticeSentences();
                                             } else {
                                                 PracticeActivity.exercises = null;
                                                 finish();
@@ -274,11 +293,18 @@ public class PracticeActivity extends Activity {
                                     .show();
 
                         } else {
-                            loadPracticeSentences(exercises);
+                            loadPracticeSentences();
                         }
                     }
                 }
             }
+        }
+
+        private void setTotalExercisesCount() {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("total_exercises", exercises.size());
+            editor.commit();
+            mProgressExercises.setMax(exercises.size());
         }
 
         @Override
@@ -287,11 +313,8 @@ public class PracticeActivity extends Activity {
             mListExercisesTask = null;
         }
 
-        private void loadPracticeSentences(List<Exercise> exercises) {
-
-            PracticeActivity.exercises = exercises;
-            current.setCurrentExercise(exercises.get(sharedPreferences.getInt("exercise_count", 0)));
-
+        private void loadPracticeSentences() {
+            changeCurrentExercise(sharedPreferences.getInt("exercise_count", 0));
             getScripts(current.getCurrentExercise().get_id());
         }
     }
@@ -330,7 +353,7 @@ public class PracticeActivity extends Activity {
                     }
 
                     if (hit) {
-                        mProgress.setProgress(mProgressStatus++);
+                        mProgressScripts.setProgress(mProgressScriptsStatus++);
 
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(PracticeActivity.this);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -344,9 +367,10 @@ public class PracticeActivity extends Activity {
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(PracticeActivity.this);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putInt("wrong_sentence_count", sharedPreferences.getInt("wrong_sentence_count", 0) + 1);
+                        editor.commit();
                         //TODO: update number_attemps to +1 on the current execution
                         // db.updateNumberAttempts  (current.getCurrentSpeechScript().get_id(),lessonId);
-                        editor.commit();
+
                         recognizedSentence = formatWrongSentence(recognizedSentence, current.getCurrentSpeechScript().getTextToCheck());
                     }
 
@@ -451,8 +475,8 @@ public class PracticeActivity extends Activity {
 
 
                         //Progress Bar
-                        mProgress.setMax(scripts.size());
-                        mProgress.setProgress(0);
+                        mProgressScripts.setMax(scripts.size());
+                        mProgressScripts.setProgress(0);
 
                         selectNextExercise();
                         TTS = new TextToSpeech(PracticeActivity.this, new TextToSpeech.OnInitListener() {
@@ -506,22 +530,23 @@ public class PracticeActivity extends Activity {
     public void selectNextExercise() {
 
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        current.setCurrentExercise(exercises.get(sharedPreferences.getInt("exercise_count", 0)));
-
+        changeCurrentExercise(sharedPreferences.getInt("exercise_count", 0));
         if (hasMoreExercises()) {
-
+            SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putInt("exercise_count", (sharedPreferences.getInt("exercise_count", 0) + 1));
-
+            editor.commit();
             if (current.getCurrentExercise().getScriptEntries().size() > 0) {
                 current.setCurrentScriptIndex(0);
                 current.setCurrentSpeechScript(current.getCurrentExercise().getScriptEntries().get(current.getCurrentScriptIndex()));
             }
         }
+    }
 
-        editor.commit();
+    private void changeCurrentExercise(Integer count) {
+
+        Exercise exercise = exercises.get(count);
+        current.setCurrentExercise(exercise);
+        mProgressExercises.setProgress(count);
     }
 
 
@@ -742,7 +767,7 @@ public class PracticeActivity extends Activity {
                     if (mInterstitialAd.isLoaded()) {
                         mInterstitialAd.show();
                     } else {
-                       finishLesson();
+                        finishLesson();
                     }
                 }
                 finish();
@@ -757,6 +782,7 @@ public class PracticeActivity extends Activity {
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         current.setShouldRunScript(true);
     }
+
     private void finishLesson() {
 
         Intent i = new Intent(PracticeActivity.this, LessonCompletedActivity.class);

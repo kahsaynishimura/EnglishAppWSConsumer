@@ -23,24 +23,50 @@
             android:text="@string/lesson_completed"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
+        <TextView
+            android:id="@+id/txt_user_total_points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/txt_lesson_completed"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:gravity="center"
+            android:text="@string/user_total_points"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <Button
             android:id="@+id/view_prizes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/txt_lesson_completed"
+            android:layout_below="@+id/txt_user_total_points"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:background="#0063CF"
             android:onClick="viewPrizes"
             android:padding="@dimen/activity_horizontal_margin"
             android:text="@string/view_prizes"
             android:textColor="@android:color/white" />
 
+        <Button
+            android:id="@+id/btn_send_to_wallet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/view_prizes"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:background="#0063CF"
+            android:onClick="viewPrizes"
+            android:visibility="gone"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:text="@string/send_to_wallet"
+            android:textColor="@android:color/white" />
+
         <com.google.android.gms.ads.AdView
             android:id="@+id/ad_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/view_prizes"
+            android:layout_below="@+id/btn_send_to_wallet"
             android:layout_marginTop="@dimen/activity_horizontal_margin"
             ads:adSize="FLUID"
             ads:adUnitId="@string/banner_ad_unit_id" />

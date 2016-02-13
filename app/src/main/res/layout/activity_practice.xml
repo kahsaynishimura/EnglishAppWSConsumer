@@ -9,17 +9,25 @@
     tools:context=".BookActivity">
 
     <ProgressBar
-        android:id="@+id/progressBar"
+        android:id="@+id/exercisesProgressBar"
         style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" />
+
+    <ProgressBar
+        android:id="@+id/scriptsProgressBar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/exercisesProgressBar"
         android:layout_gravity="center_horizontal" />
 
     <LinearLayout
         android:id="@+id/videoFrame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/progressBar"
+        android:layout_below="@+id/scriptsProgressBar"
         android:orientation="vertical"
         android:visibility="gone">
 
@@ -47,9 +55,9 @@
 
     <ScrollView
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/mic"
-        android:layout_centerHorizontal="true"
-        android:layout_height="wrap_content">
+        android:layout_centerHorizontal="true">
 
         <LinearLayout
             android:layout_width="match_parent"

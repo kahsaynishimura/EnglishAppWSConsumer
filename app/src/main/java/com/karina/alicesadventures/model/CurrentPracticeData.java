@@ -58,4 +58,5 @@ public class CurrentPracticeData {
     public boolean hasMoreScripts() {
         return getCurrentExercise().getScriptEntries().size() > getCurrentScriptIndex();
     }
+
 }

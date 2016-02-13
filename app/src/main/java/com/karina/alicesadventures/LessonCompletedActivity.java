@@ -11,6 +11,7 @@ import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
@@ -19,6 +20,8 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.karina.alicesadventures.model.GeneralResponse;
+import com.karina.alicesadventures.parsers.GeneralResponseXmlParser;
 import com.karina.alicesadventures.parsers.MessageXmlParser;
 import com.karina.alicesadventures.util.AnalyticsApplication;
 import com.karina.alicesadventures.util.EchoPractice;
@@ -65,6 +68,7 @@ public class LessonCompletedActivity extends ActionBarActivity {
             e.printStackTrace();
         }
 
+
         //Admob
         AdView mAdView = (AdView) findViewById(R.id.ad_view);
         AdRequest.Builder b = new AdRequest.Builder();
@@ -78,7 +82,6 @@ public class LessonCompletedActivity extends ActionBarActivity {
         mAdView.loadAd(adRequest);
 
     }
-
 
 
     @Override
@@ -95,9 +98,10 @@ public class LessonCompletedActivity extends ActionBarActivity {
         startActivity(i);
     }
 
-    private class SaveLastLessonTask extends AsyncTask<Void, Void, String> {
+    private class SaveLastLessonTask extends AsyncTask<Void, Void, GeneralResponse> {
 
         private final String url;
+        private Integer data;
         HashMap hashMap;
 
         public SaveLastLessonTask(String url, HashMap<String, String> hashMap) {
@@ -106,14 +110,14 @@ public class LessonCompletedActivity extends ActionBarActivity {
         }
 
         @Override
-        protected String doInBackground(Void... params) {
-            String message = null;
+        protected GeneralResponse doInBackground(Void... params) {
+            GeneralResponse message = null;
             HTTPConnection httpConnection = new HTTPConnection();
-            MessageXmlParser messageXmlParser = new MessageXmlParser();
+            GeneralResponseXmlParser generalResponseXmlParser = new GeneralResponseXmlParser();
             String result = "";
             try {
                 result = httpConnection.sendPost(url, hashMap);
-                message = messageXmlParser.parse(new StringReader(result));
+                message = generalResponseXmlParser.parse(new StringReader(result));
             } catch (Exception e) {
                 e.printStackTrace();
                 mSaveLastLessonTask = null;
@@ -125,13 +129,16 @@ public class LessonCompletedActivity extends ActionBarActivity {
 
 
         @Override
-        protected void onPostExecute(String message) {
-            super.onPostExecute(message);
+        protected void onPostExecute(GeneralResponse response) {
+            super.onPostExecute(response);
             mSaveLastLessonTask = null;
-            if (message == null) {
+            if (response.getMessage() == null) {
                 Toast.makeText(LessonCompletedActivity.this, getText(R.string.verify_internet_connection), Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(LessonCompletedActivity.this, message, Toast.LENGTH_LONG).show();
+                //data == the user's current total points
+                String text = String.format(getString(R.string.user_total_points), response.getData());
+                ((TextView) findViewById(R.id.txt_user_total_points)).setText(text);
+                Toast.makeText(LessonCompletedActivity.this, response.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
 
