@@ -8,28 +8,49 @@
     android:orientation="vertical"
     tools:context=".BookActivity">
 
-    <ProgressBar
-        android:id="@+id/exercisesProgressBar"
-        style="@android:style/Widget.ProgressBar.Horizontal"
+    <LinearLayout
+        android:id="@+id/exercisesProgressBarContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
+        android:orientation="horizontal">
 
-    <ProgressBar
-        android:id="@+id/scriptsProgressBar"
-        style="@android:style/Widget.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/exercisesProgressBar"
-        android:layout_gravity="center_horizontal" />
+        <ProgressBar
+            android:id="@+id/exercisesProgressBar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="9" />
+
+        <TextView
+            android:id="@+id/txt_exercises_progress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:text="@string/progress_mask" />
+    </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/videoFrame"
+        android:id="@+id/scriptsProgressBarContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/scriptsProgressBar"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:layout_below="@+id/exercisesProgressBarContainer"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/scriptsProgressBar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="9" />
+
+        <TextView
+            android:id="@+id/txt_scripts_progress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:text="@string/progress_mask" />
 
     </LinearLayout>
 
@@ -37,7 +58,7 @@
         android:id="@+id/contentFrame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/videoFrame"
+        android:layout_below="@+id/scriptsProgressBarContainer"
         android:layout_margin="@dimen/activity_vertical_margin"
         android:orientation="vertical">
 

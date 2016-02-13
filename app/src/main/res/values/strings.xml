@@ -69,5 +69,6 @@
     <string name="create_account_instructions">We sent you an activation email. Please, open your email and click on Activate Account. Welcome to Echo Practice!</string>
     <string name="user_total_points">Awesome! Now, you have %1$s points</string>
     <string name="send_to_wallet">Send to bitcoin wallet</string>
+    <string name="progress_mask">%1$s / %2$s</string>
 
 </resources>

@@ -60,6 +60,8 @@ import com.karina.alicesadventures.util.EchoPractice;
 import com.karina.alicesadventures.util.HTTPConnection;
 import com.karina.alicesadventures.util.SessionManager;
 
+import org.w3c.dom.Text;
+
 import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -354,6 +356,10 @@ public class PracticeActivity extends Activity {
 
                     if (hit) {
                         mProgressScripts.setProgress(mProgressScriptsStatus++);
+                        ((TextView)findViewById(R.id.txt_scripts_progress)).setText(String.format(
+                                getString(R.string.progress_mask),
+                                current.getCurrentScriptIndex()+1,
+                                current.getCurrentExercise().getScriptEntries().size()));
 
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(PracticeActivity.this);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -477,7 +483,10 @@ public class PracticeActivity extends Activity {
                         //Progress Bar
                         mProgressScripts.setMax(scripts.size());
                         mProgressScripts.setProgress(0);
-
+                        ((TextView)findViewById(R.id.txt_scripts_progress)).setText(String.format(
+                                getString(R.string.progress_mask),
+                                0,
+                                current.getCurrentExercise().getScriptEntries().size()));
                         selectNextExercise();
                         TTS = new TextToSpeech(PracticeActivity.this, new TextToSpeech.OnInitListener() {
                             @Override
@@ -547,6 +556,10 @@ public class PracticeActivity extends Activity {
         Exercise exercise = exercises.get(count);
         current.setCurrentExercise(exercise);
         mProgressExercises.setProgress(count);
+        ((TextView)findViewById(R.id.txt_exercises_progress)).setText(String.format(
+                getString(R.string.progress_mask),
+                count+1,
+                exercises.size()));
     }
 
 
@@ -670,33 +683,33 @@ public class PracticeActivity extends Activity {
                             break;
                         case 4:
                             //shows video and asks for audio input then checks audio
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    final VideoView v = new VideoView(PracticeActivity.this);
-                                    final LinearLayout r = (LinearLayout) findViewById(R.id.videoFrame);
-                                    r.setVisibility(View.VISIBLE);
-                                    r.addView(v);
-                                    int videoResource = getResources().getIdentifier("raw/" + s.getTextToRead(), null, getPackageName());
-
-                                    String path = "android.resource://" + getPackageName() + "/" + videoResource;
-                                    v.setVideoURI(Uri.parse(path));
-                                    v.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                                        @Override
-                                        public void onCompletion(MediaPlayer mp) {
-                                            r.removeView(v);
-                                            promptSpeechInput();
-                                        }
-                                    });
-                                    v.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                        @Override
-                                        public void onPrepared(MediaPlayer mp) {
-
-                                            v.start();
-                                        }
-                                    });
-                                }
-                            });
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    final VideoView v = new VideoView(PracticeActivity.this);
+//                                    final LinearLayout r = (LinearLayout) findViewById(R.id.videoFrame);
+//                                    r.setVisibility(View.VISIBLE);
+//                                    r.addView(v);
+//                                    int videoResource = getResources().getIdentifier("raw/" + s.getTextToRead(), null, getPackageName());
+//
+//                                    String path = "android.resource://" + getPackageName() + "/" + videoResource;
+//                                    v.setVideoURI(Uri.parse(path));
+//                                    v.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//                                        @Override
+//                                        public void onCompletion(MediaPlayer mp) {
+//                                            r.removeView(v);
+//                                            promptSpeechInput();
+//                                        }
+//                                    });
+//                                    v.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//                                        @Override
+//                                        public void onPrepared(MediaPlayer mp) {
+//
+//                                            v.start();
+//                                        }
+//                                    });
+//                                }
+//                            });
 
                             break;
                         case 5://only shows a video containing instructions. do not ask for audio back
